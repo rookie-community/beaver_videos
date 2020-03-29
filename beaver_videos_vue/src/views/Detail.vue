@@ -15,7 +15,7 @@
                 frameborder="0"
               ></iframe>
               <div class="tip">《{{DataInfo[0].vod_name}}》- 影视简介</div>
-              <p v-html="DataInfo[0].vod_content"></p>
+              <p class="font_vod"><span v-html="DataInfo[0].vod_content"></span></p>
             </el-col>
             <el-col :md='6' >
               <div class="tip">《{{DataInfo[0].vod_name}}》- 影视详情</div>
@@ -47,7 +47,7 @@
             <el-col :md="24">
               <div class="tip">
                 《{{DataInfo[0].vod_name}}》- 迅雷下载：
-                <small>点击复制链接，然后使用迅雷打开即可下载该视频文件</small>
+                <small>复制链接，然后使用迅雷打开即可下载该视频文件</small>
               </div>
               <el-table
                 ref="multipleTable"
@@ -261,6 +261,12 @@ export default {
 .el-tabs {
   max-height: 600px;
   overflow: auto;
+}
+.font_vod{
+  padding: 0px 20px;
+  font-family: "Helvetica Neue";
+  font-size: 0.88rem;
+  line-height: 1.4rem;
 }
 .el-tabs__content {
   padding: 5px !important;

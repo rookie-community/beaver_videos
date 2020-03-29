@@ -75,7 +75,7 @@
                   </p>
                 </el-col>
               </el-row>
-               <hr style="color:rgba(191, 191, 191, 0.18)" />
+               <el-divider></el-divider>
             </div>
             <el-row type="flex" justify="center">
               <el-col :md="18">
@@ -293,6 +293,7 @@ export default {
   img {
     width: 100%;
     height: 220px;
+    border-radius: 5px;
   }
   img:after {
     content: "图片加载失败";
@@ -312,8 +313,8 @@ export default {
     margin-bottom: 0px;
   }
 }
-#datalist:hover,
-#datalist img {
+// #datalist:hover,
+#datalist img:hover {
   box-shadow: 0 4px 8px rgba(40, 40, 40, 0.2);
 }
 .el-pagination {
