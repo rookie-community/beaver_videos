@@ -17,7 +17,7 @@ module.exports = {
     //         }
     //     } 
     // },
-    pwa: {
+    pwa: {//配置程序ico图标
         iconPaths: {
           favicon32: 'favicon.ico',
           favicon16: 'favicon.ico',

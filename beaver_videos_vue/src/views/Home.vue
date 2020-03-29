@@ -28,37 +28,43 @@
       </el-row>
     </div>
     <el-row type="flex" justify="center">
-      <el-col :xs="20" :md="16">
+      <el-col :xs="23" :md="16">
         <el-card class="box-card" v-show="Active!=0">
           <!-- 影视搜索 -->
           <div v-if="Active==1" ref="SearchInfo">
             <div v-for="item in DataList" :key="item.vod_id" ref="Info">
-              <el-row type="flex" justify="center" id="datalist" :gutter="20">
-                <el-col :xs="12" :sm="6" :md="4">
+              <el-row id="datalist" :gutter="20">
+                <el-col :xs="12" :sm="12" :md=" {span: 4, offset: 3}">
                   <router-link
                     type="primary"
                     target="_blank"
                     :to="{path:'/detail',query:{id:item.vod_id}}"
                   >
-                    <img :src="item.vod_pic" onerror="../assets/error.jpg" alt="图片加载失败" />
+                    <img :src="item.vod_pic" onerror="../assets/error.jpg" :alt="item.vod_name" />
                   </router-link>
                 </el-col>
-                <el-col :md="15">
-                  <h3>
+                <el-col :xs="12" :sm="12" :md="14">
+                  <router-link
+                  class="hidden-md-and-up"
+                    type="primary"
+                    target="_blank"
+                    :to="{path:'/detail',query:{id:item.vod_id}}"
+                  >{{item.vod_name}}</router-link>
+                  <h3 class="hidden-sm-and-down">
                     <router-link
                       type="primary"
                       target="_blank"
                       :to="{path:'/detail',query:{id:item.vod_id}}"
                     >{{item.vod_name}}</router-link>
                   </h3>
-                  <p>导演：{{FormatTxt(item.vod_director)}}</p>
+                  <p style="margin-top:5px;">导演：{{FormatTxt(item.vod_director)}}</p>
                   <p>主演：{{FormatTxt(item.vod_actor)}}</p>
-                  <!-- <p>类型：{{item.vod_class}}</p>
-                  <p>地区：{{item.vod_area}}</p>
-                  <p>其他：{{item.vod_remarks}}</p>
+                  <p>类型：{{item.vod_class}}</p>
+                  <p class="hidden-md-and-up">地区：{{item.vod_area}}</p>
                   <p>语言：{{item.vod_lang}}</p>
-                  <p>更新时间：{{item.vod_time}}</p>-->
-                  <p>
+                  <p class="hidden-md-and-up">其他：{{item.vod_remarks}}</p>
+                  <!-- <p>更新时间：{{item.vod_time}}</p> -->
+                  <p class="hidden-sm-and-down">
                     简介：
                     <span v-html="item.vod_blurb"></span>
                     <router-link
@@ -69,6 +75,7 @@
                   </p>
                 </el-col>
               </el-row>
+               <hr style="color:rgba(191, 191, 191, 0.18)" />
             </div>
             <el-row type="flex" justify="center">
               <el-col :md="18">
@@ -288,9 +295,9 @@ export default {
     height: 220px;
   }
   img:after {
-    content: "";
+    content: "图片加载失败";
     display: inline-block;
-    position: absolute;
+    position: relative;
     z-index: 2;
     top: 0;
     left: 0;
@@ -298,7 +305,7 @@ export default {
     height: 220px;
     background-image: url("../assets/error.jpg");
     background-size: cover;
-    background-color: #fff;
+    background-color: rgba(191, 191, 191, 0.18);
   }
   .el-button {
     bottom: 0px;
