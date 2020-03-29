@@ -1,0 +1,155 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "首页",
+				"navigationBarTextStyle": "white",
+				"navigationBarBackgroundColor": "#007AFF",
+				"enablePullDownRefresh": true,
+				"app-plus": {
+					"titleNView": {
+						"searchInput": {
+							"align": "center",
+							"placeholder": "请输入您要查询的影视名称",
+							"borderRadius": "50upx",
+							"backgroundColor": "#fff"
+						}
+					}
+				}
+			}
+		}, {
+			"path": "pages/Live/Live",
+			"style": {
+				"navigationBarTitleText": "电视直播",
+				"navigationBarTextStyle": "white",
+				"navigationBarBackgroundColor": "#007AFF"
+			}
+		}, {
+			"path": "pages/about/about",
+			"style": {
+				"navigationBarTitleText": "关于小狸视频",
+				"navigationBarTextStyle": "white",
+				"navigationBarBackgroundColor": "#007AFF"
+			}
+		}, {
+			"path": "pages/index/Search",
+			"style": {
+				"navigationBarTitleText": "视频搜索",
+				"navigationBarTextStyle": "white",
+				"navigationBarBackgroundColor": "#007AFF"
+			}
+		},
+		{
+			"path": "pages/index/info",
+			"style": {
+				"navigationBarTitleText": "影视详情",
+				"navigationBarTextStyle": "white",
+				"navigationBarBackgroundColor": "#007AFF"
+			}
+		}, {
+			"path": "pages/analysis/Play",
+			"style": {
+				"navigationBarTitleText": "视频播放",
+				"navigationBarTextStyle": "white",
+				"navigationBarBackgroundColor": "#007AFF",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"type": "menu"
+						}]
+					}
+				}
+			}
+		}, {
+			"path": "pages/analysis/analysis",
+			"style": {
+				"navigationBarTitleText": "影视网站解析",
+				"navigationBarTextStyle": "white",
+				"navigationBarBackgroundColor": "#007AFF"
+			}
+		},
+		{
+			"path": "pages/about/service",
+			"style": {
+				"navigationBarTitleText": "在线聊天"
+			}
+		},
+		{
+			"path": "pages/Live/LivePlay",
+			"style": {
+				"navigationBarTitleText": "电视直播",
+				"navigationBarTextStyle": "white",
+				"navigationBarBackgroundColor": "#007AFF"
+			}
+		},
+		{
+			"path": "pages/about/feedback",
+			"style": {
+				"navigationBarTitleText": "问题反馈"
+			}
+		}, {
+			"path": "pages/analysis/other",
+			"style": {
+				"navigationBarTitleText": "正在加载中..."
+			}
+		}, {
+			"path": "pages/analysis/centent",
+			"style": {
+				"navigationBarTitleText": "正在加载中...",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"fontSize": "28upx",
+							"float": "right",
+							"text": "解析"
+						}]
+					}
+				}
+			}
+		}
+	],
+	"tabBar": {
+		"color": "#7A7E83",
+		"selectedColor": "#1296db",
+		"borderStyle": "black",
+		"backgroundColor": "#ffffff",
+		"list": [{
+				"pagePath": "pages/index/index",
+				"iconPath": "static/TabBar_Img/shouye_1.png",
+				"selectedIconPath": "static/TabBar_Img/shouye_2.png",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/analysis/analysis",
+				"iconPath": "static/TabBar_Img/jiexi_1.png",
+				"selectedIconPath": "static/TabBar_Img/jiexi_2.png",
+				"text": "解析"
+			}, {
+				"pagePath": "pages/Live/Live",
+				"iconPath": "static/TabBar_Img/zhibo_1.png",
+				"selectedIconPath": "static/TabBar_Img/zhibo_2.png",
+				"text": "直播"
+			},
+			{
+				"pagePath": "pages/about/about",
+				"iconPath": "static/TabBar_Img/about_1.png",
+				"selectedIconPath": "static/TabBar_Img/about_2.png",
+				"text": "关于"
+			}
+		]
+	},
+	"condition": { //模式配置，仅开发期间生效
+		"current": 0, //当前激活的模式（list 的索引项）
+		"list": [{
+			"name": "test", //模式名称
+			"path": "pages/index/index" //启动页面，必选
+		}]
+	},
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	}
+}

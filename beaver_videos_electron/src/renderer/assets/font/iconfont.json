@@ -1,0 +1,23 @@
+{
+  "id": "",
+  "name": "",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "991641",
+      "name": "最大化2",
+      "font_class": "zuidahua2",
+      "unicode": "e623",
+      "unicode_decimal": 58915
+    },
+    {
+      "icon_id": "3368838",
+      "name": "最大化",
+      "font_class": "zuidahua",
+      "unicode": "e66b",
+      "unicode_decimal": 58987
+    }
+  ]
+}

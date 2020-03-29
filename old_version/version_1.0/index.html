@@ -1,0 +1,234 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="baidu-site-verification" content="dkArV6opuI" />
+    <title>小狸视频(=￣ω￣=)免费的哟</title>
+    <link rel="shortcut icon" href="/xiaoli.ico" />
+    <link rel="bookmark" href="/xiaoli.ico" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <link href="https://cdn.bootcss.com/Buttons/2.0.0/css/buttons.min.css" rel="stylesheet">
+    <link href="http://cdn.bootcss.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+    <script src="https://cdn.bootcss.com/messenger/1.5.0/js/messenger.min.js"></script>
+    <script type="text/javascript" src="js/buttons.js"></script>
+    <script src="js/index.js"></script>
+    <script src="js/ShowText.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            background-image: url(img/bg1.jpeg);
+        }
+
+        #top {
+            margin: 30px 0px;
+        }
+
+        h2 {
+            color: #007BFF;
+        }
+
+        footer {
+            padding-bottom: 20px;
+        }
+
+        .img-circle {
+            height: 55px;
+            border-radius: 40px;
+        }
+
+        #test {
+            filter: alpha(opacity=80);
+            /* IE */
+            -moz-opacity: 1.0;
+            /* Moz + FF */
+            opacity: 0.8;
+        }
+
+        #Other .row {
+            margin-left: 60px;
+        }
+
+        #Other {
+            margin-top: 20px;
+        }
+
+            #Other a {
+                display: block;
+                background-color: #ffffff;
+                border-radius: 7px;
+                padding: 5px 10px;
+                border: 1px solid #b7b7b7;
+                margin-left: 10px;
+                margin-top: 5px;
+            }
+
+                #Other a:hover {
+                    border: 1px solid #ff6a00;
+                }
+
+        .dropdown-menu a:hover {
+            background-color: #80BDFF;
+        }
+
+        .foot-a {
+            color: #808080;
+        }
+    </style>
+    <script>
+        $(function () {
+            const ipc = require('electron').ipcRenderer;
+            const trayBtn = document.getElementById('put-in-tray');
+            let trayOn = false;
+
+            trayBtn.addEventListener('click', function (event) {
+                if (trayOn) {
+                    alert("关闭");
+                    trayOn = false;
+                    document.getElementById('tray-countdown').innerHTML = '';
+                    ipc.send('remove-tray');
+                } else {
+                    alert("打开");
+                    trayOn = true;
+                    const message = 'Click demo again to remove.';
+                    document.getElementById('tray-countdown').innerHTML = message;
+                    ipc.send('put-in-tray');
+                }
+            })
+            // Tray removed from context menu on icon
+            ipc.on('tray-removed', function () {
+                ipc.send('remove-tray')
+                trayOn = false
+                document.getElementById('tray-countdown').innerHTML = ''
+            })
+        })
+    </script>
+    <script>
+        (function () {
+            var bp = document.createElement('script');
+            var curProtocol = window.location.protocol.split(':')[0];
+            if (curProtocol === 'https') {
+                bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+            }
+            else {
+                bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+            }
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(bp, s);
+        })();
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h2 class="text-center" style="margin: 20px 0px;">
+            <a href="http://www.xiaoli.sylx.ltd">
+                <img class="img-circle"
+                     src="img/title_BG.jpeg">
+            </a>小狸视频
+        </h2>
+        <h6 class="text-center"><mark>若无法播放请切换播放线路</mark></h6>
+        <div class="row" id="top">
+            <!-- 线路 -->
+            <div class="col-lg-2" style="text-align:center;">
+                <div class="dropdown">
+                    <button id="ty" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                        默认线路
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" onclick="switchUrl(0)">默认线路</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" onclick="switchUrl(1)">线路一</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" onclick="switchUrl(2)">线路二</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#" onclick="switchUrl(3)">线路三</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#" onclick="switchUrl(4)">线路四</a>
+                    </div>
+                </div>
+            </div>
+            <!--lab-->
+            <div class="col">
+                <label for="Url" class="col-form-label">
+                    <b>请输入视频网址：</b>
+                </label>
+            </div>
+            <!-- Url -->
+            <div class="col-lg-6">
+                <input id="Url" type="text" class="form-control" placeholder="请输入https://或http://开头的视频Url地址" />
+            </div>
+            <!-- 按钮 -->
+            <div class="col-lg-2">
+                <button id="PlayVideo" class="button button-3d button-primary button-pill col"
+                        onclick="Play()">
+                    播放&nbsp;&nbsp;&nbsp;<i class="fa fa-thumbs-up"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="row">
+            <iframe id="test" class="container-fluid" style="height:600px" allowfullscreen="true"
+                    src="https://up.enterdesk.com/edpic_source/5e/46/c5/5e46c529f1d0bd7084fa01fcfd3e659b.jpg" name="main"
+                    scrolling="no" frameborder="0"></iframe>
+        </div>
+        <div class="container" id="Other">
+            <h5>
+                <i class="fa fa-twitter"></i><strong>以下网站视频支持播放</strong>&nbsp;&nbsp;&nbsp;&nbsp;<small>
+                    点击后可进入对应页面
+                </small>
+            </h5>
+            <div class="row">
+                <a href="https://film.qq.com/" class="img-responsive center-block" target="_Blank">
+                    <img src="img/qqlogo.png" />
+                </a>
+                <a href="https://home.vip.youku.com/" target="_Blank"><img src="img/youkulogo.png" /></a>
+                <a href="http://vip.iqiyi.com/" target="_Blank"><img src="img/iqiyilogo.png" /></a>
+                <a href="https://tv.sohu.com/movie/" target="_Blank"><img src="img/sohulogo.png" /></a>
+                <a href="https://www.bilibili.com/" target="_Blank"><img src="img/bilibili.png" /></a>
+            </div>
+            <div class="row">
+                <a href="https://tudou.com/" target="_Blank"><img src="img/tudoulogo.png" /></a>
+                <a href="https://www.mgtv.com/vip/" target="_Blank"><img src="img/hunantvlogo.png" /></a>
+                <a href="http://movie.pptv.com/" target="_Blank"><img src="img/pptv.png" /></a>
+                <a href="http://www.fun.tv/movie" target="_Blank"><img src="img/fengxing.png" /></a>
+                <a href="http://www.acfun.cn/" target="_Blank"><img src="img/acfun.png" /></a>
+            </div>
+
+        </div>
+        <footer class="text-center" style="margin-top:20px;">
+            <p>
+                免责声明：本网站仅用作学习交流使用，不存储任何视频资料，仅提供视频检索服务，一切数据来源于网络，若有侵权信息，请联系<a href="http://wpa.qq.com/msgrd?v=3&uin=2270969436&menu=yes"
+                                                                             target="_Blank"><strong>管理员</strong></a>删除
+            </p>
+            <p>
+                友情链接：<strong>
+                    <a href="http://www.index.sylx.ltd"
+                       target="_Blank">兰轩商城</a>
+                </strong>&nbsp;&nbsp;&nbsp;&nbsp;<strong>
+                    <a href="http://email.sylx.ltd" target="_Blank">邮箱API</a>
+                </strong>&nbsp;&nbsp;&nbsp;&nbsp;
+            </p>
+            <p>
+                <small style="color:#808080">
+                    Copyright © 2019 <strong><a class="foot-a" href="www.xiaoli.sylx.ltd">小狸视频</a></strong> <b>
+                        <a class="foot-a" href="www.xiaoli.sylx.ltd">www.xiaoli.sylx.ltd</a>
+                    </b>
+                    All Rights
+                    Reserved. 备案号：湘ICP备19006201号-1
+                </small>
+                <!--诗雨兰轩统计-->
+               <!-- <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1277957213'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1277957213%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));</script>-->
+          
+                <!--免费空间统计-->
+                <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1277957278'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/z_stat.php%3Fid%3D1277957278%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));</script>
+              </p>
+        </footer>
+    </div>
+</body>
+
+</html>

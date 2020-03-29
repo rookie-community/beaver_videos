@@ -1,0 +1,42 @@
+﻿body {
+    height:98vh;
+    background-size: cover;
+    background-attachment: fixed;
+    background-position-x: center;
+}
+.Search_div {
+}
+/*搜索按钮样式*/
+.Search_Btn {
+    color: #fff;
+    background-color: #0094ff;
+    border-color: #0062cc;
+}
+
+/*输入框透明度*/
+.opacity {
+    opacity: 0.7;
+}
+
+/*Logo图片*/
+.img-circle {
+    height: 55px;
+    border-radius: 50px;
+}
+
+.title_logo {
+    color: #ffffff;
+}
+
+#close {
+    display:block;
+padding-bottom:100px;
+}
+
+#footer a {
+    color: rgb(134, 138, 141);
+}
+
+    #footer a :hover {
+        color: #fff;
+    }

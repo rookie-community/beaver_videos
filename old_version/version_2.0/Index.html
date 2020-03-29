@@ -1,0 +1,177 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>小狸视频(=￣ω￣=)免费的哟</title>
+    <link rel="shortcut icon" href="../Images/xiaoli.ico" />
+    <link href="CSS/bootstrap.min.css" rel="stylesheet" />
+    <link href="CSS/toastr.min.css" rel="stylesheet" /> <!--通知插件样式-->
+    <link href="CSS/Index.css" rel="stylesheet" />
+    <link href="https://cdn.bootcss.com/dplayer/1.25.0/DPlayer.min.css" rel="stylesheet">
+    <script src="JS/"></script>
+    <script src="JS/"></script>
+    <script src="JS/"></script>
+    <script src="JS/"></script>     <!--通知插件-->
+    <script src="JS/"></script>
+    <script src="https://cdn.bootcss.com/dplayer/1.25.0/DPlayer.min.js"></script>
+    <!--<script src="JavaScript/Shut_down_debug.js"></script> 调试状态-->
+    <style>
+    body{
+        background: url(https://bing.ioliu.cn/v1/blur?d=0&w=1920&h=1080r=10) no-repeat;
+    }
+    </style>
+</head>
+<body>
+    <div id="app" class="container">
+        <!--顶部导航栏-->
+        <nav class="navbar navbar-expand-sm navbar-dark fixed-top">
+            <div class="container">
+            </div>
+        </nav>
+
+        <!--主体部分-->
+        <div>
+            <!--标题-->
+            <h2 class="text-center mt-5">
+                <a href="http://www.xiaoli.sylx.ltd">
+                    <label class="title_logo"><img src="../Images/title_BG.jpeg" class="img-circle" />&nbsp;小狸视频</label>
+                </a>
+            </h2>
+            <h6 class="text-center"><mark><small>若无法播放请刷新页面重试</small></mark></h6>
+
+            <!--搜索-->
+            <div class="input-group mb-4 mt-5">
+                <input type="text" class="form-control col-md-6 offset-md-2 opacity text-center" placeholder="请输入影视名称或者影视地址链接" v-model="SearchName" v-on:keyup.enter="Submit()" />
+                <div class="input-group-append">
+                    <button class="input-group-text btn btn-primary Search_Btn" v-on:click="Submit()">搜索&nbsp;|&nbsp;解析</button>
+                </div>
+            </div>
+        </div>
+
+        <!--播放界面-->
+        <div v-show="Video_PlayShow">
+            <iframe id="Play_View" class="col-md-10 offset-md-1" allowfullscreen="true" v-bind:src="Play_Url" name="main" scrolling="no" frameborder="0"></iframe>
+        </div>
+
+        <!--影视数据-->
+        <div class="card alert alert-info opacity text-center">
+            <div class="card-body">
+                <h4 class="card-title">网站公告：</h4>
+                <p class="card-text">影视搜索功能正在维护中，请直接复制视频链接播放...</p>
+                <p>更新时间：2019-10-8 8:20</p>
+                <a href="https://m3w.cn/xiaolishipin" class="card-link" target="_blank">小狸视频APP下载</a>
+                <!--<a href="#" class="card-link">Another link</a>-->
+            </div>
+        </div>
+
+        <span id="close"></span>
+
+        <!--底部导航栏-->
+        <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-bottom" id="footer">
+            <div class="container text-center">
+                <small>
+                    <span class="navbar-text">
+                        免责声明：本网站所有数据均来源于网络，若有侵权信息，请联系<a href="http://wpa.qq.com/msgrd?v=3&uin=2270969436&menu=yes" target="_Blank"><strong>管理员</strong></a>删除
+                    </span>
+                    <span class="navbar-text">&nbsp;&nbsp;&nbsp;</span>
+                    <span class="navbar-text">
+                        备案号：湘ICP备19006201号-1
+                    </span>
+                    <span class="navbar-text">&nbsp;&nbsp;&nbsp;</span>
+                    <span class="navbar-text">
+                        © 2019 <a href="http://xiaoli.sylx.ltd"><strong>xiaoli.sylx.ltd</strong></a>
+                    </span>
+                </small>
+            </div>
+        </nav>
+    </div>
+    <!--网站统计代码-->
+    <span style="display:none;">
+        <!--诗雨兰轩-->
+        <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://"); document.write(unescape("%3Cspan id='cnzz_stat_icon_1277957213'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1277957213%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));</script>
+
+        <!--免费空间统计-->
+        <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://"); document.write(unescape("%3Cspan id='cnzz_stat_icon_1277957278'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/z_stat.php%3Fid%3D1277957278%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));</script>
+    </span>
+</body>
+</html>
+<script type="text/javascript">
+    new Vue({
+        el: "#app",
+        data: {
+            Background_image: '',//背景图片
+            SearchName: '',      //搜索内容
+            VideoInfo: [],       //影视数据
+            Play_Url: '',        //视频播放地址
+
+            Hot: 'https://z1.m1907.cn/api/v/',//热门影视
+            Hint: 'https://z1.m1907.cn/api/search_prompt?k=',//搜索提示
+
+            SearchApi: 'https://z1.m1907.cn/api/v/?z=1c8af15f8706ec379353f8b04d2b4c3a&jx=【名称】&t2f=11399&sig=11399',//搜索
+
+            Video_PlayShow: false,//播放器显示与隐藏
+            Search_Info: false,   //视频数据显示与隐藏
+        },
+
+        //在模板渲染成html后调用
+        mounted: function () {
+            //this.Get_Background_image();
+        },
+
+        methods: {
+
+            //播放|解析判断事件
+            Submit() {
+
+                //链接地址正则表达式
+                var Verification = new RegExp('^((https|http|ftp|rtsp|mms)?:\/\/)[^\s]+');
+                // 通知插件类型：【success，info，warning，error】
+                this.SearchName = this.SearchName.trim();
+                if (this.SearchName == "") {
+                    toastr.warning('视频播放路径不能为空！');
+                }
+                //验证是否为链接地址
+                else if (Verification.test(this.SearchName)) {
+                    //播放
+                    this.Play();
+                }
+                else {
+                    //搜索
+                    toastr.warning('影视搜索功能正在维护中，请稍后再试！');
+                    //this.Search();
+                    //toastr.info('正在加载影视数据...');
+                };
+            },
+
+            //播放
+            Play: function () {
+                toastr.info('正在解析视频播放，请稍后...');
+                //显示播放窗体
+                //this.Video_PlayShow = true;
+                //解析视频播放链接
+                this.Play_Url = this.Video_Api[2] + this.SearchName;
+                window.open(this.Play_Url);
+            },
+
+            //搜索视频
+            Search() {
+                var that = this;
+                this.$http.post('https://www.easy-mock.com/mock/5ccfd01f6ef62e39f192b80e/sylx/SearchVideo/:' + that.SearchName, { emulateJSON: true })
+                    .then(res => {
+                        if (res.code) {
+
+                        }
+                        //var data = res.data.replace(/\s+/g,"");//去除空格
+                        //var i = data.indexOf("\{");//获取分隔符下标
+                        //this.VideoInfo = JSON.parse(data.substr(i)).data.docinfos;//截取字符串
+                        console.log(res);
+                    })
+                    .catch(Error => {
+                        toastr.info('影视搜索功能正在维护中，请稍后再试！');
+                        console.error(Error);
+                    })
+            },
+        }
+    })
+</script>
+<!--
