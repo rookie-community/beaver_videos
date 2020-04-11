@@ -202,7 +202,7 @@ export default {
           if (res.data.list.length == 0) {
             this.$message({
               showClose: true,
-              message: `"${name}"的查询数据为空，请检测后重试！"`,
+              message: `"${name}"的查询数据为空，请更换关键字后重试！"`,
               type: "warning"
             });
             this.Active = 0; //数据为空
@@ -351,7 +351,8 @@ export default {
   width: 100%;
   height: 100vh;
   background: black;
-  opacity: 0.55;
+  transition:0.5s;
+  opacity: 0.6;
   z-index: 101;
 }
 </style>

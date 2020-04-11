@@ -15,7 +15,8 @@
       }"
       >UP</div>
     </el-backtop>
-    <footer>免责声明：所有数据均来源于于互联网,如有侵犯版权请联系<a href="mailto:2270969436@qq.com">管理员</a>删除。</footer>
+    <div class="bgimg"></div>
+    <footer>免责声明：数据均来源自于互联网,如有侵权请联系<a href="mailto:2270969436@qq.com">管理员</a>删除。</footer>
   </div>
 </template>
 
@@ -39,14 +40,21 @@ export default {
   color: #2c3e50;
 }
 body {
-  background: url(https://bing.ioliu.cn/v1/blur?d=0&h=1080r%3D10&w=1920)
-    no-repeat;
-  // background: url('./assets/bg.jpg') no-repeat;
-  background-attachment: scroll;
-  background-size: auto;
-  background-size: cover;
-  background-attachment: fixed;
   height: 100%;
+  // background: url('./assets/bg.jpg') no-repeat;
+  overflow: hidden;
+}
+.bgimg{
+    position:fixed;
+    top: 0;
+    left: 0;
+    width:100%;
+    height:100%;
+    min-width: 700px;
+    z-index:-10;
+    background: url(https://bing.ioliu.cn/v1?d=0&h=1080&w=1920) no-repeat;
+    background-size: cover;
+    background-position: center;
 }
 footer {
   width: 100%;
@@ -56,6 +64,7 @@ footer {
   position: fixed;
   left: 0;
   bottom: 0;
+  // font-size: 0.7em;
   color: #666;
   background-color: #333333;
   font-size: small;
