@@ -1,0 +1,15 @@
+body {
+    background: url(https://bing.ioliu.cn/v1/blur?d=0&h=1080r%3D10&w=1920)
+      no-repeat;
+    /* background: url('./assets/bg.jpg') no-repeat; */
+    background-attachment: scroll;
+    background-size: auto;
+    background-size: cover;
+    background-attachment: fixed;
+    height: 100%;
+  }
+  @media screen and (max-width: 768px) {
+    body {
+      background: url(https://bing.ioliu.cn/v1/blur?d=0&h=1280r%3D10&w=768);
+    }
+  }

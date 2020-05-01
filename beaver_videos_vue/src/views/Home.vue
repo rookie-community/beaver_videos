@@ -4,7 +4,7 @@
       <el-row type="flex" justify="center">
         <el-col :xs="4" :sm="1" :md="1">
           <a src="https://www.baidu.com">
-            <img class="logo" @click="ToApp" alt="logo" src="../assets/logo.png" />
+            <img class="logo" @click="ToApp" alt="logo" src="../assets/img/logo.png" />
           </a>
         </el-col>
         <el-col :xs="9" :sm="3" :md="3">
@@ -40,12 +40,12 @@
                     target="_blank"
                     :to="{path:'/detail',query:{id:item.vod_id}}"
                   >
-                    <img :src="item.vod_pic" onerror="../assets/error.jpg" :alt="item.vod_name" />
+                    <img :src="item.vod_pic" onerror="../assets/img/error.jpg" :alt="item.vod_name" />
                   </router-link>
                 </el-col>
                 <el-col :xs="12" :sm="12" :md="14">
                   <router-link
-                  class="hidden-md-and-up"
+                    class="hidden-md-and-up"
                     type="primary"
                     target="_blank"
                     :to="{path:'/detail',query:{id:item.vod_id}}"
@@ -75,7 +75,7 @@
                   </p>
                 </el-col>
               </el-row>
-               <el-divider></el-divider>
+              <el-divider></el-divider>
             </div>
             <el-row type="flex" justify="center">
               <el-col :md="18">
@@ -108,12 +108,13 @@
         </el-card>
       </el-col>
     </el-row>
+    <bea-footer />
     <div :class="{'focus_ovr':focus}"></div>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
+import beafooter from "../components/beaver_footer";
 export default {
   name: "Home",
   data() {
@@ -140,8 +141,12 @@ export default {
         },
         autoplay: false
       },
-      player: null
+      player: null,
+      auth: { name: "tzm2270969436", Token: "ZEhwdE1qSTNNRGsyT1RRek5nJTNEJTNE" }
     };
+  },
+  components: {
+    "bea-footer": beafooter
   },
   mounted() {
     this.SearchName = this.$route.query.search;
@@ -160,6 +165,12 @@ export default {
           message: "搜索内容不能为空！",
           type: "warning"
         });
+      } else if (name == this.auth.name) {
+        sessionStorage.setItem("Token", this.auth.Token);
+        let q = this.$route.query.search;
+        if (q != "" && q != null) {
+          this.$router.push("/welfare");
+        }
       } else {
         //播放Url
         let LowerName = name.toLowerCase(); //英文字母转小写
@@ -202,7 +213,7 @@ export default {
           if (res.data.list.length == 0) {
             this.$message({
               showClose: true,
-              message: `"${name}"的查询数据为空，请更换关键字后重试！"`,
+              message: `${name}的查询数据为空，请更换关键字后重试！`,
               type: "warning"
             });
             this.Active = 0; //数据为空
@@ -259,7 +270,8 @@ export default {
   }
 };
 </script>
-<style lang="less">
+
+<style lang="less" scoped>
 .logo {
   margin-right: 0px;
   width: 60px;
@@ -304,7 +316,7 @@ export default {
     left: 0;
     width: 144px;
     height: 220px;
-    background-image: url("../assets/error.jpg");
+    background-image: url("../assets/img/error.jpg");
     background-size: cover;
     background-color: rgba(191, 191, 191, 0.18);
   }
@@ -351,7 +363,7 @@ export default {
   width: 100%;
   height: 100vh;
   background: black;
-  transition:0.5s;
+  transition: 0.5s;
   opacity: 0.6;
   z-index: 101;
 }

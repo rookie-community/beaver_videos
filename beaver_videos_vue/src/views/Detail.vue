@@ -4,7 +4,7 @@
       <el-col :md="20">
         <el-card>
           <el-row :gutter="20">
-            <el-col :md="18" >
+            <el-col :md="18">
               <d-player :options="options" @play="play" ref="player" v-if="PlayStatus"></d-player>
               <iframe
                 v-else
@@ -15,9 +15,11 @@
                 frameborder="0"
               ></iframe>
               <div class="tip">《{{DataInfo[0].vod_name}}》- 影视简介</div>
-              <p class="font_vod"><span v-html="DataInfo[0].vod_content"></span></p>
+              <p class="font_vod">
+                <span v-html="DataInfo[0].vod_content"></span>
+              </p>
             </el-col>
-            <el-col :md='6' >
+            <el-col :md="6">
               <div class="tip">《{{DataInfo[0].vod_name}}》- 影视详情</div>
               <el-tabs type="border-card">
                 <el-tab-pane label="ckm3u8">
@@ -54,12 +56,18 @@
                 max-height="400"
                 :data="Down_url_list"
                 tooltip-effect="dark"
-                size='small'
+                size="small"
                 style="width: 100%"
                 stripe
               >
                 <el-table-column type="selection" min-width="15" align="center"></el-table-column>
-                <el-table-column label="序号" type="index" min-width="35" align="center" class="hidden-sm-and-down"></el-table-column>
+                <el-table-column
+                  label="序号"
+                  type="index"
+                  min-width="35"
+                  align="center"
+                  class="hidden-sm-and-down"
+                ></el-table-column>
                 <el-table-column prop="name" label="剧集" min-width="60" align="center"></el-table-column>
                 <el-table-column prop="url" label="下载地址" show-overflow-tooltip></el-table-column>
                 <el-table-column prop="url" label="操作" min-width="60" align="center">
@@ -84,9 +92,11 @@
         </el-card>
       </el-col>
     </el-row>
+    <bea-footer />
   </div>
 </template>
 <script>
+import beafooter from "../components/beaver_footer";
 export default {
   data() {
     return {
@@ -115,6 +125,9 @@ export default {
       },
       player: null
     };
+  },
+  components: {
+    "bea-footer": beafooter
   },
   mounted() {
     let id = this.$route.query.id; //获取路由参数
@@ -165,6 +178,7 @@ export default {
           ); //执行播放
           this.player.play();
           this.loading = false;
+          window.document.title = `${res.data.list[0].vod_name} - 小狸视频`;
         })
         .catch(error => {
           this.loading = false;
@@ -250,7 +264,8 @@ export default {
   }
 };
 </script>
-<style lang="less">
+
+<style lang="less" scoped>
 .el-card {
   margin: 20px 0px 50px 0px;
   .el-button {
@@ -262,7 +277,7 @@ export default {
   max-height: 600px;
   overflow: auto;
 }
-.font_vod{
+.font_vod {
   padding: 0px 20px;
   font-family: "Helvetica Neue";
   font-size: 0.88rem;

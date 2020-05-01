@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "precache-manifest.572f074944a5d533f853ddc87c7d7e25.js"
+  "precache-manifest.0b36140e77571894a245575871261162.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "beaver_videos"});
