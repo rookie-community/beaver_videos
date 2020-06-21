@@ -143,7 +143,7 @@ export default {
       this.loading = true;
       this.fullscreenLoading = true;
       this.$axios
-        .get("provide/vod/?ac=detail&ids=" + this.vod_id)
+        .get(`provide/vod/?ac=detail&ids=${this.vod_id}`)
         .then(res => {
           if (res.data.list.length == 0) {
             this.vod_error();

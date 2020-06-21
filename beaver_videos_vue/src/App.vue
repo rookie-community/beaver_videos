@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div v-wechat-title="$route.meta.title"></div>
-    <router-view></router-view>
+    <router-view :key="$route.fullPath"></router-view>
     <el-backtop>
       <div
         style="{

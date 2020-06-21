@@ -1,7 +1,6 @@
 <template>
   <footer>
-    免责声明：所有数据均来源于于互联网,如有侵犯版权请联系
-    <a href="mailto:2270969436@qq.com">管理员</a>删除。
+    免责声明:数据来源于互联网,如有侵犯版权请联系<a href="mailto:2270969436@qq.com">管理员</a>删除。
   </footer>
 </template>
 

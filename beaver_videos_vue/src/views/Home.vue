@@ -151,12 +151,16 @@ export default {
   mounted() {
     this.SearchName = this.$route.query.search;
     if (this.SearchName != "" && this.SearchName != null) {
-      this.Search();
+      this.analysis();
     }
   },
   methods: {
-    //搜索
-    Search() {
+    //搜索事件
+    Search(){
+      this.$router.push(`/?search=${this.SearchName}`);
+    },
+    //解析
+    analysis() {
       let name = this.SearchName;
       this.Vod_Name = name;
       if (name == "" || name == null) {
@@ -194,7 +198,7 @@ export default {
           });
           this.VideoUrl = name;
         } else {
-          //搜索
+          //根据名称查询数据
           this.GetData(1, name);
         }
       }
@@ -208,7 +212,7 @@ export default {
         background: "rgba(0, 0, 0, 0.7)"
       });
       this.$axios
-        .get("provide/vod/?ac=detail&wd=" + name + "&pg=" + page)
+        .get(`provide/vod/?ac=detail&wd=${name}&pg=${page}`)
         .then(res => {
           if (res.data.list.length == 0) {
             this.$message({
