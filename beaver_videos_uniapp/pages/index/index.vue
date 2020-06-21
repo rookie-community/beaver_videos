@@ -8,7 +8,6 @@
 
 			</swiper>
 		</view>
-
 		<view class="example-title">电影推荐</view>
 		<view class="example-body">
 			<view v-for="(item,index) in Movies" v-show="index<Top" :key="index" class="example-item" :data-id="index" @tap="ToInfo">
@@ -104,7 +103,7 @@
 			},
 			imageError(e){
 				this.defaultSrc='https://p.ssl.qhimg.com/t0171e8c76999826ddc.jpg';
-			}
+			},
 		}
 	}
 </script>

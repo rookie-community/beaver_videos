@@ -17,7 +17,10 @@
         },
         /* 模块配置 */
         "modules" : {
-            "VideoPlayer" : {}
+            "VideoPlayer" : {},
+            "Share" : {},
+            "Webview-x5" : {},
+            "Push" : {}
         },
         /* 应用发布信息 */
         "distribute" : {
@@ -56,7 +59,9 @@
             "ios" : {},
             /* SDK配置 */
             "sdkConfigs" : {
-                "push" : {},
+                "push" : {
+                    "unipush" : {}
+                },
                 "statics" : {}
             },
             "icons" : {
@@ -110,7 +115,8 @@
     "mp-weixin" : {
         "appid" : "wx66d7a2cbd03ecabe",
         "setting" : {
-            "urlCheck" : false
+            "urlCheck" : false,
+            "minified" : true
         },
         "usingComponents" : true
     },
