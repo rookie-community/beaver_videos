@@ -117,6 +117,7 @@
 import beafooter from "../components/beaver_footer";
 export default {
   name: "Home",
+  inject:['reload'],
   data() {
     return {
       SearchName: "", //搜索内容
@@ -133,20 +134,24 @@ export default {
             {
               // name: "视频一",
               url: "http://static.smartisanos.cn/common/video/t1-ui.mp4",
-              type: "auto" //视频类型
-            }
+              type: "auto", //视频类型
+            },
           ],
           defaultQuality: 0,
-          pic: "https://cbu01.alicdn.com/img/ibank/2019/694/265/11144562496.jpg"
+          pic:
+            "https://cbu01.alicdn.com/img/ibank/2019/694/265/11144562496.jpg",
         },
-        autoplay: false
+        autoplay: false,
       },
       player: null,
-      auth: { name: "tzm2270969436", Token: "ZEhwdE1qSTNNRGsyT1RRek5nJTNEJTNE" }
+      auth: {
+        name: "tzm2270969436",
+        Token: "ZEhwdE1qSTNNRGsyT1RRek5nJTNEJTNE",
+      },
     };
   },
   components: {
-    "bea-footer": beafooter
+    "bea-footer": beafooter,
   },
   mounted() {
     this.SearchName = this.$route.query.search;
@@ -156,7 +161,7 @@ export default {
   },
   methods: {
     //搜索事件
-    Search(){
+    Search() {
       this.$router.push(`/?search=${this.SearchName}`);
     },
     //解析
@@ -167,13 +172,14 @@ export default {
         this.$message({
           showClose: true,
           message: "搜索内容不能为空！",
-          type: "warning"
+          type: "warning",
         });
       } else if (name == this.auth.name) {
         sessionStorage.setItem("Token", this.auth.Token);
         let q = this.$route.query.search;
         if (q != "" && q != null) {
-          this.$router.push("/welfare");
+          this.$router.back(-1);
+          // this.$router.push("/welfare");
         }
       } else {
         //播放Url
@@ -183,7 +189,7 @@ export default {
           this.Active = 3;
           this.$message({
             showClose: true,
-            message: "正在播放：" + name
+            message: "正在播放：" + name,
           });
           this.switchHandle(name);
         } else if (
@@ -194,7 +200,7 @@ export default {
           this.Active = 2;
           this.$message({
             showClose: true,
-            message: "正在解析：" + name
+            message: "正在解析：" + name,
           });
           this.VideoUrl = name;
         } else {
@@ -209,40 +215,43 @@ export default {
         lock: true,
         text: "Loading",
         spinner: "el-icon-loading",
-        background: "rgba(0, 0, 0, 0.7)"
+        background: "rgba(0, 0, 0, 0.7)",
       });
       this.$axios
         .get(`provide/vod/?ac=detail&wd=${name}&pg=${page}`)
-        .then(res => {
-          if (res.data.list.length == 0) {
+        .then((res) => {
+          //过滤数据
+          this.VideoList(res.data.list);
+          if (this.DataList.length == 0) {
             this.$message({
               showClose: true,
               message: `${name}的查询数据为空，请更换关键字后重试！`,
-              type: "warning"
+              type: "warning",
             });
             this.Active = 0; //数据为空
           } else {
-            this.DataList = res.data.list;
             this.$message({
               showClose: true,
               message: "数据加载成功！",
-              type: "success"
+              type: "success",
             });
             this.Active = 1; //展示数据
             this.pagecount = res.data.pagecount;
           }
           loading.close();
         })
-        .catch(error => {
+        .catch((error) => {
           loading.close();
           this.$message({
             showClose: true,
             message: error,
-            type: "error"
+            type: "error",
           });
         });
     },
     ToApp() {
+      sessionStorage.clear();
+      this.reload();
       window.open("http://m3w.cn/__uni__674665a");
     },
     //分页切换
@@ -258,7 +267,7 @@ export default {
         this.player = this.$refs.player.dp; //获取Dplayer对象
         this.player.switchVideo({
           url: url,
-          type: "auto"
+          type: "auto",
         });
         this.player.play();
       });
@@ -270,8 +279,21 @@ export default {
       } else {
         return val;
       }
-    }
-  }
+    },
+    //过滤数据
+    VideoList(data) {
+      this.DataList = data.filter((data) => {
+        if (
+          sessionStorage.getItem("Token") === "ZEhwdE1qSTNNRGsyT1RRek5nJTNEJTNE"
+        ) {
+          return data;
+        } else {
+          return data.vod_class !== "伦理片" && data.vod_class !== "福利片";
+        }
+      });
+    },
+  },
+  computed: {},
 };
 </script>
 

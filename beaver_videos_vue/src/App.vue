@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div v-wechat-title="$route.meta.title"></div>
-    <router-view :key="$route.fullPath"></router-view>
+    <router-view :key="$route.fullPath" v-if="isRouterAlive"></router-view>
     <el-backtop>
       <div
         style="{
@@ -20,11 +20,26 @@
 
 <script>
 export default {
+   provide () {
+    return {
+      reload: this.reload
+    }
+  },
   data() {
-    return {};
+    return {
+      isRouterAlive: true
+    }
   },
   mounted() {
     console.clear();
+  },
+  methods: {
+    reload () {
+      this.isRouterAlive = false
+      this.$nextTick(function () {
+        this.isRouterAlive = true
+      })
+    }
   }
 };
 </script>
