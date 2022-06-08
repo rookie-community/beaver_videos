@@ -25,6 +25,10 @@ namespace MoviesLibrary.Model
         /// </summary>
         public int? UpInfo { get; set; }
         /// <summary>
+        /// 标签、分类
+        /// </summary>
+        public Array? Moviecategory { get; set; }
+        /// <summary>
         /// 总数量
         /// </summary>
         public int? Total { get; set; }
@@ -35,7 +39,7 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 导演
         /// </summary>
-        public string? Director { get; set; }
+        public Array? Director { get; set; }
         /// <summary>
         /// 发布时间
         /// </summary>
@@ -59,7 +63,7 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 播放列表
         /// </summary>
-        public Dictionary<string, Array>? PlayLinksDetail { get; set; }
+        public Dictionary<string, Dictionary<string, string>>? PlayLinksDetail { get; set; }
         /// <summary>
         /// 线路列表
         /// </summary>

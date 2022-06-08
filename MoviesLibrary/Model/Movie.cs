@@ -19,7 +19,7 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 唯一编码
         /// </summary>
-        public string? EnId { get; set; }
+        public string EnId { get; set; } = string.Empty;
         /// <summary>
         /// 类型ID
         /// </summary>

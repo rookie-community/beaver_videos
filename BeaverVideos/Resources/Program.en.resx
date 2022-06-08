@@ -583,7 +583,7 @@
     <value>Record(s)</value>
   </data>
   <data name="Sys.RecordsPerPage" xml:space="preserve">
-    <value />
+    <value>Per Page</value>
   </data>
   <data name="Sys.Refresh" xml:space="preserve">
     <value>Refresh</value>
@@ -1013,5 +1013,14 @@
   </data>
   <data name="_Admin.ZipCode" xml:space="preserve">
     <value>Zip</value>
+  </data>
+  <data name="MenuMangement" xml:space="preserve">
+    <value>Menu Mangement</value>
+  </data>
+  <data name="Validate.{0}range{1}" xml:space="preserve">
+    <value>{0} is at least {1}!</value>
+  </data>
+  <data name="Validate.{0}range{2}" xml:space="preserve">
+    <value>{0} is {1} at most!</value>
   </data>
 </root>

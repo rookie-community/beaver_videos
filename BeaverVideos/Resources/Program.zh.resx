@@ -199,7 +199,7 @@
     <value>关联表显示字段</value>
   </data>
   <data name="Codegen.Success" xml:space="preserve">
-    <value>生成成功！请关闭调试重新编译运行</value>
+    <value>生成成功！请关闭调试重新编译运行.</value>
   </data>
   <data name="Codegen.TestNs" xml:space="preserve">
     <value>Test命名空间</value>
@@ -310,7 +310,7 @@
     <value>Api文档</value>
   </data>
   <data name="Sys.AttemptedValueIsInvalidAccessor" xml:space="preserve">
-    <value>'{0}' 不是 {1} 的有效格式</value>
+    <value>'{0}' 不是 {1} 的有效格式.</value>
   </data>
   <data name="Sys.BackHome" xml:space="preserve">
     <value>返回首页</value>
@@ -391,10 +391,10 @@
     <value>删除</value>
   </data>
   <data name="Sys.DeleteConfirm" xml:space="preserve">
-    <value>确定要删除这条数据么：</value>
+    <value>确定要删除这条数据么</value>
   </data>
   <data name="Sys.DeleteFailed" xml:space="preserve">
-    <value>数据使用中，无法删除</value>
+    <value>数据使用中，无法删除.</value>
   </data>
   <data name="Sys.Details" xml:space="preserve">
     <value>详细</value>
@@ -517,7 +517,7 @@
     <value>更多设置</value>
   </data>
   <data name="Sys.NeedLogin" xml:space="preserve">
-    <value>您没有登录或登录已过期，请重新登陆</value>
+    <value>您没有登录或登录已过期，请重新登陆.</value>
   </data>
   <data name="Sys.No" xml:space="preserve">
     <value>否</value>
@@ -655,7 +655,7 @@
     <value>有效</value>
   </data>
   <data name="Sys.ValueIsInvalidAccessor" xml:space="preserve">
-    <value>{0} 格式错误</value>
+    <value>{0} 格式错误.</value>
   </data>
   <data name="Sys.WrongTemplate" xml:space="preserve">
     <value>错误的模板</value>
@@ -685,13 +685,13 @@
     <value>{0}必须是数字</value>
   </data>
   <data name="Validate.{0}range{1}" xml:space="preserve">
-    <value>{0}至少是{1}</value>
+    <value>{0}至少是{1}!</value>
   </data>
   <data name="Validate.{0}range{1}{2}" xml:space="preserve">
     <value>{0}必须是{1}到{2}之间的数</value>
   </data>
   <data name="Validate.{0}range{2}" xml:space="preserve">
-    <value>{0}最多是{1}</value>
+    <value>{0}最多是{1}!</value>
   </data>
   <data name="Validate.{0}required" xml:space="preserve">
     <value>{0}是必填项</value>
@@ -1016,5 +1016,11 @@
   </data>
   <data name="_Admin.ZipCode" xml:space="preserve">
     <value>邮编</value>
+  </data>
+  <data name="Validate.{0}rangemax{1}" xml:space="preserve">
+    <value>{0}必须小于{1}</value>
+  </data>
+  <data name="Validate.{0}rangemin{1}" xml:space="preserve">
+    <value>{0}必须至少{1}个字符</value>
   </data>
 </root>

@@ -211,10 +211,12 @@ namespace BeaverVideos.Test
     {
         public static WTMContext CreateWtmContext(IDataContext dataContext= null, string usercode = null)
         {
-            GlobalData gd = new GlobalData();
-            gd.AllAccessUrls = new List<string>();
-            gd.AllAssembly = new List<System.Reflection.Assembly>();
-            gd.AllModule = new List<WalkingTec.Mvvm.Core.Support.Json.SimpleModule>();
+            GlobalData gd = new GlobalData
+            {
+                AllAccessUrls = new List<string>(),
+                AllAssembly = new List<System.Reflection.Assembly>(),
+                AllModule = new List<WalkingTec.Mvvm.Core.Support.Json.SimpleModule>()
+            };
 
             Mock<HttpContext> mockHttpContext = new Mock<HttpContext>();
             Mock<HttpRequest> mockHttpRequest = new Mock<HttpRequest>();
@@ -226,11 +228,15 @@ namespace BeaverVideos.Test
             mockService.Setup(x => x.GetService(typeof(IDistributedCache))).Returns(cache);
             mockHttpContext.Setup(x => x.Request).Returns(mockHttpRequest.Object);
             mockHttpContext.Setup(x => x.RequestServices).Returns(mockService.Object);
-            var httpa = new HttpContextAccessor();
-            httpa.HttpContext = mockHttpContext.Object;
-            var wtmcontext = new WTMContext(null, new GlobalData(), httpa, new DefaultUIService(), null,dataContext, res, cache:cache);
-            wtmcontext.MSD = new BasicMSD();
-            wtmcontext.Session = new SessionServiceProvider(mockSession);
+            var httpa = new HttpContextAccessor
+            {
+                HttpContext = mockHttpContext.Object
+            };
+            var wtmcontext = new WTMContext(null, new GlobalData(), httpa, new DefaultUIService(), null, dataContext, res, cache: cache)
+            {
+                MSD = new BasicMSD(),
+                Session = new SessionServiceProvider(mockSession)
+            };
             if (dataContext == null)
             {
                 wtmcontext.DC = new EmptyContext(Guid.NewGuid().ToString(), DBTypeEnum.Memory);
