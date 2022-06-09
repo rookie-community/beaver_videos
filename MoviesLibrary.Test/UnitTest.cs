@@ -14,26 +14,18 @@ namespace MoviesLibrary.Test
         public UnitTest()
         {
             _movieService = new MovieService();
-            _listItems = new List<string> { "斗罗大陆" };
+            _listItems = new List<string> { "寻梦环游记" };
         }
 
         [TestMethod("搜索测试"), Priority(1)]
         public void TestMethodSearch()
         {
-            foreach (var item in _listItems)
+            _listItems.ForEach(item =>
             {
                 var result = _movieService.Search(item);
-                if (result.Any())
-                {
-                    Assert.IsTrue(true, $"获取“{item}”数据成功！");
-                    var tops = _movieService.GetTops(x => x.Cat == CatType.电视剧);
-                    Assert.IsTrue(tops.Any(), "获取排行榜数据失败！");
-                }
-                else
-                {
-                    Assert.IsTrue(false, $"获取“{item}”数据失败！");
-                }
-            }
+                Assert.IsTrue(result.Any(), $"获取“{item}”数据失败！");
+
+            });
         }
 
         [TestMethod("获取详情"), Priority(2)]
@@ -44,7 +36,7 @@ namespace MoviesLibrary.Test
             Assert.IsTrue(detail.EntId == entId);
         }
 
-        [TestMethod("获取详情"), Priority(2), TestCategory("获取指定页面范围的数据")]
+        [TestMethod("获取详情_分页查询"), Priority(2), TestCategory("获取指定页面范围的数据")]
         public void TestMethodDetail_2()
         {
             //_ = int.TryParse(Regex.Replace($"{obj.CoverInfo?.FirstOrDefault().Value}", @"[^0-9]+", string.Empty), out int total);
@@ -52,6 +44,13 @@ namespace MoviesLibrary.Test
             string entId = "Q4RraX7lTzbqN3";
             var detail = _movieService.GetDetail(CatType.电视剧, entId, 1, 20, PlayLinkType.imgo);
             Assert.IsTrue(detail.EntId == entId);
+        }
+
+        [TestMethod("获取排行榜数据"), Priority(3)]
+        public void TestMethodGetTops()
+        {
+            var tops = _movieService.GetTops(x => x.Cat == CatType.电视剧);
+            Assert.IsTrue(tops.Any(), "获取排行榜数据失败！");
         }
     }
 }

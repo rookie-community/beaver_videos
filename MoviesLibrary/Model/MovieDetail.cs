@@ -27,7 +27,7 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 标签、分类
         /// </summary>
-        public Array? Moviecategory { get; set; }
+        public List<string>? Moviecategory { get; set; }
         /// <summary>
         /// 总数量
         /// </summary>
@@ -39,7 +39,7 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 导演
         /// </summary>
-        public Array? Director { get; set; }
+        public List<string>? Director { get; set; }
         /// <summary>
         /// 发布时间
         /// </summary>
@@ -47,11 +47,11 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 区域
         /// </summary>
-        public Array? Area { get; set; }
+        public List<string>? Area { get; set; }
         /// <summary>
         /// 主演
         /// </summary>
-        public Array? Actor { get; set; }
+        public List<string>? Actor { get; set; }
         /// <summary>
         /// 封面
         /// </summary>
@@ -67,7 +67,7 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 线路列表
         /// </summary>
-        public Array? PlayLinkSites { get; set; }
+        public List<string>? PlayLinkSites { get; set; }
         /// <summary>
         /// 是否需要会员
         /// </summary>

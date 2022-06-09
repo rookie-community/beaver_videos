@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -48,11 +47,11 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 地区
         /// </summary>
-        public Array? Area { get; set; }
+        public List<string>? Area { get; set; }
         /// <summary>
         /// 标签
         /// </summary>
-        public Array? Tag { get; set; }
+        public List<string>? Tag { get; set; }
         /// <summary>
         /// 评分
         /// </summary>
@@ -60,11 +59,11 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 主演
         /// </summary>
-        public Array? ActList { get; set; }
+        public List<string>? ActList { get; set; }
         /// <summary>
         /// 导演
         /// </summary>
-        public Array? DirList { get; set; }
+        public List<string>? DirList { get; set; }
         /// <summary>
         /// 是否需要会员
         /// </summary>
