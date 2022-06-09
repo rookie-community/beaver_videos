@@ -14,7 +14,7 @@ namespace MoviesLibrary.Test
         public UnitTest()
         {
             _movieService = new MovieService();
-            _listItems = new List<string> { "寻梦环游记" };
+            _listItems = new List<string> { "寻梦环游记", "斗罗大陆", "楚门世界" };
         }
 
         [TestMethod("搜索测试"), Priority(1)]
@@ -24,7 +24,6 @@ namespace MoviesLibrary.Test
             {
                 var result = _movieService.Search(item);
                 Assert.IsTrue(result.Any(), $"获取“{item}”数据失败！");
-
             });
         }
 

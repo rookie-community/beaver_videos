@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -9,26 +7,39 @@ using System.Threading.Tasks;
 using MoviesLibrary.Model;
 using MoviesLibrary.Common.Enum;
 using System.Security.Authentication;
-using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Polly;
+using MoviesLibrary.MemoryCacheModel;
 
 namespace MoviesLibrary
 {
     public class MovieService
     {
         readonly HttpClient _httpClient;
-        readonly ConcurrentDictionary<DateTime, List<TopModel>> _tops;//排行榜数据
+        TopMomoryCache _topMomoryCache;
+        readonly List<MovieMemoryCache> _movieMemoryCache;
+        readonly List<MovieDetailMemoryCache> _movieDetailMemoryCache;
+        readonly TimeSpan _timeSpan;//缓存过期时间
+        readonly bool _memoryCache;
 
-        public MovieService()
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="memoryCache">是否启用缓存</param>
+        /// <param name="memoryCacheHours">缓存过期时间</param>
+        public MovieService(bool memoryCache = false, int memoryCacheHours = 1)
         {
             _httpClient = new HttpClient(new HttpClientHandler
             {
                 ServerCertificateCustomValidationCallback = (message, cert, chain, error) => true,
                 SslProtocols = SslProtocols.Tls12,
             });
-            _tops = new ConcurrentDictionary<DateTime, List<TopModel>>();
+            _topMomoryCache = new TopMomoryCache();
+            _movieMemoryCache = new List<MovieMemoryCache>();
+            _movieDetailMemoryCache = new List<MovieDetailMemoryCache>();
+            _memoryCache = memoryCache;
+            _timeSpan = TimeSpan.FromHours(memoryCacheHours);
         }
 
         /// <summary>
@@ -38,22 +49,12 @@ namespace MoviesLibrary
         /// <returns></returns>
         public IEnumerable<TopModel> GetTops(Func<TopModel, bool> lambda)
         {
-            List<TopModel> topModels = new();
-            try
+            if (!_topMomoryCache.Tops.Any())
             {
-                if (!_tops.Any())
-                {
-                    var result = this.Search("斗罗大陆");
-                    Policy.HandleResult(result.Any()).Retry(3);
-                }
-                var key = _tops.Max(x => x.Key);
-                _tops.TryGetValue(key, out topModels!);
-                return topModels.Where(lambda).ToList();
+                var result = Search("寻梦环游记");
+                Policy.HandleResult(result.Any()).Retry(3);
             }
-            catch (Exception)
-            {
-                return topModels;
-            }
+            return _topMomoryCache.Tops.Where(lambda).ToList();
         }
 
         /// <summary>
@@ -63,10 +64,34 @@ namespace MoviesLibrary
         /// <returns></returns>
         public IEnumerable<Movie> Search(string name)
         {
+            string identification = $"Search_{name}";
+            IEnumerable<Movie> result;
+            if (_memoryCache && DateTime.Now - _topMomoryCache.Time <= _timeSpan && _topMomoryCache.Tops.Any())
+            {
+                result = _movieMemoryCache.Where(x => x.Identification.Equals(identification) && DateTime.Now - x.Time <= _timeSpan).OrderBy(x => x.Time).LastOrDefault()!.Movies;
+                if (result.Any())
+                {
+                    return result;
+                }
+            }
+            result = GetMovieByName(name);
+            if (_memoryCache)
+            {
+                _movieMemoryCache.Add(new MovieMemoryCache
+                {
+                    Identification = identification,
+                    Movies = result
+                });
+            }
+            return result;
+        }
+
+        private IEnumerable<Movie> GetMovieByName(string name)
+        {
             var result = GetHttpString(new Uri($"https://api.so.360kan.com/index?force_v=1&kw={name}&from=&pageno=1&v_ap=1&tab=all&cb=data"));
             JsonNode obj = JsonNode.Parse(result)!;
             var lists = obj["data"]?["longData"]?["rows"] as JsonArray;
-            if (!_tops.Any() || (_tops.Any() && (DateTime.Now - _tops.Max(x => x.Key) > TimeSpan.FromHours(1))))
+            if (!_topMomoryCache.Tops.Any() || (_topMomoryCache.Tops.Any() && (DateTime.Now - _topMomoryCache.Time > _timeSpan)))
             {
                 var topData = new List<TopModel>();
                 var topJobj = obj["data"]?["toplist"] as JsonArray;
@@ -86,7 +111,11 @@ namespace MoviesLibrary
                         });
                     }
                 }
-                _tops.TryAdd(DateTime.Now, topData);
+                _topMomoryCache = new TopMomoryCache()
+                {
+                    Identification = "Top",
+                    Tops = topData
+                };
             }
             foreach (var item in lists!)
             {
@@ -122,9 +151,27 @@ namespace MoviesLibrary
         /// <returns></returns>
         public MovieDetail GetDetail(CatType cat, string EntId)
         {
-            var result = GetHttpString(new Uri($"https://api.web.360kan.com/v1/detail?cat={(int)cat}&id={EntId}&callback=data"));
-            var obj = JsonNode.Parse(result)!["data"]!;
-            return Analysis(cat, obj);
+            string identification = $"Detail_{cat}_{EntId}";
+            if (_memoryCache)
+            {
+                var data = _movieDetailMemoryCache.Where(x => x.Identification.Equals(identification) && DateTime.Now - x.Time <= _timeSpan).LastOrDefault()!.MovieDetails;
+                if (data.EntId == EntId)
+                {
+                    return data;
+                }
+            }
+            var json = GetHttpString(new Uri($"https://api.web.360kan.com/v1/detail?cat={(int)cat}&id={EntId}&callback=data"));
+            var obj = JsonNode.Parse(json)!["data"]!;
+            var result = Analysis(cat, obj);
+            if (_memoryCache)
+            {
+                _movieDetailMemoryCache.Add(new MovieDetailMemoryCache()
+                {
+                    Identification = identification,
+                    MovieDetails = result
+                });
+            }
+            return result;
         }
 
         /// <summary>
@@ -138,9 +185,27 @@ namespace MoviesLibrary
         /// <returns></returns>
         public MovieDetail GetDetail(CatType Cat, string EntId, int StartPage, int EndPage, PlayLinkType site)
         {
-            var result = GetHttpString(new Uri($"https://api.web.360kan.com/v1/detail?cat={(int)Cat}&id={EntId}&start={StartPage}&end={EndPage}&site={site}&callback=data"));
-            var obj = JsonNode.Parse(result)!["data"]!;
-            return Analysis(Cat, obj);
+            string identification = $"Detail_{Cat}_{EntId}_{StartPage}_{EndPage}_{site}";
+            if (_memoryCache)
+            {
+                var data = _movieDetailMemoryCache.Where(x => x.Identification.Equals(identification) && DateTime.Now - x.Time <= _timeSpan).LastOrDefault()!.MovieDetails;
+                if (data.EntId == EntId)
+                {
+                    return data;
+                }
+            }
+            var json = GetHttpString(new Uri($"https://api.web.360kan.com/v1/detail?cat={(int)Cat}&id={EntId}&start={StartPage}&end={EndPage}&site={site}&callback=data"));
+            var obj = JsonNode.Parse(json)!["data"]!;
+            var result = Analysis(Cat, obj);
+            if (_memoryCache)
+            {
+                _movieDetailMemoryCache.Add(new MovieDetailMemoryCache()
+                {
+                    Identification = identification,
+                    MovieDetails = result
+                });
+            }
+            return result;
         }
 
         /// <summary>
