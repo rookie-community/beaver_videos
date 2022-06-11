@@ -11,7 +11,6 @@ namespace BeaverVideos.DataAccess
     {
         public DbSet<FrameworkUser> FrameworkUsers { get; set; }
 
-
         public DataContext(CS cs)
              : base(cs)
         {
