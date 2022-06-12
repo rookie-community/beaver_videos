@@ -1,16 +1,10 @@
-﻿using System;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using MoviesLibrary.Model;
 using MoviesLibrary.Common.Enum;
 using System.Security.Authentication;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Polly;
-using System.Runtime.Caching;
 
 namespace MoviesLibrary.Services
 {
@@ -59,7 +53,7 @@ namespace MoviesLibrary.Services
             {
                 tops = Policy.HandleResult<List<TopModel>>(x => x.Any()).Retry(3).Execute(() =>
                 {
-                    _ = Search("寻梦环游记");//执行一次查询，不然没数据
+                    _ = Search("寻梦环游记").ToList();//执行一次查询，不然没数据
                     return _memoryCacheService.Get<List<TopModel>>(TopsKey);
                 });
             }
@@ -121,11 +115,12 @@ namespace MoviesLibrary.Services
             foreach (var item in lists!)
             {
                 _ = double.TryParse(item!["score"]!.GetValue<string>(), out double score);
+                _ = int.TryParse(item["cat_id"]!.GetValue<string>(), out int cat);
                 yield return new Movie
                 {
                     Id = int.Parse(item["id"]!.GetValue<string>()),
                     EnId = item["en_id"]!.GetValue<string>(),
-                    CatId = int.Parse(item["cat_id"]!.GetValue<string>()),
+                    CatId = cat,
                     CatName = item["cat_name"]!.GetValue<string>(),
                     CoverUrl = new Uri(item["cover"]!.GetValue<string>()),
                     CoverInfo = item["coverInfo"].Deserialize<Dictionary<string, string>>(),
@@ -139,7 +134,7 @@ namespace MoviesLibrary.Services
                     DirList = GetListStringByJsonArray((JsonArray)item["dirList"]!),
                     Vip = Convert.ToBoolean(item["vip"]!.GetValue<int>()),
                     VideoStatus = item["video_status"]!.GetValue<string>(),
-                    PlayLinks = item["playlinks"].Deserialize<Dictionary<string, string>>()
+                    PlayLinks = item["playlinks"].Deserialize<Dictionary<string, object>>()
                 };
             }
         }
@@ -182,23 +177,30 @@ namespace MoviesLibrary.Services
         /// <returns></returns>
         public MovieDetail GetDetail(CatType Cat, string EntId, int StartPage, int EndPage, PlayLinkType site)
         {
-            string key = $"Detail_{Cat}_{EntId}_{StartPage}_{EndPage}_{site}";
-            if (_cacheState)
+            if (Cat == CatType.电影 || Cat == CatType.综艺)
             {
-                var data = _memoryCacheService.Get<MovieDetail>(key);
-                if (data.EntId == EntId)
+                return GetDetail(Cat, EntId);
+            }
+            else
+            {
+                string key = $"Detail_{Cat}_{EntId}_{StartPage}_{EndPage}_{site}";
+                if (_cacheState)
                 {
-                    return data;
+                    var data = _memoryCacheService.Get<MovieDetail>(key);
+                    if (data.EntId == EntId)
+                    {
+                        return data;
+                    }
                 }
+                var json = GetHttpString(new Uri($"https://api.web.360kan.com/v1/detail?cat={(int)Cat}&id={EntId}&start={StartPage}&end={EndPage}&site={site}&callback=data"));
+                var obj = JsonNode.Parse(json)!["data"]!;
+                var result = Analysis(Cat, obj);
+                if (_cacheState)
+                {
+                    _memoryCacheService.Set(key, result);
+                }
+                return result;
             }
-            var json = GetHttpString(new Uri($"https://api.web.360kan.com/v1/detail?cat={(int)Cat}&id={EntId}&start={StartPage}&end={EndPage}&site={site}&callback=data"));
-            var obj = JsonNode.Parse(json)!["data"]!;
-            var result = Analysis(Cat, obj);
-            if (_cacheState)
-            {
-                _memoryCacheService.Set(key, result);
-            }
-            return result;
         }
 
         /// <summary>

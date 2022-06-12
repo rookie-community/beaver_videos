@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace MoviesLibrary.Common.Enum
 {
@@ -14,6 +9,11 @@ namespace MoviesLibrary.Common.Enum
         /// </summary>
         [Description("腾讯视频")]
         qq,
+        /// <summary>
+        /// 爱奇艺
+        /// </summary>
+        [Description("爱奇艺")]
+        qiyi,
         /// <summary>
         /// 芒果TV
         /// </summary>

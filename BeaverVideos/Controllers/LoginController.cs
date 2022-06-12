@@ -4,13 +4,10 @@ using System.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using WalkingTec.Mvvm.Core;
 using WalkingTec.Mvvm.Core.Extensions;
 using WalkingTec.Mvvm.Mvc;
 using WalkingTec.Mvvm.Mvc.Admin.ViewModels.FrameworkUserVms;
-using System.Collections.Generic;
 using BeaverVideos.ViewModels.HomeVMs;
 
 namespace BeaverVideos.Controllers
@@ -55,7 +52,7 @@ namespace BeaverVideos.Controllers
             {
                 //�������Կ���ͨ��user.Attributes["aaa"] = "bbb"��ʽ��ֵ
                 Wtm.LoginUserInfo = user;
-                string url = string.Empty;
+                string url;
                 if (!string.IsNullOrEmpty(vm.Redirect))
                 {
                     url = vm.Redirect;

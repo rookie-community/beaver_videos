@@ -106,7 +106,7 @@ namespace WalkingTec.Mvvm.Admin.Api
             }
 
             var hasuserrole = DC.Set<FrameworkRole>().Where(x => x.RoleCode == "002").FirstOrDefault();
-            FrameworkUser user = new FrameworkUser
+            FrameworkUser user = new()
             {
                 ITCode = regInfo.ITCode,
                 Name = regInfo.Name,

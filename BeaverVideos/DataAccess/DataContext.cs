@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -63,7 +65,37 @@ namespace BeaverVideos.DataAccess
             return state;
         }
 
+        /// <summary>
+        /// 根据实体类“Description”特性生成数据库字段备注
+        /// </summary>
+        /// <param name="modelBuilder"></param>
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            var Models = modelBuilder.Model.GetEntityTypes().ToList();
+            foreach (var item in Models)
+            {
+                var tabtype = Type.GetType(item.ClrType.FullName);
+                if (tabtype != null)
+                {
+                    var props = tabtype.GetProperties();
+                    var descriptionAttrtable = tabtype.GetCustomAttributes(typeof(DescriptionAttribute), true);
+                    if (descriptionAttrtable.Length > 0)
+                    {
+                        modelBuilder.Entity(item.Name).HasComment(((DescriptionAttribute)descriptionAttrtable[0]).Description);
+                    }
+                    foreach (var prop in props)
+                    {
+                        var descriptionAttr = prop.GetCustomAttributes(typeof(DescriptionAttribute), true);
+                        if (descriptionAttr.Length > 0)
+                        {
+                            modelBuilder.Entity(item.Name).Property(prop.Name).HasComment(((DescriptionAttribute)descriptionAttr[0]).Description);
+                        }
+                    }
+                }
+            }
+        }
     }
+
 
     /// <summary>
     /// DesignTimeFactory for EF Migration, use your full connection string,

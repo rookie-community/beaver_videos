@@ -1,0 +1,9 @@
+﻿@using MoviesLibrary.Model
+@model IEnumerable<Movie>
+
+<h1>搜索页</h1>
+
+@foreach (var item in Model)
+{
+    <h6>@item.Title</h6>
+}

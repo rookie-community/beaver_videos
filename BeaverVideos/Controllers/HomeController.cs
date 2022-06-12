@@ -22,7 +22,7 @@ namespace BeaverVideos.Controllers
         [AllRights]
         public IActionResult Index()
         {
-            ViewData["title"] = "WTM";
+            ViewData["title"] = "小狸影视";
             return View();
         }
 
@@ -85,7 +85,7 @@ namespace BeaverVideos.Controllers
             {
                 data.Add(new ChartData
                 {
-                    Value = m.GetProperties().Count(),
+                    Value = m.GetProperties().Length,
                     Category = m.GetPropertyDisplayName(),
                     Series = "Model"
                 }) ;
@@ -151,23 +151,23 @@ namespace BeaverVideos.Controllers
 
         [AllowAnonymous]
         [ResponseCache(Duration = 3600)]
-        public github GetGithubInfo()
+        public Github GetGithubInfo()
         {
-            var rv = Wtm.ReadFromCache<github>("githubinfo", () =>
+            var rv = Wtm.ReadFromCache("githubinfo", () =>
             {
-                var s = Wtm.CallAPI<github>("github", "repos/dotnetcore/wtm", 60).Result;
+                var s = Wtm.CallAPI<Github>("github", "repos/dotnetcore/wtm", 60).Result;
                 return s.Data;
             }, 1800);
 
             return rv;
         }
 
-        public class github
+        public class Github
         {
-            public int stargazers_count { get; set; }
-            public int forks_count { get; set; }
-            public int subscribers_count { get; set; }
-            public int open_issues_count { get; set; }
+            public int Stargazers_count { get; set; }
+            public int Forks_count { get; set; }
+            public int Subscribers_count { get; set; }
+            public int Open_issues_count { get; set; }
         }
 
     }

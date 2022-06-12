@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using MoviesLibrary.Extension;
 using WalkingTec.Mvvm.Core;
-using WalkingTec.Mvvm.Core.Extensions;
 using WalkingTec.Mvvm.Core.Support.FileHandlers;
 using WalkingTec.Mvvm.Mvc;
 
@@ -39,24 +38,25 @@ namespace BeaverVideos
             {
                 options.UseWtmMvcOptions();
             })
-            .AddJsonOptions(options => {
+            .AddJsonOptions(options =>
+            {
                 options.UseWtmJsonOptions();
             })
-            
             .ConfigureApiBehaviorOptions(options =>
             {
                 options.UseWtmApiOptions();
             })
             .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
             .AddWtmDataAnnotationsLocalization(typeof(Program));
-            
-            services.AddWtmContext(ConfigRoot, (options)=> {
+            services.AddWtmContext(ConfigRoot, (options) =>
+            {
                 options.DataPrivileges = DataPrivilegeSettings();
                 options.CsSelector = CSSelector;
                 options.FileSubDirSelector = SubDirSelector;
                 options.ReloadUserFunc = ReloadUser;
             });
 
+            services.AddMoviesLibrary();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -83,7 +83,8 @@ namespace BeaverVideos
                    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Movie}/{action=Index}/{id?}");
+
             });
 
             app.UseWtmContext();

@@ -1,5 +1,7 @@
+using System.Text.Json;
 using MoviesLibrary.Common.Enum;
 using MoviesLibrary.Services;
+using System.Diagnostics;
 
 namespace MoviesLibrary.Test
 {
@@ -21,6 +23,7 @@ namespace MoviesLibrary.Test
             _listItems.ForEach(item =>
             {
                 var result = _movieService.Search(item);
+                Debug.WriteLine(JsonSerializer.Serialize(result), item);
                 Assert.IsTrue(result.Any(), $"获取“{item}”数据失败！");
             });
         }
@@ -30,6 +33,7 @@ namespace MoviesLibrary.Test
         {
             string entId = "faXpYRH6Rnb4UR";
             var detail = _movieService.GetDetail(CatType.电影, entId);
+            Debug.WriteLine(JsonSerializer.Serialize(detail), detail.Title);
             Assert.IsTrue(detail.EntId == entId);
         }
 
@@ -38,6 +42,7 @@ namespace MoviesLibrary.Test
         {
             string entId = "Q4RraX7lTzbqN3";
             var detail = _movieService.GetDetail(CatType.电视剧, entId, 1, 20, PlayLinkType.imgo);
+            Debug.WriteLine(JsonSerializer.Serialize(detail), detail.Title);
             Assert.IsTrue(detail.EntId == entId);
         }
 
@@ -45,6 +50,7 @@ namespace MoviesLibrary.Test
         public void TestMethodGetTops()
         {
             var tops = _movieService.GetTops();
+            Debug.WriteLine(JsonSerializer.Serialize(tops), "电影排行榜");
             Assert.IsTrue(tops.Any(), "获取排行榜数据失败！");
         }
     }
