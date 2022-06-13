@@ -3,6 +3,7 @@
 @using System.Text.Json
 @model IEnumerable<IGrouping<CatType, TopInfoModel>>
 @{
+    ViewData["title"] = "小狸影视 - 首页";
     var routeData = new Dictionary<string, string>();
 }
 <div class="layui-container">
@@ -11,12 +12,14 @@
     </div>
     <div class="layui-row">
         <form class="layui-form" asp-controller="Movie" asp-action="Search" method="get">
-            @*@Html.AntiForgeryToken()*@
             <div class="layui-col-md10">
                 <input type="text" name="name" autocomplete="off" placeholder="请输入影视名称或视频链接地址" class="layui-input">
             </div>
             <div class="layui-col-md2">
-                <button class="layui-btn layui-btn-normal layui-btn-fluid" type="submit" target="_blank">查询</button>
+                <button class="layui-btn layui-btn-normal layui-btn-fluid" type="submit" target="_blank">
+                    <i class="layui-icon layui-icon-search layui-font-12"></i>
+                    查询
+                </button>
             </div>
         </form>
     </div>
@@ -24,26 +27,27 @@
     <div class="layui-row">
         <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
             <ul class="layui-tab-title">
-                @foreach (var item in Model.Select(x => x.Key).AsEnumerable())
-                {
-                    <li class="layui-this">@item</li>
-                }
+                <li class="layui-this">电影</li>
+                <li>电视剧</li>
+                <li>综艺</li>
+                <li>动漫</li>
             </ul>
             <div class="layui-tab-content" style="height: 100px;">
                 @foreach (var tops in Model)
                 {
-                    <div class="layui-tab-item layui-show">
+                    <div class="layui-tab-item @(tops.Key==CatType.Film?"layui-show":null)">
                         <div class="layui-row">
                             @foreach (var item in tops)
                             {
-                                routeData = new Dictionary<string, string>();
-                                routeData.Add("entId", item.EntId);
-                                routeData.Add("catType", ((int)item.Cat).ToString());
-
+                                routeData = new Dictionary<string, string>()
+                                    {
+                                        { "entId",item.EntId},
+                                        { "catType",((int)item.Cat).ToString()}
+                                    };
                                 <div class="layui-col-md2 layui-col-sm4">
-                                    <div class="layui-panel" style="width:183px;height:310px;margin:5px;">
+                                    <div class="layui-panel" style="width:180px;height:275px;margin:5px;">
                                         <a asp-controller="Movie" asp-action="Detail" asp-all-route-data="routeData" target="_blank">
-                                            <img src="@item.Cover" style="width:183px;height:280px;" />
+                                            <img src="@item.Cover" style="width:180px;height:235px;" />
                                             <label class="layui-form-label" style="width:150px;text-align:center">@item.Title</label>
                                         </a>
                                     </div>

@@ -1,5 +1,7 @@
 ﻿@using MoviesLibrary.Model
 @model MovieDetail
-
+@{
+    ViewData["title"] = "小狸影视 - 详情";
+}
 <h1>@Model.Title</h1>
 @await Html.PartialAsync("Analysis",new { url =""})

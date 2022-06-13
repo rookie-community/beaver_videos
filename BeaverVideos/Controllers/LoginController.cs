@@ -29,8 +29,7 @@ namespace BeaverVideos.Controllers
             return View(vm);
         }
 
-        [Public]
-        [HttpPost]
+        [Public, HttpPost, ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginVM vm)
         {
             if (Wtm.ConfigInfo.IsQuickDebug == false)
@@ -89,8 +88,7 @@ namespace BeaverVideos.Controllers
             return PartialView(vm);
         }
 
-        [Public]
-        [HttpPost]
+        [Public,HttpPost,ValidateAntiForgeryToken]
         public IActionResult Reg(RegVM vm)
         {
             if (!ModelState.IsValid)

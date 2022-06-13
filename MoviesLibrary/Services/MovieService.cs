@@ -171,7 +171,7 @@ namespace MoviesLibrary.Services
         /// <returns>MovieDetail</returns>
         public MovieDetail GetDetail(CatType Cat, string EntId, int StartPage, int EndPage, PlayLinkType site)
         {
-            if (Cat == CatType.电影 || Cat == CatType.综艺)
+            if (Cat == CatType.Film || Cat == CatType.Variety)
             {
                 return GetDetail(Cat, EntId);
             }
@@ -210,7 +210,7 @@ namespace MoviesLibrary.Services
             foreach (var item in obj!)
             {
                 int total = 0, upinfo = 0;
-                if (catType != CatType.电影)
+                if (catType != CatType.Film)
                 {
                     total = item!["total"]!.GetValue<int>();
                     upinfo = item["upinfo"]!.GetValue<int>();
@@ -253,7 +253,7 @@ namespace MoviesLibrary.Services
                 CdnCover = new Uri(obj["cdncover"]!.GetValue<string>()),
                 Vip = obj["vip"]!.GetValue<bool>()
             };
-            if (cat == CatType.电影)
+            if (cat == CatType.Film)
             {
                 _ = double.TryParse(obj["doubanscore"]!.GetValue<string>(), out double score);
                 data.DouBanScore = score;

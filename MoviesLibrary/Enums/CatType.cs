@@ -8,9 +8,21 @@ namespace MoviesLibrary.Enums
 {
     public enum CatType
     {
-        电影 = 1,
-        电视剧 = 2,
-        综艺 = 3,
-        动漫 = 4
+        /// <summary>
+        /// 电影
+        /// </summary>
+        Film = 1,
+        /// <summary>
+        /// 电视剧
+        /// </summary>
+        Teleplay = 2,
+        /// <summary>
+        /// 电视剧
+        /// </summary>
+        Variety = 3,
+        /// <summary>
+        /// 动漫
+        /// </summary>
+        Anime = 4
     }
 }

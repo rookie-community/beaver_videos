@@ -40,6 +40,7 @@
             <div class="login-form">
                 <h1>@Titlt</h1>
                 <form action="/Login/Login" method="post">
+                    @Html.AntiForgeryToken()
                     <input type="hidden" name="Redirect" value="@Model.Redirect">
                     <ul class="loginForm">
                         <li>

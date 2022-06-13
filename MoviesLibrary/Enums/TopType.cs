@@ -11,12 +11,33 @@ namespace MoviesLibrary.Enums
     /// </summary>
     public enum TopType
     {
-        总榜 = 1,
-        电影 = 2,
-        电视剧 = 3,
-        综艺 = 4,
-        动漫 = 5,
-        儿童 = 6,
-        All = 7
+        /// <summary>
+        /// 总榜
+        /// </summary>
+        General = 1,
+        /// <summary>
+        /// 电影
+        /// </summary>
+        Film = 2,
+        /// <summary>
+        /// 电视剧
+        /// </summary>
+        Teleplay = 3,
+        /// <summary>
+        /// 综艺
+        /// </summary>
+        Variety = 4,
+        /// <summary>
+        /// 动漫
+        /// </summary>
+        Anime = 5,
+        /// <summary>
+        /// 儿童
+        /// </summary>
+        Children = 6,
+        /// <summary>
+        /// 默认所有类型
+        /// </summary>
+        Default = 7
     }
 }

@@ -18,6 +18,14 @@
         "theme/vintage.js",
         "theme/macarons.js"
       ]
+    },
+    {
+      "library": "layui@2.6.13",
+      "destination": "wwwroot/layui/",
+      "files": [
+        "layui.js",
+        "css/layui.css"
+      ]
     }
   ]
 }

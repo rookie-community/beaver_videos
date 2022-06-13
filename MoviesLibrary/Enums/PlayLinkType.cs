@@ -37,7 +37,7 @@ namespace MoviesLibrary.Enums
         /// <summary>
         /// 中央电视台
         /// </summary>
-        [Description("中央电视台")]
+        [Description("央视网")]
         cntv,
     }
 }

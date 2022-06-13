@@ -26,13 +26,14 @@ namespace BeaverVideos.Controllers
         [Public]
         public IActionResult Index()
         {
-            IEnumerable<IGrouping<CatType, TopInfoModel>> tops = _movieService.GetTops(TopType.All).GroupBy(x => x.Cat).OrderBy(x => x.Key).AsEnumerable();
+            IEnumerable<IGrouping<CatType, TopInfoModel>> tops = _movieService.GetTops(TopType.Default).DistinctBy(x => x.EntId).GroupBy(x => x.Cat).OrderBy(x => x.Key).AsEnumerable();
             return View(tops);
         }
 
         [Public]
         public IActionResult Search(string name)
         {
+            ViewBag.Name = name;
             if (Regex.IsMatch(name, @"http(s)?://([\w-]+\.)+[\w-]+(/[\w-./?%&=]*)?"))
             {
                 return RedirectToAction("Analysis", new { url = name });
@@ -40,7 +41,7 @@ namespace BeaverVideos.Controllers
             else if (!string.IsNullOrWhiteSpace(name))
             {
                 var result = _movieService.Search(name);
-                return View(result);
+                return View(result.Item1);
             }
             else
             {
@@ -60,7 +61,7 @@ namespace BeaverVideos.Controllers
         public IActionResult Detail(string entId, CatType catType, PlayLinkType linkType, int start = 1, int end = 10)
         {
             MovieDetail detail;
-            if (catType == CatType.电影 || catType == CatType.综艺)
+            if (catType == CatType.Film || catType == CatType.Variety)
             {
                 detail = _movieService.GetDetail(catType, entId);
             }

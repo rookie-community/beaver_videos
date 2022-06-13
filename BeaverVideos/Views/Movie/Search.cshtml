@@ -1,9 +1,49 @@
 ﻿@using MoviesLibrary.Model
 @model IEnumerable<Movie>
-
-<h1>搜索页</h1>
-
-@foreach (var item in Model)
-{
-    <h6>@item.Title</h6>
+@{
+    ViewData["title"] = "小狸影视 - 搜索";
+    var routeData = new Dictionary<string, string>();
 }
+<div class="layui-container">
+    <div class="layui-row" style="margin:50px 0px;">
+        <div class="layui-col-md2">
+            <h1>小狸影视</h1>
+        </div>
+        <div class="layui-col-md10">
+            <form asp-controller="Movie" asp-action="Search" method="get">
+                <div class="layui-col-md10">
+                    <input type="text" name="name" autocomplete="off" placeholder="请输入影视名称或视频链接地址" value="@ViewBag.Name" class="layui-input">
+                </div>
+                <div class="layui-col-md2">
+                    <button class="layui-btn layui-btn-normal layui-btn-fluid" type="submit" target="_blank">
+                        <i class="layui-icon layui-icon-search layui-font-12"></i>
+                        查询
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    @foreach (var item in Model)
+    {
+        routeData = new Dictionary<string, string>()
+    {
+    { "entId",item.EntId},
+    { "catType",((int)item.Cat).ToString()}
+    };
+        <a asp-controller="Movie" asp-action="Detail" asp-all-route-data="routeData">
+            <div class="layui-row layui-panel" style="margin:10px 0px;">
+                <div class="layui-col-md2">
+                    <img src="@item.Cover" style="width:180px;height:240px;">
+                </div>
+
+                <div class="layui-col-md10">
+                    <h2 style="margin:15px 0px">@item.Title</h2>
+                    <h3 style="margin:10px 0px;">@item.CatName / @item.Year</h3>
+                    <div class="layui-row">
+                        <p>@item.Description</p>
+                    </div>
+                </div>
+            </div>
+        </a>
+    }
+</div>
