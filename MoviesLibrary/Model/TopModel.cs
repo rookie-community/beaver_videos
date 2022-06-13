@@ -1,4 +1,4 @@
-﻿using MoviesLibrary.Common.Enum;
+﻿using MoviesLibrary.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,22 +10,12 @@ namespace MoviesLibrary.Model
     /// <summary>
     /// 排行榜
     /// </summary>
-    public class TopModel
+    public class TopModel : BaseModel
     {
-        /// <summary>
-        /// 标题
-        /// </summary>
-        public string Title { get; set; } = string.Empty;
-
-        /// <summary>
-        /// 类型
-        /// </summary>
-        public CatType Cat { get; set; }
-
         /// <summary>
         /// 影视编号
         /// </summary>
-        public string EntId => this.PlayUrl!.ToString().Split("/").LastOrDefault()!.Replace(".html", "");
+        public new string EntId => this.PlayUrl!.ToString().Split("/").LastOrDefault()!.Replace(".html", "");
 
         /// <summary>
         /// 缩略图
@@ -40,6 +30,6 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 播放量
         /// </summary>
-        public string Pv { get; set; } = "0";
+        public string PV { get; set; } = "0";
     }
 }

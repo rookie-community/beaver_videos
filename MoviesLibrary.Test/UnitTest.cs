@@ -1,7 +1,8 @@
 using System.Text.Json;
-using MoviesLibrary.Common.Enum;
+using MoviesLibrary.Enums;
 using MoviesLibrary.Services;
 using System.Diagnostics;
+using MoviesLibrary.Model;
 
 namespace MoviesLibrary.Test
 {
@@ -22,13 +23,14 @@ namespace MoviesLibrary.Test
         {
             _listItems.ForEach(item =>
             {
-                var result = _movieService.Search(item);
-                Debug.WriteLine(JsonSerializer.Serialize(result), item);
-                Assert.IsTrue(result.Any(), $"获取“{item}”数据失败！");
+                ValueTuple<IEnumerable<Movie>, IEnumerable<TopModel>> result = _movieService.Search(item);
+                Debug.WriteLine(JsonSerializer.Serialize(result.Item1), $"{item}_Movies");
+                Debug.WriteLine(JsonSerializer.Serialize(result.Item2), $"{item}_Tops");
+                Assert.IsTrue(result.Item1.Any() && result.Item2.Any(), $"获取“{item}”数据失败！");
             });
         }
 
-        [TestMethod("获取详情"), Priority(2)]
+        [TestMethod("获取详情")]
         public void TestMethodDetail_1()
         {
             string entId = "faXpYRH6Rnb4UR";
@@ -37,7 +39,7 @@ namespace MoviesLibrary.Test
             Assert.IsTrue(detail.EntId == entId);
         }
 
-        [TestMethod("获取详情_分页查询"), Priority(2), TestCategory("获取指定页面范围的数据")]
+        [TestMethod("获取详情_分页查询"), TestCategory("获取指定页面范围的数据")]
         public void TestMethodDetail_2()
         {
             string entId = "Q4RraX7lTzbqN3";
@@ -46,12 +48,20 @@ namespace MoviesLibrary.Test
             Assert.IsTrue(detail.EntId == entId);
         }
 
-        [TestMethod("获取排行榜数据"), Priority(3)]
+        [TestMethod("获取排行榜数据")]
         public void TestMethodGetTops()
         {
-            var tops = _movieService.GetTops();
-            Debug.WriteLine(JsonSerializer.Serialize(tops), "电影排行榜");
+            var tops = _movieService.GetTops(TopType.All);
+            Debug.WriteLine(JsonSerializer.Serialize(tops));
             Assert.IsTrue(tops.Any(), "获取排行榜数据失败！");
+        }
+
+        [TestMethod("获取精彩推荐")]
+        public void TestMethodGetRecommends()
+        {
+            var recommends = _movieService.GetRecommends(CatType.电影);
+            Debug.WriteLine(JsonSerializer.Serialize(recommends));
+            Assert.IsTrue(recommends.Any(), "获取精彩推荐数据失败！");
         }
     }
 }

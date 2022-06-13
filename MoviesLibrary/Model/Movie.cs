@@ -9,20 +9,13 @@ namespace MoviesLibrary.Model
     /// <summary>
     /// 影视
     /// </summary>
-    public class Movie
+    public class Movie: BaseModel
     {
         /// <summary>
         /// ID
         /// </summary>
         public int Id { get; set; }
-        /// <summary>
-        /// 唯一编码
-        /// </summary>
-        public string EnId { get; set; } = string.Empty;
-        /// <summary>
-        /// 类型ID
-        /// </summary>
-        public int CatId { get; set; }
+
         /// <summary>
         /// 类型名称
         /// </summary>
@@ -30,15 +23,12 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 封面URL
         /// </summary>
-        public Uri? CoverUrl { get; set; }
+        public Uri? Cover { get; set; }
         /// <summary>
         /// 封面信息
         /// </summary>
         public Dictionary<string, string>? CoverInfo { get; set; }
-        /// <summary>
-        /// 影片名称
-        /// </summary>
-        public string? Title { get; set; }
+
         public int Year { get; set; }
         /// <summary>
         /// 影片描述

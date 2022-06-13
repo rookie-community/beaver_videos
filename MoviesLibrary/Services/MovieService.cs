@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel;
 using MoviesLibrary.Model;
-using MoviesLibrary.Common.Enum;
 using System.Security.Authentication;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Polly;
+using MoviesLibrary.Enums;
 
 namespace MoviesLibrary.Services
 {
@@ -13,7 +13,6 @@ namespace MoviesLibrary.Services
         private readonly HttpClient _httpClient;
         private readonly MemoryCacheService _memoryCacheService;
         private readonly bool _cacheState;
-        private readonly string TopsKey = "638a5c9aaeb94e2d94fc810f7e3b4073";
 
         /// <summary>
         /// 影视服务类
@@ -31,98 +30,92 @@ namespace MoviesLibrary.Services
             _cacheState = memoryCacheState;
         }
 
-        /// <summary>
-        /// 获取排行榜数据
-        /// </summary>
-        /// <param name="lambda"></param>
-        /// <returns></returns>
-        public IEnumerable<TopModel> GetTops()
+        public IEnumerable<TopInfoModel> GetTops(TopType topType)
         {
-            return GetTops(x => true).ToList();
-        }
-
-        /// <summary>
-        /// 获取排行榜数据
-        /// </summary>
-        /// <param name="lambda"></param>
-        /// <returns></returns>
-        public IEnumerable<TopModel> GetTops(Func<TopModel, bool> lambda)
-        {
-            var tops = _memoryCacheService.Get<List<TopModel>>(TopsKey);
-            if (!tops.Any())
+            string JsonStr = GetHttpString(new Uri($"https://api.web.360kan.com/v1/rank?cat={(int)topType}&callback=data"));
+            var obj = JsonNode.Parse(JsonStr)!["data"] as JsonArray;
+            foreach (var item in obj!)
             {
-                tops = Policy.HandleResult<List<TopModel>>(x => x.Any()).Retry(3).Execute(() =>
+                yield return new TopInfoModel
                 {
-                    _ = Search("寻梦环游记").ToList();//执行一次查询，不然没数据
-                    return _memoryCacheService.Get<List<TopModel>>(TopsKey);
-                });
+                    Title = item!["title"]!.GetValue<string>(),
+                    Comment = item!["comment"]!.GetValue<string>(),
+                    UpInfo = item["upinfo"]!.GetValue<string>(),
+                    Cat = (CatType)item["cat"]!.GetValue<int>(),
+                    EntId = item["ent_id"]!.GetValue<string>(),
+                    Cover = new Uri(item["cover"]!.GetValue<string>()),
+                    Description = item["description"]!.GetValue<string>(),
+                    Moviecat = GetListStringByJsonArray((JsonArray)item["moviecat"]!),
+                    PubDate = DateTime.TryParse(item["pubdate"]!.GetValue<string>(), out DateTime date) ? date : DateTime.Now,
+                    Vip = item["vip"]!.GetValue<bool>(),
+                    PlayUrl = new Uri(item["url"]!.GetValue<string>()),
+                    PV = item["pv"]!.GetValue<string>()
+                };
             }
-            return tops.Where(lambda).ToList();
         }
 
         /// <summary>
         /// 影视搜索
         /// </summary>
         /// <param name="name">影视名称</param>
-        /// <returns></returns>
-        public IEnumerable<Movie> Search(string name)
+        /// <returns>ValueTuple<IEnumerable<Movie>, IEnumerable<TopModel>></returns>
+        public ValueTuple<IEnumerable<Movie>, IEnumerable<TopModel>> Search(string name)
         {
-            string key = $"Search_{name}";
-            IEnumerable<Movie> result;
+            string key1 = $"Search_{name}_Movies", key2 = $"Search_{name}_Tops";
+            ValueTuple<IEnumerable<Movie>, IEnumerable<TopModel>> result;
             if (_cacheState)
             {
-                result = _memoryCacheService.Get<List<Movie>>(key);
-                if (result.Any())
+                result.Item1 = _memoryCacheService.Get<List<Movie>>(key1);
+                result.Item2 = _memoryCacheService.Get<List<TopInfoModel>>(key2);
+                if (result.Item1.Any() && result.Item2.Any())
                 {
                     return result;
                 }
             }
-            result = GetMovieByName(name);
+            result = GetMovieAndTopsByName(name);
             if (_cacheState)
             {
-                _memoryCacheService.Set(key, result.ToList());
+                _memoryCacheService.Set(key1, result.Item1.ToList());
+                _memoryCacheService.Set(key2, result.Item2.ToList());
             }
             return result;
         }
 
-        private IEnumerable<Movie> GetMovieByName(string name)
+        private ValueTuple<IEnumerable<Movie>, IEnumerable<TopModel>> GetMovieAndTopsByName(string name)
         {
+            List<TopModel> tops = new List<TopModel>();
+            List<Movie> movies = new List<Movie>();
             var result = GetHttpString(new Uri($"https://api.so.360kan.com/index?force_v=1&kw={name}&from=&pageno=1&v_ap=1&tab=all&cb=data"));
             JsonNode obj = JsonNode.Parse(result)!;
             var lists = obj["data"]?["longData"]?["rows"] as JsonArray;
-            if (!_memoryCacheService.Get<List<TopModel>>(TopsKey).Any())
+            var topJobj = obj["data"]?["toplist"] as JsonArray;
+            foreach (var item in topJobj!)
             {
-                var tops = new List<TopModel>();
-                var topJobj = obj["data"]?["toplist"] as JsonArray;
-                foreach (var item in topJobj!)
+                _ = Enum.TryParse(item!["name"]!.GetValue<string>(), out CatType cat);
+                var topItems = item["list"] as JsonArray;
+                foreach (var model in topItems!)
                 {
-                    _ = Enum.TryParse(item!["name"]!.GetValue<string>(), out CatType cat);
-                    var topItems = item["list"] as JsonArray;
-                    foreach (var model in topItems!)
+                    tops.Add(new TopModel
                     {
-                        tops.Add(new TopModel
-                        {
-                            Title = model!["title"]!.GetValue<string>(),
-                            Cat = cat,
-                            Cover = new Uri(model["cover"]!.GetValue<string>()),
-                            PlayUrl = new Uri(model["url"]!.GetValue<string>()),
-                            Pv = model["pv"]!.GetValue<string>(),
-                        });
-                    }
+                        Title = model!["title"]!.GetValue<string>(),
+                        Cat = cat,
+                        Cover = new Uri(model["cover"]!.GetValue<string>()),
+                        PlayUrl = new Uri(model["url"]!.GetValue<string>()),
+                        PV = model["pv"]!.GetValue<string>(),
+                    });
                 }
-                _memoryCacheService.Set(TopsKey, tops);
             }
             foreach (var item in lists!)
             {
                 _ = double.TryParse(item!["score"]!.GetValue<string>(), out double score);
-                _ = int.TryParse(item["cat_id"]!.GetValue<string>(), out int cat);
-                yield return new Movie
+                _ = Enum.TryParse(item["cat_id"]!.GetValue<string>(), out CatType cat);
+                movies.Add(new Movie
                 {
                     Id = int.Parse(item["id"]!.GetValue<string>()),
-                    EnId = item["en_id"]!.GetValue<string>(),
-                    CatId = cat,
+                    EntId = item["en_id"]!.GetValue<string>(),
+                    Cat = cat,
                     CatName = item["cat_name"]!.GetValue<string>(),
-                    CoverUrl = new Uri(item["cover"]!.GetValue<string>()),
+                    Cover = new Uri(item["cover"]!.GetValue<string>()),
                     CoverInfo = item["coverInfo"].Deserialize<Dictionary<string, string>>(),
                     Title = item["titleTxt"]!.GetValue<string>(),
                     Year = int.Parse(item["year"]!.GetValue<string>()),
@@ -135,8 +128,9 @@ namespace MoviesLibrary.Services
                     Vip = Convert.ToBoolean(item["vip"]!.GetValue<int>()),
                     VideoStatus = item["video_status"]!.GetValue<string>(),
                     PlayLinks = item["playlinks"].Deserialize<Dictionary<string, object>>()
-                };
+                });
             }
+            return (movies, tops);
         }
 
         /// <summary>
@@ -144,7 +138,7 @@ namespace MoviesLibrary.Services
         /// </summary>
         /// <param name="cat">类型</param>
         /// <param name="EntId">编号,例如：faXpYRH6Rnb4UR</param>
-        /// <returns></returns>
+        /// <returns>MovieDetail</returns>
         public MovieDetail GetDetail(CatType cat, string EntId)
         {
             string key = $"Detail_{cat}_{EntId}";
@@ -174,7 +168,7 @@ namespace MoviesLibrary.Services
         /// <param name="StartPage">起始页</param>
         /// <param name="EndPage">结束页</param>
         /// <param name="site">线路</param>
-        /// <returns></returns>
+        /// <returns>MovieDetail</returns>
         public MovieDetail GetDetail(CatType Cat, string EntId, int StartPage, int EndPage, PlayLinkType site)
         {
             if (Cat == CatType.电影 || Cat == CatType.综艺)
@@ -203,20 +197,54 @@ namespace MoviesLibrary.Services
             }
         }
 
+        public IEnumerable<MovieRecommend> GetRecommends(CatType catType, int size = 18, string? CatName = null)
+        {
+            string url = $"https://api.web.360kan.com/v1/filter/list?catid={(int)catType}&size={size}";
+            if (!string.IsNullOrWhiteSpace(CatName))
+            {
+                url += $"&cat={CatName}";
+            }
+            url += "&callback=data";
+            var JsonStr = GetHttpString(new Uri(url));
+            var obj = JsonNode.Parse(JsonStr)!["data"]!["movies"] as JsonArray;
+            foreach (var item in obj!)
+            {
+                int total = 0, upinfo = 0;
+                if (catType != CatType.电影)
+                {
+                    total = item!["total"]!.GetValue<int>();
+                    upinfo = item["upinfo"]!.GetValue<int>();
+                }
+                yield return new MovieRecommend
+                {
+                    Title = item!["title"]!.GetValue<string>(),
+                    Comment = item["comment"]!.GetValue<string>(),
+                    Cat = catType,
+                    EntId = item["id"]!.GetValue<string>(),
+                    Cover = new Uri(item["cover"]!.GetValue<string>()),
+                    CdnCover = new Uri(item["cdncover"]!.GetValue<string>()),
+                    Total = total,
+                    UpInfo = upinfo,
+                    Vip = item["payment"]!.GetValue<bool>()
+                };
+            }
+        }
+
         /// <summary>
         /// 根据影视类型解析数据
         /// </summary>
         /// <param name="cat">影视类型</param>
         /// <param name="obj">json对象</param>
         /// <returns></returns>
-        private static MovieDetail Analysis(CatType cat, JsonNode obj)
+        private MovieDetail Analysis(CatType cat, JsonNode obj)
         {
             var data = new MovieDetail
             {
                 Id = int.Parse(obj["id"]!.GetValue<string>()),
-                EntId = obj["ent_id"]?.GetValue<string>(),
+                Cat = cat,
+                EntId = obj["ent_id"]!.GetValue<string>(),
                 Description = obj["description"]?.GetValue<string>(),
-                Title = obj["title"]?.GetValue<string>(),
+                Title = obj["title"]!.GetValue<string>(),
                 Moviecategory = GetListStringByJsonArray((JsonArray)obj["moviecategory"]!),
                 Director = GetListStringByJsonArray((JsonArray)obj["director"]!),
                 PubDate = DateTime.Parse(obj["pubdate"]!.GetValue<string>()),
@@ -241,6 +269,7 @@ namespace MoviesLibrary.Services
                 var playLinks = obj["allepidetail"].Deserialize<Dictionary<string, JsonArray>>();
                 data.PlayLinksDetail = playLinks?.ToDictionary(x => x.Key, x => x.Value.ToDictionary(x => x!["id"]!.GetValue<string>(), x => x!["url"]!.GetValue<string>().Split("?").First()));
             }
+            data.MovieRecommends = GetRecommends(cat, CatName: data.Moviecategory.FirstOrDefault());
             return data;
         }
 
@@ -259,9 +288,16 @@ namespace MoviesLibrary.Services
         /// </summary>
         /// <param name="jsonArray"></param>
         /// <returns></returns>
-        private static List<string> GetListStringByJsonArray(JsonArray jsonArray)
+        private List<string> GetListStringByJsonArray(JsonArray? jsonArray)
         {
-            return jsonArray.Select(x => x!.GetValue<string>()).ToList();
+            if (jsonArray != null)
+            {
+                return jsonArray.Select(x => x!.GetValue<string>()).ToList();
+            }
+            else
+            {
+                return new List<string>();
+            }
         }
 
         /// <summary>
@@ -269,7 +305,7 @@ namespace MoviesLibrary.Services
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static Dictionary<string, string> GetEnumList<T>() where T : Enum
+        public Dictionary<string, string> GetEnumList<T>() where T : Enum
         {
             Dictionary<string, string> pairs = new();
             Array values = Enum.GetValues(typeof(T));

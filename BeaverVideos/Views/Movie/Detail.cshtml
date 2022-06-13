@@ -2,4 +2,4 @@
 @model MovieDetail
 
 <h1>@Model.Title</h1>
-<iframe id="palybox" style="height: 100%;" src="https://jx.parwix.com:4433/player/analysis.php?v=" allowtransparency="true" frameborder="0" scrolling="no" allowfullscreen="true"></iframe>
+@await Html.PartialAsync("Analysis",new { url =""})

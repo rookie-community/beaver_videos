@@ -1,7 +1,7 @@
-﻿@using MoviesLibrary.Common.Enum
+﻿@using MoviesLibrary.Enums
 @using MoviesLibrary.Model
 @using System.Text.Json
-@model IEnumerable<TopModel>
+@model IEnumerable<IGrouping<CatType, TopInfoModel>>
 @{
     var routeData = new Dictionary<string, string>();
 }
@@ -24,13 +24,13 @@
     <div class="layui-row">
         <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
             <ul class="layui-tab-title">
-                <li class="layui-this">电影</li>
-                <li>电视剧</li>
-                <li>综艺</li>
-                <li>动漫</li>
+                @foreach (var item in Model.Select(x => x.Key).AsEnumerable())
+                {
+                    <li class="layui-this">@item</li>
+                }
             </ul>
             <div class="layui-tab-content" style="height: 100px;">
-                @foreach (var tops in Model.GroupBy(x => x.Cat).ToList())
+                @foreach (var tops in Model)
                 {
                     <div class="layui-tab-item layui-show">
                         <div class="layui-row">
@@ -41,9 +41,9 @@
                                 routeData.Add("catType", ((int)item.Cat).ToString());
 
                                 <div class="layui-col-md2 layui-col-sm4">
-                                    <div class="layui-panel" style="width:183px;height:300px;margin:5px;">
+                                    <div class="layui-panel" style="width:183px;height:310px;margin:5px;">
                                         <a asp-controller="Movie" asp-action="Detail" asp-all-route-data="routeData" target="_blank">
-                                            <img src="@item.Cover" style="width:183px;height:257px;" />
+                                            <img src="@item.Cover" style="width:183px;height:280px;" />
                                             <label class="layui-form-label" style="width:150px;text-align:center">@item.Title</label>
                                         </a>
                                     </div>

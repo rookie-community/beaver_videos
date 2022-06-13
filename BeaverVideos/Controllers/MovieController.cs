@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MoviesLibrary.Common.Enum;
+using MoviesLibrary.Enums;
 using MoviesLibrary.Model;
 using MoviesLibrary.Services;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -25,7 +26,7 @@ namespace BeaverVideos.Controllers
         [Public]
         public IActionResult Index()
         {
-            var tops = _movieService.GetTops();
+            IEnumerable<IGrouping<CatType, TopInfoModel>> tops = _movieService.GetTops(TopType.All).GroupBy(x => x.Cat).OrderBy(x => x.Key).AsEnumerable();
             return View(tops);
         }
 
@@ -48,13 +49,11 @@ namespace BeaverVideos.Controllers
         }
 
         [Public]
-        public IActionResult Analysis(string url)
+        public async Task<IActionResult> Analysis(string url)
         {
-            //string html = await _httpClient.GetStringAsync($"https://jx.parwix.com:4433/player/analysis.php?v={url}");
-            //html = html.Replace("Parwix解析系统", "小狸影视解析");
-            //https://v.qq.com/x/cover/m441e3rjq9kwpsc/m00253deqqo.html
-            string playlink = $"https://www.baidu.com";
-            return PartialView(playlink);
+            string html = await _httpClient.GetStringAsync($"https://okjx.cc/?url={url}");
+            ViewBag.AnalysisHtml = html.Replace("OK解析", "小狸影视");
+            return PartialView();
         }
 
         [Public]

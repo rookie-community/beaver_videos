@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace MoviesLibrary.Common.Enum
+namespace MoviesLibrary.Enums
 {
     public enum PlayLinkType
     {

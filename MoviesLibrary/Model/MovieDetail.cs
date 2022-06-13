@@ -6,20 +6,13 @@ using System.Threading.Tasks;
 
 namespace MoviesLibrary.Model
 {
-    public class MovieDetail
+    public class MovieDetail : BaseModel
     {
         /// <summary>
         /// 影视Id
         /// </summary>
         public int Id { get; set; }
-        /// <summary>
-        /// 唯一编号
-        /// </summary>
-        public string? EntId { get; set; }
-        /// <summary>
-        /// 影视标题
-        /// </summary>
-        public string? Title { get; set; }
+
         /// <summary>
         /// 最新集数
         /// </summary>
@@ -72,5 +65,10 @@ namespace MoviesLibrary.Model
         /// 是否需要会员
         /// </summary>
         public bool Vip { get; set; }
+
+        /// <summary>
+        /// 精彩推荐
+        /// </summary>
+        public IEnumerable<MovieRecommend> MovieRecommends { get; set; } = new List<MovieRecommend>();
     }
 }
