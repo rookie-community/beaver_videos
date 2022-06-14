@@ -7,22 +7,7 @@
     var routeData = new Dictionary<string, string>();
 }
 <div class="layui-container">
-    <div class="layui-row" style="margin-top:50px;margin-bottom:20px;">
-        <h1 class="layui-col-md-offset5 layui-col-md2">小狸影视</h1>
-    </div>
-    <div class="layui-row">
-        <form class="layui-form" asp-controller="Movie" asp-action="Search" method="get">
-            <div class="layui-col-md10">
-                <input type="text" name="name" autocomplete="off" placeholder="请输入影视名称或视频链接地址" class="layui-input">
-            </div>
-            <div class="layui-col-md2">
-                <button class="layui-btn layui-btn-normal layui-btn-fluid" type="submit" target="_blank">
-                    <i class="layui-icon layui-icon-search layui-font-12"></i>
-                    查询
-                </button>
-            </div>
-        </form>
-    </div>
+    @await Component.InvokeAsync("Navigation")
     <blockquote class="layui-elem-quote" style="margin-top:20px;">排行榜</blockquote>
     <div class="layui-row">
         <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
@@ -40,10 +25,10 @@
                             @foreach (var item in tops)
                             {
                                 routeData = new Dictionary<string, string>()
-                                    {
-                                        { "entId",item.EntId},
-                                        { "catType",((int)item.Cat).ToString()}
-                                    };
+                        {
+                        { "entId",item.EntId},
+                        { "catType",((int)item.Cat).ToString()}
+                        };
                                 <div class="layui-col-md2 layui-col-sm4">
                                     <div class="layui-panel" style="width:180px;height:275px;margin:5px;">
                                         <a asp-controller="Movie" asp-action="Detail" asp-all-route-data="routeData" target="_blank">

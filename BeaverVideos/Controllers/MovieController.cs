@@ -4,9 +4,6 @@ using MoviesLibrary.Model;
 using MoviesLibrary.Services;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using WalkingTec.Mvvm.Core;
 using WalkingTec.Mvvm.Mvc;
 
@@ -15,18 +12,20 @@ namespace BeaverVideos.Controllers
     public class MovieController : BaseController
     {
         private readonly MovieService _movieService;
-        private readonly HttpClient _httpClient;
 
         public MovieController(MovieService movieService)
         {
             _movieService = movieService;
-            _httpClient = new HttpClient();
         }
 
         [Public]
         public IActionResult Index()
         {
-            IEnumerable<IGrouping<CatType, TopInfoModel>> tops = _movieService.GetTops(TopType.Default).DistinctBy(x => x.EntId).GroupBy(x => x.Cat).OrderBy(x => x.Key).AsEnumerable();
+            var tops = _movieService.GetTops(TopType.Default)
+                .DistinctBy(x => x.EntId)
+                .GroupBy(x => x.Cat)
+                .OrderBy(x => x.Key)
+                .AsEnumerable();
             return View(tops);
         }
 
@@ -34,41 +33,63 @@ namespace BeaverVideos.Controllers
         public IActionResult Search(string name)
         {
             ViewBag.Name = name;
-            if (Regex.IsMatch(name, @"http(s)?://([\w-]+\.)+[\w-]+(/[\w-./?%&=]*)?"))
+            if (string.IsNullOrWhiteSpace(name))
             {
-                return RedirectToAction("Analysis", new { url = name });
+                return RedirectToAction("Index");
             }
-            else if (!string.IsNullOrWhiteSpace(name))
+            //else if (Regex.IsMatch(name, @"http(s)?://([\w-]+\.)+[\w-]+(/[\w-./?%&=]*)?"))
+            //{
+            //    return RedirectToAction("Analysis", new { url = name });
+            //}
+            else
             {
                 var result = _movieService.Search(name);
                 return View(result.Item1);
             }
-            else
-            {
-                return RedirectToAction("Index");
-            }
         }
 
+        /// <summary>
+        /// 详情页
+        /// </summary>
+        /// <param name="entId">编号</param>
+        /// <param name="catType">类型</param>
+        /// <param name="linkType">线路</param>
+        /// <param name="thisIndex">当前选集</param>
+        /// <returns></returns>
         [Public]
-        public async Task<IActionResult> Analysis(string url)
+        public IActionResult Detail(string entId, CatType catType, PlayLinkType linkType, int index = 1)
         {
-            string html = await _httpClient.GetStringAsync($"https://okjx.cc/?url={url}");
-            ViewBag.AnalysisHtml = html.Replace("OK解析", "小狸影视");
-            return PartialView();
-        }
-
-        [Public]
-        public IActionResult Detail(string entId, CatType catType, PlayLinkType linkType, int start = 1, int end = 10)
-        {
-            MovieDetail detail;
-            if (catType == CatType.Film || catType == CatType.Variety)
+            int page = 1;
+            int limit = 100;
+            ViewBag.ThisIndex = index;
+            MovieDetail detail = new MovieDetail();
+            do
             {
-                detail = _movieService.GetDetail(catType, entId);
+                if (catType == CatType.Film || catType == CatType.Variety)
+                {
+                    detail = _movieService.GetDetail(catType, entId);
+                }
+                else if (page == 1)
+                {
+                    detail = _movieService.GetDetail(catType, entId, page, limit, linkType);
+                }
+                else
+                {
+                    int start = (page - 1) * limit + 1;
+                    int end = page * limit > detail.UpInfo ? detail.UpInfo : page * limit;
+                    var data = _movieService.GetDetail(catType, entId, start, end, linkType);
+                    var lists = data.PlayLinksDetail;
+                    if (lists.Any())
+                    {
+                        foreach (var item in lists)
+                        {
+                            detail.PlayLinksDetail.Add(item.Key, item.Value);
+                        }
+                    }
+                }
+                page++;
             }
-            else
-            {
-                detail = _movieService.GetDetail(catType, entId, start, end, linkType);
-            }
+            while (detail.PlayLinksDetail.Count < detail.UpInfo);
             return View(detail);
         }
     }

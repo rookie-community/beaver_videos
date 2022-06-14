@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MoviesLibrary.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,7 +17,7 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 最新集数
         /// </summary>
-        public int? UpInfo { get; set; }
+        public int UpInfo { get; set; } = 0;
         /// <summary>
         /// 标签、分类
         /// </summary>
@@ -24,7 +25,7 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 总数量
         /// </summary>
-        public int? Total { get; set; }
+        public int Total { get; set; } = 0;
         /// <summary>
         /// 影视简介
         /// </summary>
@@ -56,7 +57,11 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 播放列表
         /// </summary>
-        public Dictionary<string, Dictionary<string, string>>? PlayLinksDetail { get; set; }
+        public Dictionary<string, string> PlayLinksDetail { get; set; } = new Dictionary<string, string>();
+        /// <summary>
+        /// 当前线路
+        /// </summary>
+        public PlayLinkType ThisPlayLink { get; set; }
         /// <summary>
         /// 线路列表
         /// </summary>

@@ -1,4 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Configuration;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -10,6 +14,7 @@ using MoviesLibrary.Extension;
 using WalkingTec.Mvvm.Core;
 using WalkingTec.Mvvm.Core.Support.FileHandlers;
 using WalkingTec.Mvvm.Mvc;
+using Yarp.ReverseProxy.Configuration;
 
 namespace BeaverVideos
 {
@@ -55,8 +60,9 @@ namespace BeaverVideos
                 options.FileSubDirSelector = SubDirSelector;
                 options.ReloadUserFunc = ReloadUser;
             });
-
+            services.AddHttpClient();
             services.AddMoviesLibrary();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -75,7 +81,6 @@ namespace BeaverVideos
             app.UseSession();
             app.UseWtmSwagger();
             app.UseWtm();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -84,10 +89,10 @@ namespace BeaverVideos
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Movie}/{action=Index}/{id?}");
-
             });
 
             app.UseWtmContext();
+
         }
 
         /// <summary>

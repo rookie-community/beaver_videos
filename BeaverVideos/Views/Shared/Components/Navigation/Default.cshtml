@@ -1,0 +1,18 @@
+﻿<div class="layui-row" style="margin:50px 0px;">
+    <div class="layui-col-md2">
+        <h1>小狸影视</h1>
+    </div>
+    <div class="layui-col-md10">
+        <form asp-controller="Movie" asp-action="Search" method="get">
+            <div class="layui-col-md10">
+                <input type="text" name="name" autocomplete="off" placeholder="请输入影视名称或视频链接地址" class="layui-input">
+            </div>
+            <div class="layui-col-md2">
+                <button class="layui-btn layui-btn-normal layui-btn-fluid" type="submit" target="_blank">
+                    <i class="layui-icon layui-icon-search layui-font-12"></i>
+                    查询
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
