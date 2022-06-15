@@ -12,9 +12,9 @@ namespace MoviesLibrary.Enums
     public enum TopType
     {
         /// <summary>
-        /// 总榜
+        /// 默认
         /// </summary>
-        General = 1,
+        Default = 1,
         /// <summary>
         /// 电影
         /// </summary>
@@ -36,8 +36,8 @@ namespace MoviesLibrary.Enums
         /// </summary>
         Children = 6,
         /// <summary>
-        /// 默认所有类型
+        /// 所有类型
         /// </summary>
-        Default = 7
+        General = 7
     }
 }

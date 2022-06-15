@@ -57,7 +57,7 @@ namespace BeaverVideos.Controllers
         /// <param name="linkType">线路</param>
         /// <param name="index">当前选集</param>
         /// <returns></returns>
-        [AllRights]
+        [Public]
         [ActionDescription("详情页")]
         public IActionResult Detail(string entId, CatType catType, PlayLinkType linkType, int index = 1)
         {
@@ -65,38 +65,45 @@ namespace BeaverVideos.Controllers
             {
                 return Redirect("/");
             }
+            bool IsFirst = true;//是否第一次请求
             int page = 1;
-            int limit = 100;
+            int limit = 50;
             string baseUrl = "https://jx.parwix.com:4433/player/analysis.php?v=";
             ViewBag.ThisIndex = index;
             MovieDetail detail = new MovieDetail();
             do
             {
-                if ((catType == CatType.Film || catType == CatType.Variety) && page == 1)
+                if (IsFirst)
                 {
                     detail = _movieService.GetDetail(catType, entId);
-                }
-                else if (page == 1)
-                {
-                    detail = _movieService.GetDetail(catType, entId, page, limit, linkType);
+                    limit = detail.PlayLinksDetail.Count;//设置每页数量
+                    if (linkType == 0)
+                    {
+                        linkType = detail.ThisPlayLink;
+                    }
+                    IsFirst = false;
                 }
                 else
                 {
                     int start = (page - 1) * limit + 1;
                     int end = page * limit > detail.UpInfo ? detail.UpInfo : page * limit;
-                    var data = _movieService.GetDetail(catType, entId, start, end, linkType);
-                    var lists = data.PlayLinksDetail;
-                    if (lists.Any())
+                    var lists = _movieService.GetDetail(catType, entId, start, end, linkType).PlayLinksDetail;
+                    if (page == 1)
+                    {
+                        detail.PlayLinksDetail = lists;
+                    }
+                    else if (lists.Any())
                     {
                         foreach (var item in lists)
                         {
                             detail.PlayLinksDetail.Add(item.Key, item.Value);
                         }
                     }
+                    page++;
                 }
-                page++;
             }
             while (detail.PlayLinksDetail.Count < detail.UpInfo);
+            detail.MovieRecommends = _movieService.GetRecommends(catType, 12, detail.Moviecategory.FirstOrDefault());
             if (detail.PlayLinksDetail.TryGetValue(index.ToString(), out string url))
             {
                 ViewBag.PlayUrl = baseUrl + url;

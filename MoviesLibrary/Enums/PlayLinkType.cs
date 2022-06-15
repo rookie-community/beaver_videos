@@ -8,36 +8,41 @@ namespace MoviesLibrary.Enums
         /// 腾讯视频
         /// </summary>
         [Description("腾讯视频")]
-        qq,
+        qq = 1,
         /// <summary>
         /// 爱奇艺
         /// </summary>
         [Description("爱奇艺")]
-        qiyi,
+        qiyi = 2,
+        /// <summary>
+        /// 优酷
+        /// </summary>
+        [Description("优酷")]
+        youku = 3,
         /// <summary>
         /// 芒果TV
         /// </summary>
         [Description("芒果TV")]
-        imgo,
+        imgo = 4,
         /// <summary>
         /// 乐视
         /// </summary>
         [Description("乐视")]
-        leshi,
+        leshi = 5,
         /// <summary>
         /// 搜狐
         /// </summary>
         [Description("搜狐")]
-        sohu,
+        sohu = 6,
         /// <summary>
         /// 1905电影
         /// </summary>
         [Description("1905电影")]
-        m1905,
+        m1905 = 7,
         /// <summary>
         /// 中央电视台
         /// </summary>
         [Description("央视网")]
-        cntv,
+        cntv = 8,
     }
 }

@@ -146,9 +146,10 @@ namespace MoviesLibrary.Services
         /// </summary>
         /// <param name="cat">类型</param>
         /// <param name="EntId">编号,例如：faXpYRH6Rnb4UR</param>
+        /// <param name="getRecommends">是否需要精彩推荐数据</param>
         /// <param name="total">精彩推荐数量</param>
         /// <returns>MovieDetail</returns>
-        public MovieDetail GetDetail(CatType cat, string EntId, int total = 12)
+        public MovieDetail GetDetail(CatType cat, string EntId, bool getRecommends = false, int total = 12)
         {
             string key = $"Detail_{cat}_{EntId}";
             if (_cacheState)
@@ -161,7 +162,7 @@ namespace MoviesLibrary.Services
             }
             var json = GetHttpString(new Uri($"https://api.web.360kan.com/v1/detail?cat={(int)cat}&id={EntId}&callback=data"));
             var obj = JsonNode.Parse(json)!["data"]!;
-            var result = Analysis(cat, obj, total);
+            var result = Analysis(cat, obj, getRecommends, total);
             if (_cacheState)
             {
                 _memoryCacheService.Set(key, result);
@@ -177,9 +178,10 @@ namespace MoviesLibrary.Services
         /// <param name="StartPage">起始页</param>
         /// <param name="EndPage">结束页</param>
         /// <param name="site">线路</param>
+        /// <param name="getRecommends">是否需要精彩推荐数据</param>
         /// <param name="total">精彩推荐数量</param>
         /// <returns>MovieDetail</returns>
-        public MovieDetail GetDetail(CatType Cat, string EntId, int StartPage, int EndPage, PlayLinkType site, int total = 12)
+        public MovieDetail GetDetail(CatType Cat, string EntId, int StartPage, int EndPage, PlayLinkType site, bool getRecommends = false, int total = 12)
         {
             if ((EndPage <= StartPage) || (EndPage - StartPage + 1 > 200))
             {
@@ -187,7 +189,7 @@ namespace MoviesLibrary.Services
             }
             else if (Cat == CatType.Film || Cat == CatType.Variety)
             {
-                return GetDetail(Cat, EntId, total);
+                return GetDetail(Cat, EntId, getRecommends, total);
             }
             else
             {
@@ -202,7 +204,7 @@ namespace MoviesLibrary.Services
                 }
                 var json = GetHttpString(new Uri($"https://api.web.360kan.com/v1/detail?cat={(int)Cat}&id={EntId}&start={StartPage}&end={EndPage}&site={site}&callback=data"));
                 var obj = JsonNode.Parse(json)!["data"]!;
-                var result = Analysis(Cat, obj, total);
+                var result = Analysis(Cat, obj, getRecommends, total);
                 if (_cacheState)
                 {
                     _memoryCacheService.Set(key, result);
@@ -214,9 +216,9 @@ namespace MoviesLibrary.Services
         /// <summary>
         /// 获取推荐列表数据
         /// </summary>
-        /// <param name="catType"></param>
+        /// <param name="catType">影视类型</param>
         /// <param name="size">数量</param>
-        /// <param name="CatName"></param>
+        /// <param name="CatName">关联词</param>
         /// <returns></returns>
         public IEnumerable<MovieRecommend> GetRecommends(CatType catType, int size = 12, string? CatName = null)
         {
@@ -257,8 +259,9 @@ namespace MoviesLibrary.Services
         /// <param name="cat">影视类型</param>
         /// <param name="obj">json对象</param>
         /// <param name="total">精彩推荐数量</param>
+        /// <param name="getRecommends">是否获取推荐数据</param>
         /// <returns></returns>
-        private MovieDetail Analysis(CatType cat, JsonNode obj, int total)
+        private MovieDetail Analysis(CatType cat, JsonNode obj, bool getRecommends = false, int total = 12)
         {
             if (obj != null)
             {
@@ -300,7 +303,10 @@ namespace MoviesLibrary.Services
                     var playLinks = PlayResult.Value;
                     data.PlayLinksDetail = playLinks!.ToDictionary(x => x!["playlink_num"]!.GetValue<string>(), x => x!["url"]!.GetValue<string>().Split("?").First());
                 }
-                data.MovieRecommends = GetRecommends(cat, total, data.Moviecategory.FirstOrDefault());
+                if (getRecommends)
+                {
+                    data.MovieRecommends = GetRecommends(cat, total, data.Moviecategory.FirstOrDefault());
+                }
                 return data;
             }
             else
@@ -316,7 +322,14 @@ namespace MoviesLibrary.Services
         /// <returns></returns>
         private string GetHttpString(Uri uri)
         {
-            return _httpClient.GetStringAsync(uri.ToString()).Result.Trim()[5..^2];
+            try
+            {
+                return _httpClient.GetStringAsync(uri.ToString()).Result.Trim()[5..^2];
+            }
+            catch (Exception)
+            {
+                return "404错误";
+            }
         }
 
         /// <summary>
