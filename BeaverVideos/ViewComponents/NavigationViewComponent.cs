@@ -6,15 +6,9 @@ namespace BeaverVideos.Components
 {
     public class NavigationViewComponent : ViewComponent
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-
-        public NavigationViewComponent(IHttpClientFactory httpClientFactory)
+        public IViewComponentResult Invoke(string name = "")
         {
-            _httpClientFactory = httpClientFactory;
-        }
-
-        public IViewComponentResult Invoke()
-        {
+            ViewBag.Name = name;
             return View();
         }
     }

@@ -1,11 +1,14 @@
-﻿<div class="layui-row" style="margin:50px 0px;">
+﻿@{
+    var name = ViewBag.Name;
+}
+<div class="layui-row" style="margin:50px 0px;">
     <div class="layui-col-md2">
         <h1>小狸影视</h1>
     </div>
     <div class="layui-col-md10">
         <form asp-controller="Movie" asp-action="Search" method="get">
             <div class="layui-col-md10">
-                <input type="text" name="name" autocomplete="off" placeholder="请输入影视名称或视频链接地址" class="layui-input">
+                <input type="text" name="name" autocomplete="off" placeholder="请输入您需要查询的影视名称" asp-for="@name" class="layui-input">
             </div>
             <div class="layui-col-md2">
                 <button class="layui-btn layui-btn-normal layui-btn-fluid" type="submit" target="_blank">

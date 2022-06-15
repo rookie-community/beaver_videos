@@ -17,7 +17,7 @@ namespace MoviesLibrary.Enums
         /// </summary>
         Teleplay = 2,
         /// <summary>
-        /// 电视剧
+        /// 综艺
         /// </summary>
         Variety = 3,
         /// <summary>

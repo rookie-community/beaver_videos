@@ -169,7 +169,5 @@ namespace BeaverVideos.Controllers
             public int Subscribers_count { get; set; }
             public int Open_issues_count { get; set; }
         }
-
     }
-
 }

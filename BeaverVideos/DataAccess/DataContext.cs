@@ -119,5 +119,4 @@ namespace BeaverVideos.DataAccess
             return new DataContext(connectionObject.Value, (DBTypeEnum)connectionObject.DbType);
         }
     }
-
 }

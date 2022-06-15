@@ -13,9 +13,9 @@ namespace MoviesLibrary.Model
     public class MovieRecommend: BaseModel
     {
         /// <summary>
-        /// 简介
+        /// 简短介绍
         /// </summary>
-        public string Comment { get; set; } = string.Empty;
+        public string? Comment { get; set; }
 
         /// <summary>
         /// 缩略图

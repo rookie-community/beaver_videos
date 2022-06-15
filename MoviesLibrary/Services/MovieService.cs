@@ -231,7 +231,7 @@ namespace MoviesLibrary.Services
             foreach (var item in obj!)
             {
                 int total = 0, upinfo = 0;
-                if (catType != CatType.Film)
+                if (catType == CatType.Anime || catType == CatType.Teleplay)
                 {
                     total = item!["total"]!.GetValue<int>();
                     upinfo = item["upinfo"]!.GetValue<int>();
@@ -239,7 +239,7 @@ namespace MoviesLibrary.Services
                 yield return new MovieRecommend
                 {
                     Title = item!["title"]!.GetValue<string>(),
-                    Comment = item["comment"]!.GetValue<string>(),
+                    Comment = item["comment"]?.GetValue<string>(),
                     Cat = catType,
                     EntId = item["id"]!.GetValue<string>(),
                     Cover = new Uri($"http:{item["cover"]!.GetValue<string>()}"),
@@ -277,9 +277,9 @@ namespace MoviesLibrary.Services
                     CdnCover = new Uri(obj["cdncover"]!.GetValue<string>()),
                     Vip = obj["vip"]!.GetValue<bool>()
                 };
-                if (cat == CatType.Film)
+                if (cat == CatType.Film || cat == CatType.Variety)
                 {
-                    _ = double.TryParse(obj["doubanscore"]!.GetValue<string>(), out double score);
+                    _ = double.TryParse(obj["doubanscore"]?.GetValue<string>(), out double score);
                     data.DouBanScore = score;
                     data.PlayLinkSites = GetListStringByJsonArray((JsonArray)obj["playlink_sites"]!);
                     var PlayResult = obj["playlinksdetail"].Deserialize<Dictionary<string, JsonNode>>()!.First();

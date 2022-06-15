@@ -5,7 +5,7 @@
     var routeData = new Dictionary<string, string>();
 }
 <div class="layui-container">
-    @await Component.InvokeAsync("Navigation",new {name=ViewBag.Name})
+    <vc:navigation name="@ViewBag.Name"></vc:navigation>
     @if (Model.Any())
     {
         foreach (var item in Model)

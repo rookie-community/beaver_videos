@@ -7,7 +7,7 @@
     var routeData = new Dictionary<string, string>();
 }
 <div class="layui-container">
-    @await Component.InvokeAsync("Navigation")
+    <vc:navigation name=""></vc:navigation>
     <blockquote class="layui-elem-quote" style="margin-top:20px;">排行榜</blockquote>
     <div class="layui-row">
         <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
@@ -32,7 +32,7 @@
                                 <div class="layui-col-md2 layui-col-sm4">
                                     <div class="layui-panel" style="width:180px;height:275px;margin:5px;">
                                         <a asp-controller="Movie" asp-action="Detail" asp-all-route-data="routeData" target="_blank">
-                                            <img src="@item.Cover" style="width:180px;height:235px;" />
+                                            <img src="@item.Cover" style="width:180px;height:235px;"/>
                                             <label class="layui-form-label" style="width:150px;text-align:center">@item.Title</label>
                                         </a>
                                     </div>
