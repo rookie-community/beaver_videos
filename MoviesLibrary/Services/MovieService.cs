@@ -20,14 +20,14 @@ namespace MoviesLibrary.Services
         /// </summary>
         /// <param name="memoryCacheState">是否启用缓存</param>
         /// <param name="absoluteExpiration">缓存过期时间，默认一小时过期</param>
-        public MovieService(bool memoryCacheState = false, DateTimeOffset absoluteExpiration = default)
+        public MovieService(bool memoryCacheState = true, DateTimeOffset absoluteExpiration = default)
         {
             _httpClient = new HttpClient(new HttpClientHandler
             {
                 ServerCertificateCustomValidationCallback = (message, cert, chain, error) => true,
                 SslProtocols = SslProtocols.Tls12,
             });
-            _memoryCacheService = new MemoryCacheService(absoluteExpiration == default ? DateTimeOffset.Now.AddHours(1) : absoluteExpiration);
+            _memoryCacheService = new MemoryCacheService(absoluteExpiration);
             _cacheState = memoryCacheState;
         }
 
@@ -242,7 +242,7 @@ namespace MoviesLibrary.Services
                     Comment = item["comment"]?.GetValue<string>(),
                     Cat = catType,
                     EntId = item["id"]!.GetValue<string>(),
-                    Cover = new Uri($"http:{item["cover"]!.GetValue<string>()}"),
+                    Cover = new Uri($"http:{item["cdncover"]!.GetValue<string>()}"),
                     CdnCover = new Uri(item["cdncover"]!.GetValue<string>()),
                     Total = total,
                     UpInfo = upinfo,

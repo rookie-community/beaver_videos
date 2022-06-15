@@ -19,7 +19,7 @@ namespace MoviesLibrary.Services
             _cache = MemoryCache.Default;
             _policy = new CacheItemPolicy()
             {
-                AbsoluteExpiration = absoluteExpiration
+                AbsoluteExpiration = absoluteExpiration == default ? DateTimeOffset.Now.AddHours(1) : absoluteExpiration
             };
         }
 

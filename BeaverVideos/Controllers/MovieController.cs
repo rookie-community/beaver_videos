@@ -2,7 +2,6 @@
 using MoviesLibrary.Enums;
 using MoviesLibrary.Model;
 using MoviesLibrary.Services;
-using System.Collections.Generic;
 using System.Linq;
 using WalkingTec.Mvvm.Core;
 using WalkingTec.Mvvm.Mvc;
@@ -62,6 +61,10 @@ namespace BeaverVideos.Controllers
         [ActionDescription("详情页")]
         public IActionResult Detail(string entId, CatType catType, PlayLinkType linkType, int index = 1)
         {
+            if (entId == null || catType == 0)
+            {
+                return Redirect("/");
+            }
             int page = 1;
             int limit = 100;
             string baseUrl = "https://jx.parwix.com:4433/player/analysis.php?v=";

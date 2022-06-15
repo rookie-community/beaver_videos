@@ -14,7 +14,7 @@ namespace MoviesLibrary.Test
 
         public UnitTest()
         {
-            _movieService = new MovieService(true);
+            _movieService = new MovieService();
             _listItems = new List<string> { "寻梦环游记", "斗罗大陆", "海上钢琴师" };
         }
 

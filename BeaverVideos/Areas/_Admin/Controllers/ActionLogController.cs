@@ -74,6 +74,5 @@ namespace WalkingTec.Mvvm.Mvc.Admin.Controllers
                 return FFResult().CloseDialog().RefreshGrid().Alert(Localizer["Sys.BatchDeleteSuccess", vm.Ids.Length]);
             }
         }
-
     }
 }
