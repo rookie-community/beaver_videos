@@ -28,7 +28,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Update="wwwroot\font-awesome\css\all.css">
+		<Content Update="wwwroot\font-awesome\css\font-awesome.css">
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>

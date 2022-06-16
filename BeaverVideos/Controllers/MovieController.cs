@@ -75,12 +75,16 @@ namespace BeaverVideos.Controllers
             {
                 if (IsFirst)
                 {
-                    detail = _movieService.GetDetail(catType, entId);
-                    limit = detail.PlayLinksDetail.Count;//设置每页数量
                     if (linkType == 0)
                     {
+                        detail = _movieService.GetDetail(catType, entId);
                         linkType = detail.ThisPlayLink;
                     }
+                    else
+                    {
+                        detail = _movieService.GetDetail(catType, entId, linkType);
+                    }
+                    limit = detail.UpInfo > 100 ? 100 : detail.PlayLinksDetail.Count;//设置每页数量
                     IsFirst = false;
                 }
                 else
@@ -99,11 +103,16 @@ namespace BeaverVideos.Controllers
                             detail.PlayLinksDetail.Add(item.Key, item.Value);
                         }
                     }
+                    else if (!lists.Any() && page != 1)
+                    {
+                        break;
+                    }
                     page++;
                 }
             }
             while (detail.PlayLinksDetail.Count < detail.UpInfo);
             detail.MovieRecommends = _movieService.GetRecommends(catType, 12, detail.Moviecategory.FirstOrDefault());
+            ViewBag.PlayTypeList = _movieService.GetEnumList<PlayLinkType>();
             if (detail.PlayLinksDetail.TryGetValue(index.ToString(), out string url))
             {
                 ViewBag.PlayUrl = baseUrl + url;

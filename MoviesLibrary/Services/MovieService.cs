@@ -37,21 +37,31 @@ namespace MoviesLibrary.Services
             var obj = JsonNode.Parse(JsonStr)!["data"] as JsonArray;
             foreach (var item in obj!)
             {
-                yield return new TopInfoModel
+                TopInfoModel top;
+                try
                 {
-                    Title = item!["title"]!.GetValue<string>(),
-                    Comment = item!["comment"]!.GetValue<string>(),
-                    UpInfo = item["upinfo"]!.GetValue<string>(),
-                    Cat = (CatType)item["cat"]!.GetValue<int>(),
-                    EntId = item["ent_id"]!.GetValue<string>(),
-                    Cover = new Uri(item["cover"]!.GetValue<string>()),
-                    Description = item["description"]!.GetValue<string>(),
-                    Moviecat = GetListStringByJsonArray((JsonArray)item["moviecat"]!),
-                    PubDate = DateTime.TryParse(item["pubdate"]!.GetValue<string>(), out DateTime date) ? date : DateTime.Now,
-                    Vip = item["vip"]!.GetValue<bool>(),
-                    PlayUrl = new Uri(item["url"]!.GetValue<string>()),
-                    PV = item["pv"]!.GetValue<string>()
-                };
+                    top = new TopInfoModel
+                    {
+                        Title = item!["title"]!.GetValue<string>(),
+                        Comment = item!["comment"]!.GetValue<string>(),
+                        UpInfo = item["upinfo"]!.GetValue<string>(),
+                        Cat = (CatType)item["cat"]!.GetValue<int>(),
+                        EntId = item["ent_id"]!.GetValue<string>(),
+                        Cover = new Uri(item["cover"]!.GetValue<string>()),
+                        Description = item["description"]!.GetValue<string>(),
+                        Moviecat = GetListStringByJsonArray((JsonArray)item["moviecat"]!),
+                        PubDate = DateTime.TryParse(item["pubdate"]!.GetValue<string>(), out DateTime date) ? date : DateTime.Now,
+                        Vip = item["vip"]!.GetValue<bool>(),
+                        PlayUrl = new Uri(item["url"]?.GetValue<string>() ?? ""),
+                        PV = item["pv"]!.GetValue<string>()
+                    };
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    continue;
+                }
+                yield return top;
             }
         }
 
@@ -149,9 +159,9 @@ namespace MoviesLibrary.Services
         /// <param name="getRecommends">是否需要精彩推荐数据</param>
         /// <param name="total">精彩推荐数量</param>
         /// <returns>MovieDetail</returns>
-        public MovieDetail GetDetail(CatType cat, string EntId, bool getRecommends = false, int total = 12)
+        public MovieDetail GetDetail(CatType cat, string EntId, PlayLinkType linkType = 0, bool getRecommends = false, int total = 12)
         {
-            string key = $"Detail_{cat}_{EntId}";
+            string key = $"Detail_{cat}_{EntId}_{linkType}_{getRecommends}_{total}";
             if (_cacheState)
             {
                 var data = _memoryCacheService.Get<MovieDetail>(key);
@@ -160,7 +170,7 @@ namespace MoviesLibrary.Services
                     return data;
                 }
             }
-            var json = GetHttpString(new Uri($"https://api.web.360kan.com/v1/detail?cat={(int)cat}&id={EntId}&callback=data"));
+            var json = GetHttpString(new Uri($"https://api.web.360kan.com/v1/detail?cat={(int)cat}&id={EntId}{(linkType == 0 ? null : $"&site={linkType}")}&callback=data"));
             var obj = JsonNode.Parse(json)!["data"]!;
             var result = Analysis(cat, obj, getRecommends, total);
             if (_cacheState)
@@ -189,11 +199,11 @@ namespace MoviesLibrary.Services
             }
             else if (Cat == CatType.Film || Cat == CatType.Variety)
             {
-                return GetDetail(Cat, EntId, getRecommends, total);
+                return GetDetail(Cat, EntId, site, getRecommends, total);
             }
             else
             {
-                string key = $"Detail_{Cat}_{EntId}_{StartPage}_{EndPage}_{site}";
+                string key = $"Detail_{Cat}_{EntId}_{StartPage}_{EndPage}_{site}_{getRecommends}_{total}";
                 if (_cacheState)
                 {
                     var data = _memoryCacheService.Get<MovieDetail>(key);

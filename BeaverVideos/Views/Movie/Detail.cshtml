@@ -1,10 +1,12 @@
-﻿@using MoviesLibrary.Model
+﻿@using MoviesLibrary.Enums
+@using MoviesLibrary.Model
 @model MovieDetail
 @{
     ViewData["title"] = $"{Model.Title} - 小狸影视";
-    int VideoIndex = 0;
+    int VideoIndex = 0;//用于循环时输出剧集的索引
     int upInfo = Model.UpInfo == 0 ? 1 : Model.UpInfo;
     var tabs = upInfo / 50 == 0 && upInfo > 50 ? upInfo : upInfo / 50 + 1;
+    Dictionary<string, string> valuePairs = ViewBag.PlayTypeList;//所有线路
 }
 <div class="layui-container">
     <vc:navigation name="@Model.Title"></vc:navigation>
@@ -20,11 +22,12 @@
                             《@Model.Title》简介
                             @Html.Raw("&nbsp;&nbsp;&nbsp;&nbsp;")
                             @Html.Raw((Model.Vip?"<span class='layui-badge'>VIP</span>":"<span class='layui-badge layui-bg-blue'>免费</span>"))
-                            <span class="layui-badge layui-bg-black">导演：
-                            @foreach (var item in Model.Director)
-                            {
-                                @Html.Raw($"{item}&nbsp;&nbsp;&nbsp;&nbsp;")
-                            }
+                            <span class="layui-badge layui-bg-black">
+                                导演：
+                                @foreach (var item in Model.Director)
+                                {
+                                    @Html.Raw($"{item}&nbsp;&nbsp;&nbsp;&nbsp;")
+                                }
                             </span>
                             @foreach (var item in Model.Moviecategory)
                             {
@@ -39,7 +42,26 @@
             </div>
         </div>
         <div class="layui-col-md4" style="padding-left:5px;">
-            <h2 class="text-align:center;">@Model.Title</h2>
+            <h2 style="margin:0px 0px 10px 15px;">@Model.Title</h2>
+            <div class="layui-form">
+                <form asp-controller="Movie" asp-action="Detail" method="get">
+                    <div class="layui-row">
+                        <label class="layui-form-label layui-col-md4">当前线路:</label>
+                        <input style="display:none;" name="entId" value="@Model.EntId" />
+                        <input style="display:none;" name="catType" value="@Model.Cat">
+                        <input style="display:none;" name="index" value="@ViewBag.ThisIndex">
+                        <div class="layui-input-inline layui-col-md6">
+                            <select name="linkType">
+                                @foreach (var item in Model.PlayLinkSites)
+                                {
+                                    <option value="@item" selected="@(item==Model.ThisPlayLink.ToString()?"selected":null)">@(Enum.TryParse(item, out PlayLinkType type)?valuePairs[$"{(int)type}"]:item)</option>
+                                }
+                            </select>
+                        </div>
+                        <button class="layui-btn layui-btn-primary layui-border-blue layui-col-md2" type="submit">切换</button>
+                    </div>
+                </form>
+            </div>
             <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
                 <ul class="layui-tab-title">
                     @for (var i = 0; i < tabs; i++)
@@ -62,6 +84,7 @@
                     {
                     { "entId",Model.EntId},
                     { "catType",((int)Model.Cat).ToString()},
+                    { "linkType",Model.ThisPlayLink.ToString()},
                     { "index",VideoIndex.ToString()}
                     };
                         if (VideoIndex % 50 == 1)
@@ -98,7 +121,7 @@
                 <div class="layui-col-md2 layui-col-sm3">
                     <div class="layui-panel" style="width:180px;height:275px;margin:5px;">
                         <a asp-controller="Movie" asp-action="Detail" asp-all-route-data="otherRouteData" target="_blank">
-                            <img src="@item.Cover" style="width:180px;height:235px;"/>
+                            <img src="@item.Cover" style="width:180px;height:235px;" />
                             <label class="layui-form-label" style="width:150px;text-align:center">@item.Title</label>
                         </a>
                     </div>

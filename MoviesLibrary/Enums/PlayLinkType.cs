@@ -44,5 +44,15 @@ namespace MoviesLibrary.Enums
         /// </summary>
         [Description("央视网")]
         cntv = 8,
+        /// <summary>
+        /// 西瓜视频
+        /// </summary>
+        [Description("西瓜视频")]
+        xigua = 9,
+        /// <summary>
+        /// PPTV聚力
+        /// </summary>
+        [Description("PPTV聚力")]
+        pptv
     }
 }
