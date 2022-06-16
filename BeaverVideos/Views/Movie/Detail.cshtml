@@ -42,7 +42,7 @@
             </div>
         </div>
         <div class="layui-col-md4" style="padding-left:5px;">
-            <h2 style="margin:0px 0px 10px 15px;">@Model.Title</h2>
+            <blockquote class="layui-elem-quote" style="margin:0px 0px 10px 15px;"><h2>@Model.Title</h2></blockquote>
             <div class="layui-form">
                 <form asp-controller="Movie" asp-action="Detail" method="get">
                     <div class="layui-row">
@@ -66,7 +66,7 @@
                 <ul class="layui-tab-title">
                     @for (var i = 0; i < tabs; i++)
                     {
-                        if (Model.Cat == MoviesLibrary.Enums.CatType.Film)
+                        if (Model.Cat == MoviesLibrary.Enums.CatType.Film || Model.PlayLinksDetail.Count == 1)
                         {
                             <li class="layui-this">播放列表</li>
                         }
@@ -98,8 +98,10 @@
                                 @Html.Raw($"<div class='layui-tab-item' style='max-height:420px;min-height:100px;'>")
                             }
                         }
-                        <a asp-controller="Movie" asp-action="Detail" asp-all-route-data="routeData" class="layui-btn layui-btn-sm @(ViewBag.ThisIndex==VideoIndex?"layui-btn-normal":"layui-btn-primary")" style="width:55px;margin:3px;">@VideoIndex
-                        @Html.Raw(item.Value.EndsWith(".pay")?$"<span class='layui-badge' style='padding:1px;'>vip</span>":null)</a>
+                        <a asp-controller="Movie" asp-action="Detail" asp-all-route-data="routeData" class="layui-btn layui-btn-sm @(ViewBag.ThisIndex==VideoIndex?"layui-btn-normal":"layui-btn-primary")" style="width:55px;margin:3px;">
+                            @VideoIndex
+                            @Html.Raw(item.Value.EndsWith(".pay")?$"<span class='layui-badge' style='padding:1px;'>vip</span>":null)
+                        </a>
                         if (VideoIndex % 50 == 0 || VideoIndex == Model.PlayLinksDetail.Count)
                         {
                             @Html.Raw("</div>")
