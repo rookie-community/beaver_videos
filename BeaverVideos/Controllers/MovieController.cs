@@ -2,6 +2,9 @@
 using MoviesLibrary.Enums;
 using MoviesLibrary.Model;
 using MoviesLibrary.Services;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using WalkingTec.Mvvm.Core;
 using WalkingTec.Mvvm.Mvc;
@@ -21,7 +24,14 @@ namespace BeaverVideos.Controllers
         [ActionDescription("首页")]
         public IActionResult Index()
         {
-            var tops = _movieService.GetTops(TopType.Default)
+            List<TopType> types = new()
+            {
+                TopType.Film,
+                TopType.Teleplay,
+                TopType.Variety,
+                TopType.Anime
+            };
+            var tops = _movieService.GetTops(types)
                 .DistinctBy(x => x.EntId)
                 .GroupBy(x => x.Cat)
                 .OrderBy(x => x.Key)
@@ -68,6 +78,7 @@ namespace BeaverVideos.Controllers
             bool IsFirst = true;//是否第一次请求
             int page = 1;
             int limit = 50;
+            int total = 0;//总数量
             string baseUrl = "https://jx.parwix.com:4433/player/analysis.php?v=";
             ViewBag.ThisIndex = index;
             MovieDetail detail = new MovieDetail();
@@ -75,10 +86,14 @@ namespace BeaverVideos.Controllers
             {
                 if (IsFirst)
                 {
-                    if (linkType == 0)
+                    if (linkType == 0 || catType == CatType.Variety)
                     {
                         detail = _movieService.GetDetail(catType, entId);
                         linkType = detail.ThisPlayLink;
+                        if (detail.Cat == CatType.Variety)
+                        {
+                            break;
+                        }
                     }
                     else
                     {
@@ -86,6 +101,11 @@ namespace BeaverVideos.Controllers
                     }
                     limit = detail.UpInfo > 100 ? 100 : detail.PlayLinksDetail.Count;//设置每页数量
                     IsFirst = false;
+                    if (detail.Cat != CatType.Film && detail.Cat != CatType.Variety)
+                    {
+                        total = detail.PlayLinksDetail.Max(x => x.Key);
+                        detail.UpInfo = total;
+                    }
                 }
                 else
                 {
@@ -98,10 +118,17 @@ namespace BeaverVideos.Controllers
                     }
                     else if (lists.Any())
                     {
-                        foreach (var item in lists)
+                        lists.ToList().ForEach((item) =>
                         {
-                            detail.PlayLinksDetail.Add(item.Key, item.Value);
-                        }
+                            try
+                            {
+                                detail.PlayLinksDetail.Add(item.Key, item.Value);
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine(ex.Message);
+                            }
+                        });
                     }
                     else if (!lists.Any() && page != 1)
                     {
@@ -110,16 +137,17 @@ namespace BeaverVideos.Controllers
                     page++;
                 }
             }
-            while (detail.PlayLinksDetail.Count < detail.UpInfo);
+            while (detail.PlayLinksDetail.Count < total);
             detail.MovieRecommends = _movieService.GetRecommends(catType, 12, detail.Moviecategory.FirstOrDefault());
+            detail.UpInfo = detail.PlayLinksDetail.Count();
             ViewBag.PlayTypeList = _movieService.GetEnumList<PlayLinkType>();
-            if (detail.PlayLinksDetail.TryGetValue(index.ToString(), out string url))
+            if (detail.PlayLinksDetail.TryGetValue(index, out string url))
             {
-                ViewBag.PlayUrl = baseUrl + url;
+                ViewBag.PlayUrl = $"{baseUrl}{url.Split("?").First()}";
             }
             else
             {
-                ViewBag.PlayUrl = baseUrl + detail.PlayLinksDetail.FirstOrDefault().Value;
+                ViewBag.PlayUrl = $"{baseUrl}{detail.PlayLinksDetail.FirstOrDefault().Value.Split("?").First()}";
             }
             return View(detail);
         }

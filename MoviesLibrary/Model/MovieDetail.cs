@@ -57,7 +57,7 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 播放列表
         /// </summary>
-        public Dictionary<string, string> PlayLinksDetail { get; set; } = new Dictionary<string, string>();
+        public Dictionary<int, string> PlayLinksDetail { get; set; } = new Dictionary<int, string>();
         /// <summary>
         /// 当前线路
         /// </summary>

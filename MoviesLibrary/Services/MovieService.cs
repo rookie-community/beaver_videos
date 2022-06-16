@@ -6,6 +6,7 @@ using System.Text.Json.Nodes;
 using Polly;
 using MoviesLibrary.Enums;
 using System.Diagnostics;
+using System.Collections.Concurrent;
 
 namespace MoviesLibrary.Services
 {
@@ -31,6 +32,11 @@ namespace MoviesLibrary.Services
             _cacheState = memoryCacheState;
         }
 
+        /// <summary>
+        /// 获取排行榜数据
+        /// </summary>
+        /// <param name="topType">类型</param>
+        /// <returns></returns>
         public IEnumerable<TopInfoModel> GetTops(TopType topType)
         {
             string JsonStr = GetHttpString(new Uri($"https://api.web.360kan.com/v1/rank?cat={(int)topType}&callback=data"));
@@ -61,8 +67,26 @@ namespace MoviesLibrary.Services
                     Debug.WriteLine(ex.Message);
                     continue;
                 }
+                if (string.IsNullOrWhiteSpace(top.Title))
+                {
+                    continue;
+                }
                 yield return top;
             }
+        }
+
+        /// <summary>
+        /// 获取排行榜数据
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<TopInfoModel> GetTops(List<TopType> types)
+        {
+            List<TopInfoModel> tops = new();
+            types.ForEach((item) =>
+            {
+                tops.AddRange(GetTops(item));
+            });
+            return tops.OrderBy(x => x.Cat);
         }
 
         /// <summary>
@@ -290,28 +314,52 @@ namespace MoviesLibrary.Services
                     CdnCover = new Uri(obj["cdncover"]!.GetValue<string>()),
                     Vip = obj["vip"]!.GetValue<bool>()
                 };
-                if (cat == CatType.Film || cat == CatType.Variety)
+                try
                 {
-                    _ = double.TryParse(obj["doubanscore"]?.GetValue<string>(), out double score);
-                    data.DouBanScore = score;
-                    data.PlayLinkSites = GetListStringByJsonArray((JsonArray)obj["playlink_sites"]!);
-                    var PlayResult = obj["playlinksdetail"].Deserialize<Dictionary<string, JsonNode>>()!.First();
-                    data.ThisPlayLink = Enum.Parse<PlayLinkType>(PlayResult.Key);
-                    var playLinks = PlayResult.Value;
-                    data.PlayLinksDetail = new Dictionary<string, string>()
+                    if (cat == CatType.Film || cat == CatType.Variety)
                     {
-                        { playLinks["api_video_id"]!.GetValue<string>(), playLinks["default_url"]!.GetValue<string>() }
+                        _ = double.TryParse(obj["doubanscore"]?.GetValue<string>(), out double score);
+                        data.DouBanScore = score;
+                        data.PlayLinkSites = GetListStringByJsonArray((JsonArray)obj["playlink_sites"]!);
+                        var PlayResult = obj["playlinksdetail"].Deserialize<Dictionary<string, JsonNode>>()!.First();
+                        data.ThisPlayLink = Enum.Parse<PlayLinkType>(PlayResult.Key);
+                        var playLinks = PlayResult.Value;
+                        data.PlayLinksDetail = new Dictionary<int, string>()
+                    {
+                        {data.PlayLinksDetail.Count+1, playLinks["default_url"]!.GetValue<string>() }
                     };
+                        if (cat == CatType.Variety)
+                        {
+                            var otherData = (JsonArray)obj["defaultepisode"]!;
+                            foreach (var item in otherData)
+                            {
+                                if (!string.IsNullOrWhiteSpace(item!["url"]!.GetValue<string>()))
+                                {
+                                    data.PlayLinksDetail.TryAdd(data.PlayLinksDetail.Count + 1, item!["url"]!.GetValue<string>());
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        data.UpInfo = obj["upinfo"]!.GetValue<int>();
+                        data.Total = obj["total"]!.GetValue<int>();
+                        data.PlayLinkSites = JsonSerializer.Deserialize<Dictionary<string, string>>(obj["playlinks"]!.ToJsonString())?.Select(x => x.Key).ToList();
+                        var PlayResult = obj["allepidetail"].Deserialize<Dictionary<string, JsonArray>>()!.First();
+                        data.ThisPlayLink = Enum.Parse<PlayLinkType>(PlayResult.Key);
+                        var playLinks = PlayResult.Value;
+                        playLinks.ToList().ForEach((item) =>
+                        {
+                            if (!string.IsNullOrWhiteSpace(item!["url"]!.GetValue<string>()))
+                            {
+                                data.PlayLinksDetail.Add(int.Parse(item!["playlink_num"]!.GetValue<string>()), item!["url"]!.GetValue<string>());
+                            }
+                        });
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    data.UpInfo = obj["upinfo"]!.GetValue<int>();
-                    data.Total = obj["total"]!.GetValue<int>();
-                    data.PlayLinkSites = JsonSerializer.Deserialize<Dictionary<string, string>>(obj["playlinks"]!.ToJsonString())?.Select(x => x.Key).ToList();
-                    var PlayResult = obj["allepidetail"].Deserialize<Dictionary<string, JsonArray>>()!.First();
-                    data.ThisPlayLink = Enum.Parse<PlayLinkType>(PlayResult.Key);
-                    var playLinks = PlayResult.Value;
-                    data.PlayLinksDetail = playLinks!.ToDictionary(x => x!["playlink_num"]!.GetValue<string>(), x => x!["url"]!.GetValue<string>().Split("?").First());
+                    Debug.WriteLine(ex.Message);
                 }
                 if (getRecommends)
                 {

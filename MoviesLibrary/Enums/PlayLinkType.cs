@@ -37,7 +37,7 @@ namespace MoviesLibrary.Enums
         /// <summary>
         /// 1905电影
         /// </summary>
-        [Description("1905电影")]
+        [Description("电影网")]
         m1905 = 7,
         /// <summary>
         /// 中央电视台
@@ -52,7 +52,7 @@ namespace MoviesLibrary.Enums
         /// <summary>
         /// PPTV聚力
         /// </summary>
-        [Description("PPTV聚力")]
+        [Description("PP视频")]
         pptv
     }
 }
