@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using WalkingTec.Mvvm.Core;
 using WalkingTec.Mvvm.Mvc;
 
@@ -13,6 +14,7 @@ namespace BeaverVideos.Controllers
 {
     public class MovieController : BaseController
     {
+        private const string AnalysisBaseUrl = "https://jx.parwix.com:4433/player/analysis.php?v=";
         private readonly MovieService _movieService;
 
         public MovieController(MovieService movieService)
@@ -48,10 +50,11 @@ namespace BeaverVideos.Controllers
             {
                 return RedirectToAction("Index");
             }
-            //else if (Regex.IsMatch(name, @"http(s)?://([\w-]+\.)+[\w-]+(/[\w-./?%&=]*)?"))
-            //{
-            //    return RedirectToAction("Analysis", new { url = name });
-            //}
+            else if (Regex.IsMatch(name, @"http(s)?://([\w-]+\.)+[\w-]+(/[\w-./?%&=]*)?"))
+            {
+                return Redirect($"{AnalysisBaseUrl}{name}");
+                //return RedirectToAction("Analysis", new { url = name });
+            }
             else
             {
                 var result = _movieService.Search(name);
@@ -79,7 +82,6 @@ namespace BeaverVideos.Controllers
             int page = 1;
             int limit = 50;
             int total = 0;//总数量
-            string baseUrl = "https://jx.parwix.com:4433/player/analysis.php?v=";
             ViewBag.ThisIndex = index;
             MovieDetail detail = new MovieDetail();
             do
@@ -143,11 +145,11 @@ namespace BeaverVideos.Controllers
             ViewBag.PlayTypeList = _movieService.GetEnumList<PlayLinkType>();
             if (detail.PlayLinksDetail.TryGetValue(index, out string url))
             {
-                ViewBag.PlayUrl = $"{baseUrl}{url.Split("?").First()}";
+                ViewBag.PlayUrl = $"{AnalysisBaseUrl}{url.Split("?").First()}";
             }
             else
             {
-                ViewBag.PlayUrl = $"{baseUrl}{detail.PlayLinksDetail.FirstOrDefault().Value.Split("?").First()}";
+                ViewBag.PlayUrl = $"{AnalysisBaseUrl}{detail.PlayLinksDetail.FirstOrDefault().Value.Split("?").First()}";
             }
             return View(detail);
         }

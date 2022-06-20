@@ -2,7 +2,7 @@
 @using MoviesLibrary.Model
 @model MovieDetail
 @{
-    ViewData["title"] = $"{Model.Title} - 小狸影视";
+    ViewData["title"] = $"{Model.Title} 第{ViewBag.ThisIndex}集 - 小狸影视";
     int VideoIndex = 0;//用于循环时输出剧集的索引
     int upInfo = Model.UpInfo == 0 ? 1 : Model.UpInfo;
     var tabs = upInfo / 50 == 0 && upInfo > 50 ? upInfo : upInfo / 50 + 1;
@@ -72,7 +72,7 @@
                         }
                         else
                         {
-                            <li @(i==0?"class=layui-this":null)>@($"{i*50+1} - {((i+1)*50>upInfo?upInfo:(i+1)*50)}")</li>
+                            <li @(i*50+1 <= ViewBag.ThisIndex && ViewBag.ThisIndex <= (i+1)*50 ? "class=layui-this":null)>@($"{i*50+1} - {((i+1)*50>upInfo?upInfo:(i+1)*50)}")</li>
                         }
                     }
                 </ul>
