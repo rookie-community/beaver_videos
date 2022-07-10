@@ -14,7 +14,7 @@ namespace BeaverVideos.Controllers
 {
     public class MovieController : BaseController
     {
-        private const string AnalysisBaseUrl = "https://jx.parwix.com:4433/player/analysis.php?v=";
+        private const string AnalysisBaseUrl = "https://jx.bozrc.com:4433/player/?url=";
         private readonly MovieService _movieService;
 
         public MovieController(MovieService movieService)
@@ -83,7 +83,7 @@ namespace BeaverVideos.Controllers
             int limit = 50;
             int total = 0;//总数量
             ViewBag.ThisIndex = index;
-            MovieDetail detail = new MovieDetail();
+            MovieDetail detail = new();
             do
             {
                 if (IsFirst)
@@ -141,7 +141,7 @@ namespace BeaverVideos.Controllers
             }
             while (detail.PlayLinksDetail.Count < total);
             detail.MovieRecommends = _movieService.GetRecommends(catType, 12, detail.Moviecategory.FirstOrDefault());
-            detail.UpInfo = detail.PlayLinksDetail.Count();
+            detail.UpInfo = detail.PlayLinksDetail.Count;
             ViewBag.PlayTypeList = _movieService.GetEnumList<PlayLinkType>();
             if (detail.PlayLinksDetail.TryGetValue(index, out string url))
             {
