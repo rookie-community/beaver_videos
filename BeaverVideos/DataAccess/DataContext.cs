@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -71,25 +72,21 @@ namespace BeaverVideos.DataAccess
         /// <param name="modelBuilder"></param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            var Models = modelBuilder.Model.GetEntityTypes().ToList();
-            foreach (var item in Models)
+            foreach (var item in modelBuilder.Model.GetEntityTypes())
             {
                 var tabtype = Type.GetType(item.ClrType.FullName);
                 if (tabtype != null)
                 {
                     var props = tabtype.GetProperties();
-                    var descriptionAttrtable = tabtype.GetCustomAttributes(typeof(DescriptionAttribute), true);
-                    if (descriptionAttrtable.Length > 0)
+                    var descriptionAttrtable = tabtype.GetCustomAttribute<DescriptionAttribute>();
+                    if (descriptionAttrtable != null)
                     {
-                        modelBuilder.Entity(item.Name).HasComment(((DescriptionAttribute)descriptionAttrtable[0]).Description);
+                        modelBuilder.Entity(item.Name).HasComment(descriptionAttrtable.Description);
                     }
                     foreach (var prop in props)
                     {
-                        var descriptionAttr = prop.GetCustomAttributes(typeof(DescriptionAttribute), true);
-                        if (descriptionAttr.Length > 0)
-                        {
-                            modelBuilder.Entity(item.Name).Property(prop.Name).HasComment(((DescriptionAttribute)descriptionAttr[0]).Description);
-                        }
+                        var descriptionAttr = prop.GetCustomAttribute<DescriptionAttribute>();
+                        modelBuilder.Entity(item.Name).Property(prop.Name).HasComment(descriptionAttr.Description);
                     }
                 }
             }
