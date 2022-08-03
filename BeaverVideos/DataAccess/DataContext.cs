@@ -86,7 +86,10 @@ namespace BeaverVideos.DataAccess
                     foreach (var prop in props)
                     {
                         var descriptionAttr = prop.GetCustomAttribute<DescriptionAttribute>();
-                        modelBuilder.Entity(item.Name).Property(prop.Name).HasComment(descriptionAttr.Description);
+                        if (descriptionAttr != null)
+                        {
+                            modelBuilder.Entity(item.Name).Property(prop.Name).HasComment(descriptionAttr.Description);
+                        }
                     }
                 }
             }
