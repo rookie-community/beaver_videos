@@ -10,7 +10,6 @@ using BeaverVideos.ViewModels.HomeVMs;
 using BeaverVideos;
 using WalkingTec.Mvvm.Mvc;
 using WalkingTec.Mvvm.Mvc.Admin.ViewModels.FrameworkUserVms;
-using BeaverVideos.DataAccess;
 
 namespace BeaverVideos.Test
 {

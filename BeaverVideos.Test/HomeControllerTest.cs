@@ -7,7 +7,6 @@ using WalkingTec.Mvvm.Core;
 using BeaverVideos;
 using BeaverVideos.Controllers;
 using BeaverVideos.ViewModels.HomeVMs;
-using BeaverVideos.DataAccess;
 
 namespace BeaverVideos.Test
 {

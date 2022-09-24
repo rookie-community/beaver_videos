@@ -77,7 +77,7 @@ namespace WalkingTec.Mvvm.Mvc.Admin.ViewModels.DataPrivilegeVMs
                     string user = null;
                     if (ConfigInfo.HasMainHost && Wtm.LoginUserInfo?.CurrentTenant == null)
                     {
-                        var check = Wtm.CallAPI<List<ComboSelectListItem>>("mainhost", "/api/_frameworkuser/GetUserById").Result;
+                        var check = Wtm.CallAPI<List<ComboSelectListItem>>("mainhost", "/api/_account/GetUserById").Result;
                         if (check.Data != null)
                         {
                             user = check.Data.Where(x => x.Value.ToString() == Entity.UserCode).Select(x => x.Value.ToString()).FirstOrDefault();
@@ -213,6 +213,7 @@ namespace WalkingTec.Mvvm.Mvc.Admin.ViewModels.DataPrivilegeVMs
                     dp.RelateId = null;
                     dp.UserCode = Entity.UserCode;
                     dp.TableName = this.Entity.TableName;
+                    dp.TenantCode = LoginUserInfo.CurrentTenant;
                     DC.Set<DataPrivilege>().Add(dp);
 
                 }
@@ -222,6 +223,7 @@ namespace WalkingTec.Mvvm.Mvc.Admin.ViewModels.DataPrivilegeVMs
                     dp.RelateId = null;
                     dp.GroupCode = Entity.GroupCode;
                     dp.TableName = this.Entity.TableName;
+                    dp.TenantCode = LoginUserInfo.CurrentTenant;
                     DC.Set<DataPrivilege>().Add(dp);
                 }
             }
@@ -236,6 +238,7 @@ namespace WalkingTec.Mvvm.Mvc.Admin.ViewModels.DataPrivilegeVMs
                             dp.RelateId = id;
                             dp.UserCode = Entity.UserCode;
                             dp.TableName = this.Entity.TableName;
+                            dp.TenantCode = LoginUserInfo.CurrentTenant;
                             DC.Set<DataPrivilege>().Add(dp);
                         }
 
@@ -248,6 +251,7 @@ namespace WalkingTec.Mvvm.Mvc.Admin.ViewModels.DataPrivilegeVMs
                             dp.RelateId = id;
                             dp.GroupCode = Entity.GroupCode;
                             dp.TableName = this.Entity.TableName;
+                            dp.TenantCode = LoginUserInfo.CurrentTenant;
                             DC.Set<DataPrivilege>().Add(dp);
                         }
                     }

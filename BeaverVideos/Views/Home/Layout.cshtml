@@ -65,7 +65,7 @@
             </li>
             @if (tenants.Count() > 0)
             {
-                var current = Model?.Wtm?.LoginUserInfo?.CurrentTenant == Model?.Wtm?.LoginUserInfo?.TenantCode ? Model.Localizer["_Admin.TenantHost"] : tenants.Where(x => x.Value.ToString() == Model?.Wtm?.LoginUserInfo?.CurrentTenant).Select(x => x.Text).SingleOrDefault();
+                var current = Model?.Wtm?.LoginUserInfo?.CurrentTenant ==Model?.Wtm?.LoginUserInfo?.TenantCode ? Model.Localizer["_Admin.TenantHost"] : tenants.Where(x=>x.Value.ToString() == Model?.Wtm?.LoginUserInfo?.CurrentTenant).Select(x=>x.Text).SingleOrDefault();
                 <li class="layui-nav-item" lay-unselect>
                     <a href="javascript:;">
                         <cite>@current</cite>
@@ -138,7 +138,7 @@
                         ,url = (item.jump && typeof item.jump === 'string') ? item.jump : item.name;
                   }}
                   <li data-name="{{ item.name || '' }}" data-jump="{{ item.jump || '' }}" class="layui-nav-item ">
-                    <a href="javascript:;" {{ hasChildren ? null : `lay-href=`+ url }} lay-tips="{{ item.title }}" lay-direction="2">
+                    <a href="javascript:;" {{ hasChildren ? '' : 'lay-href="'+ url +'"' }} lay-tips="{{ item.title }}" lay-direction="2">
                       <i class="{{ item.icon }}"></i>
                       <cite>{{ item.title }}</cite>
                     </a>
@@ -151,7 +151,7 @@
                             : [item.name, item2.name, ''].join('/');
                       }}
                       <dd data-name="{{ item2.name || '' }}" data-jump="{{ item2.jump || '' }}">
-                        <a href="javascript:;" {{ hasChildren2 ? null : `lay-href=`+ url2 }}>
+                        <a href="javascript:;" {{ hasChildren2 ? '' : 'lay-href="'+ url2 +'"' }}>
                           <i class="{{ item2.icon }}"></i>
                           <cite>{{ item2.title }}</cite>
                         </a>
@@ -163,7 +163,7 @@
                                     : [item.name, item2.name, item3.name].join('/')
                           }}
                           <dd data-name="{{ item3.name || '' }}" data-jump="{{ item3.jump || '' }}">
-                            <a href="javascript:;" lay-href="{{ url3 }}" {{ item3.iframe ? `lay-iframe="true"` : `null` }}>
+                            <a href="javascript:;" lay-href="{{ url3 }}" {{ item3.iframe ? 'lay-iframe="true"' : '' }}>
                               <i class="{{ item3.icon }}"></i>
                               <cite>{{ item3.title }}</cite>
                             </a>

@@ -1,20 +1,18 @@
 ﻿using System.Collections.Generic;
-using System.Configuration;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using MoviesLibrary.Extension;
 using WalkingTec.Mvvm.Core;
+using WalkingTec.Mvvm.Core.Extensions;
 using WalkingTec.Mvvm.Core.Support.FileHandlers;
 using WalkingTec.Mvvm.Mvc;
-using Yarp.ReverseProxy.Configuration;
+using System;
+using MoviesLibrary.Extension;
 
 namespace BeaverVideos
 {
@@ -43,18 +41,18 @@ namespace BeaverVideos
             {
                 options.UseWtmMvcOptions();
             })
-            .AddJsonOptions(options =>
-            {
+            .AddJsonOptions(options => {
                 options.UseWtmJsonOptions();
             })
+            
             .ConfigureApiBehaviorOptions(options =>
             {
                 options.UseWtmApiOptions();
             })
             .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
             .AddWtmDataAnnotationsLocalization(typeof(Program));
-            services.AddWtmContext(ConfigRoot, (options) =>
-            {
+            
+            services.AddWtmContext(ConfigRoot, (options)=> {
                 options.DataPrivileges = DataPrivilegeSettings();
                 options.CsSelector = CSSelector;
                 options.FileSubDirSelector = SubDirSelector;
@@ -66,6 +64,7 @@ namespace BeaverVideos
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IOptionsMonitor<Configs> configs)
         {
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
             IconFontsHelper.GenerateIconFont();
 
             app.UseExceptionHandler(configs.CurrentValue.ErrorHandler);
@@ -79,6 +78,7 @@ namespace BeaverVideos
             app.UseSession();
             app.UseWtmSwagger();
             app.UseWtm();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -90,7 +90,6 @@ namespace BeaverVideos
             });
 
             app.UseWtmContext();
-
         }
 
         /// <summary>
