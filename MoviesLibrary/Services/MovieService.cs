@@ -3,10 +3,8 @@ using MoviesLibrary.Model;
 using System.Security.Authentication;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Polly;
 using MoviesLibrary.Enums;
 using System.Diagnostics;
-using System.Collections.Concurrent;
 
 namespace MoviesLibrary.Services
 {

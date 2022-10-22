@@ -12,8 +12,8 @@
 
 
   <ItemGroup>
-    <PackageReference Include="WalkingTec.Mvvm.TagHelpers.LayUI" Version="6.3.4" />
-    <PackageReference Include="WalkingTec.Mvvm.Mvc" Version="6.3.4" />
+    <PackageReference Include="WalkingTec.Mvvm.Mvc" Version="6.3.6" />
+    <PackageReference Include="Yarp.ReverseProxy" Version="1.1.1" />
 </ItemGroup>
 
 
