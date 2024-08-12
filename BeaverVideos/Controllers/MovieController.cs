@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MoviesLibrary.Enums;
-using MoviesLibrary.Model;
-using MoviesLibrary.Services;
+﻿using BeaverVideos.Common.Enums;
+using BeaverVideos.Dto;
+using BeaverVideos.Services;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,7 +14,7 @@ namespace BeaverVideos.Controllers
 {
     public class MovieController : BaseController
     {
-        private const string AnalysisBaseUrl = "https://jx.bozrc.com:4433/player/?url=";
+        private const string AnalysisBaseUrl = "https://jx.xmflv.com/?url=";
         private readonly MovieService _movieService;
 
         public MovieController(MovieService movieService)
@@ -149,7 +149,7 @@ namespace BeaverVideos.Controllers
             }
             else
             {
-                ViewBag.PlayUrl = $"{AnalysisBaseUrl}{detail.PlayLinksDetail.FirstOrDefault().Value.Split("?").First()}";
+                ViewBag.PlayUrl = $"{AnalysisBaseUrl}{detail.PlayLinksDetail.Select(x => x.Value.Split('?').First()).FirstOrDefault()}";
             }
             return View(detail);
         }

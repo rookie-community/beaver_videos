@@ -1,5 +1,5 @@
-﻿@using MoviesLibrary.Enums
-@using MoviesLibrary.Model
+﻿@using BeaverVideos.Common.Enums
+@using BeaverVideos.Dto
 @model MovieDetail
 @{
     ViewData["title"] = $"{Model.Title} 第{ViewBag.ThisIndex}集 - 小狸影视";
@@ -21,7 +21,7 @@
                         <h2 class="layui-colla-title">
                             《@Model.Title》简介
                             @Html.Raw("&nbsp;&nbsp;&nbsp;&nbsp;")
-                            @Html.Raw((Model.Vip?"<span class='layui-badge'>VIP</span>":"<span class='layui-badge layui-bg-blue'>免费</span>"))
+                            @Html.Raw((Model.Vip ? "<span class='layui-badge'>VIP</span>" : "<span class='layui-badge layui-bg-blue'>免费</span>"))
                             <span class="layui-badge layui-bg-black">
                                 导演：
                                 @foreach (var item in Model.Director)
@@ -54,7 +54,7 @@
                             <select name="linkType">
                                 @foreach (var item in Model.PlayLinkSites)
                                 {
-                                    <option value="@item" selected="@(item==Model.ThisPlayLink.ToString()?"selected":null)">@(Enum.TryParse(item, out PlayLinkType type)?valuePairs[$"{(int)type}"]:item)</option>
+                                    <option value="@item" selected="@(item==Model.ThisPlayLink.ToString()?"selected":null)">@(Enum.TryParse(item, out PlayLinkType type) ? valuePairs[$"{(int)type}"] : item)</option>
                                 }
                             </select>
                         </div>
@@ -66,13 +66,13 @@
                 <ul class="layui-tab-title">
                     @for (var i = 0; i < tabs; i++)
                     {
-                        if (Model.Cat == MoviesLibrary.Enums.CatType.Film || Model.PlayLinksDetail.Count == 1)
+                        if (Model.Cat == CatType.Film || Model.PlayLinksDetail.Count == 1)
                         {
                             <li class="layui-this">播放列表</li>
                         }
                         else
                         {
-                            <li @(i*50+1 <= ViewBag.ThisIndex && ViewBag.ThisIndex <= (i+1)*50 ? "class=layui-this":null)>@($"{i*50+1} - {((i+1)*50>upInfo?upInfo:(i+1)*50)}")</li>
+                            <li @(i * 50 + 1 <= ViewBag.ThisIndex && ViewBag.ThisIndex <= (i + 1) * 50 ? "class=layui-this" : null)>@($"{i * 50 + 1} - {((i + 1) * 50 > upInfo ? upInfo : (i + 1) * 50)}")</li>
                         }
                     }
                 </ul>
@@ -100,7 +100,7 @@
                         }
                         <a asp-controller="Movie" asp-action="Detail" asp-all-route-data="routeData" class="layui-btn layui-btn-sm @(ViewBag.ThisIndex==VideoIndex?"layui-btn-normal":"layui-btn-primary")" style="width:55px;margin:3px;">
                             @VideoIndex
-                            @Html.Raw(item.Value.EndsWith(".pay")?$"<span class='layui-badge' style='padding:1px;'>vip</span>":null)
+                            @Html.Raw(item.Value.EndsWith(".pay") ? $"<span class='layui-badge' style='padding:1px;'>vip</span>" : null)
                         </a>
                         if (VideoIndex % 50 == 0 || VideoIndex == Model.PlayLinksDetail.Count)
                         {

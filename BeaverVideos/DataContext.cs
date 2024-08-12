@@ -1,18 +1,16 @@
-﻿using System;
-using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.DependencyInjection;
 using WalkingTec.Mvvm.Core;
 
-namespace BeaverVideos.DataAccess
+namespace BeaverVideos
 {
     public class DataContext : FrameworkContext
     {
         public DbSet<FrameworkUser> FrameworkUsers { get; set; }
+
 
         public DataContext(CS cs)
              : base(cs)
@@ -38,10 +36,10 @@ namespace BeaverVideos.DataAccess
             bool emptydb = false;
             try
             {
-                emptydb = !Set<FrameworkUser>().Any() && !Set<FrameworkUserRole>().Any();
+                emptydb = Set<FrameworkUser>().Count() == 0 && Set<FrameworkUserRole>().Count() == 0;
             }
             catch { }
-            if (state || emptydb)
+            if (state == true || emptydb == true)
             {
                 //when state is true, means it's the first time EF create database, do data init here
                 //当state是true的时候，表示这是第一次创建数据库，可以在这里进行数据初始化
@@ -66,36 +64,7 @@ namespace BeaverVideos.DataAccess
             return state;
         }
 
-        /// <summary>
-        /// 根据实体类“Description”特性生成数据库字段备注
-        /// </summary>
-        /// <param name="modelBuilder"></param>
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            foreach (var item in modelBuilder.Model.GetEntityTypes())
-            {
-                var tabtype = Type.GetType(item.ClrType.FullName);
-                if (tabtype != null)
-                {
-                    var props = tabtype.GetProperties();
-                    var descriptionAttrtable = tabtype.GetCustomAttribute<DescriptionAttribute>();
-                    if (descriptionAttrtable != null)
-                    {
-                        modelBuilder.Entity(item.Name).HasComment(descriptionAttrtable.Description);
-                    }
-                    foreach (var prop in props)
-                    {
-                        var descriptionAttr = prop.GetCustomAttribute<DescriptionAttribute>();
-                        if (descriptionAttr != null)
-                        {
-                            modelBuilder.Entity(item.Name).Property(prop.Name).HasComment(descriptionAttr.Description);
-                        }
-                    }
-                }
-            }
-        }
     }
-
 
     /// <summary>
     /// DesignTimeFactory for EF Migration, use your full connection string,
@@ -119,4 +88,5 @@ namespace BeaverVideos.DataAccess
             return new DataContext(connectionObject.Value, (DBTypeEnum)connectionObject.DbType);
         }
     }
+
 }

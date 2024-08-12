@@ -1,11 +1,11 @@
-﻿using MoviesLibrary.Enums;
+﻿using BeaverVideos.Common.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MoviesLibrary.Model
+namespace BeaverVideos.Dto
 {
     public class MovieDetail : BaseModel
     {
@@ -21,7 +21,7 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 标签、分类
         /// </summary>
-        public List<string>? Moviecategory { get; set; }
+        public List<string> Moviecategory { get; set; }
         /// <summary>
         /// 总数量
         /// </summary>
@@ -29,11 +29,11 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 影视简介
         /// </summary>
-        public string? Description { get; set; }
+        public string Description { get; set; }
         /// <summary>
         /// 导演
         /// </summary>
-        public List<string>? Director { get; set; }
+        public List<string> Director { get; set; }
         /// <summary>
         /// 发布时间
         /// </summary>
@@ -41,15 +41,15 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 区域
         /// </summary>
-        public List<string>? Area { get; set; }
+        public List<string> Area { get; set; }
         /// <summary>
         /// 主演
         /// </summary>
-        public List<string>? Actor { get; set; }
+        public List<string> Actor { get; set; }
         /// <summary>
         /// 封面
         /// </summary>
-        public Uri? CdnCover { get; set; }
+        public Uri CdnCover { get; set; }
         /// <summary>
         /// 豆瓣评分
         /// </summary>
@@ -65,7 +65,7 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 线路列表
         /// </summary>
-        public List<string>? PlayLinkSites { get; set; }
+        public List<string> PlayLinkSites { get; set; }
         /// <summary>
         /// 是否需要会员
         /// </summary>

@@ -1,11 +1,7 @@
-﻿using MoviesLibrary.Enums;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MoviesLibrary.Model
+namespace BeaverVideos.Dto
 {
     /// <summary>
     /// 排行榜
@@ -15,17 +11,17 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 影视编号
         /// </summary>
-        public new string EntId => this.PlayUrl!.ToString().Split("/").LastOrDefault()!.Replace(".html", "");
+        public new string EntId => PlayUrl!.ToString().Split("/").LastOrDefault()!.Replace(".html", "");
 
         /// <summary>
         /// 缩略图
         /// </summary>
-        public Uri? Cover { get; set; }
+        public Uri Cover { get; set; }
 
         /// <summary>
         /// 播放链接
         /// </summary>
-        public Uri? PlayUrl { get; set; }
+        public Uri PlayUrl { get; set; }
 
         /// <summary>
         /// 播放量

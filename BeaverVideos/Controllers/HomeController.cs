@@ -85,7 +85,7 @@ namespace BeaverVideos.Controllers
             {
                 data.Add(new ChartData
                 {
-                    Value = m.GetProperties().Length,
+                    Value = m.GetProperties().Count(),
                     Category = m.GetPropertyDisplayName(),
                     Series = "Model"
                 }) ;
@@ -153,7 +153,7 @@ namespace BeaverVideos.Controllers
         [ResponseCache(Duration = 3600)]
         public Github GetGithubInfo()
         {
-            var rv = Wtm.ReadFromCache("githubinfo", () =>
+            var rv = Wtm.ReadFromCache<Github>("githubinfo", () =>
             {
                 var s = Wtm.CallAPI<Github>("github", "repos/dotnetcore/wtm", 60).Result;
                 return s.Data;

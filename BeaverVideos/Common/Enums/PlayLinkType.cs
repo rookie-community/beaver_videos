@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace MoviesLibrary.Enums
+namespace BeaverVideos.Common.Enums
 {
     public enum PlayLinkType
     {

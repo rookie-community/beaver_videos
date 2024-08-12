@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="~/sitecss/logincss.css">
     <title>@Titlt</title>
     <script type="text/javascript">
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#verify_code_img').attr('src', '/_framework/GetVerifyCode?id=' + Math.random());
             $("input[name='VerifyCode']").attr('autocomplete', 'off');
         });
@@ -40,7 +40,6 @@
             <div class="login-form">
                 <h1>@Titlt</h1>
                 <form action="/Login/Login" method="post">
-                    @Html.AntiForgeryToken()
                     <input type="hidden" name="Redirect" value="@Model.Redirect">
                     <ul class="loginForm">
                         <li>

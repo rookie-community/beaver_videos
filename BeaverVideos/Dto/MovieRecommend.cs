@@ -1,31 +1,26 @@
-﻿using MoviesLibrary.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
-namespace MoviesLibrary.Model
+namespace BeaverVideos.Dto
 {
     /// <summary>
     /// 精彩推荐
     /// </summary>
-    public class MovieRecommend: BaseModel
+    public class MovieRecommend : BaseModel
     {
         /// <summary>
         /// 简短介绍
         /// </summary>
-        public string? Comment { get; set; }
+        public string Comment { get; set; }
 
         /// <summary>
         /// 缩略图
         /// </summary>
-        public Uri? Cover { get; set; }
+        public Uri Cover { get; set; }
 
         /// <summary>
         /// CDN图片地址
         /// </summary>
-        public Uri? CdnCover { get; set; }
+        public Uri CdnCover { get; set; }
 
         /// <summary>
         /// 总集数

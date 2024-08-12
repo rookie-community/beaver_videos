@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MoviesLibrary.Enums
+namespace BeaverVideos.Common.Enums
 {
     public enum CatType
     {

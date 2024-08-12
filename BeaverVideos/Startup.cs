@@ -1,18 +1,16 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using WalkingTec.Mvvm.Core;
-using WalkingTec.Mvvm.Core.Extensions;
 using WalkingTec.Mvvm.Core.Support.FileHandlers;
 using WalkingTec.Mvvm.Mvc;
 using System;
-using MoviesLibrary.Extension;
+using BeaverVideos.Services;
 
 namespace BeaverVideos
 {
@@ -22,6 +20,7 @@ namespace BeaverVideos
 
         public Startup(IWebHostEnvironment env, IConfiguration config)
         {
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
             ConfigRoot = config;
         }
 
@@ -29,6 +28,7 @@ namespace BeaverVideos
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddWtmWorkflow(ConfigRoot);
             services.AddDistributedMemoryCache();
             services.AddWtmSession(3600, ConfigRoot);
             services.AddWtmCrossDomain(ConfigRoot);
@@ -60,14 +60,12 @@ namespace BeaverVideos
                 options.FileSubDirSelector = SubDirSelector;
                 options.ReloadUserFunc = ReloadUser;
             });
-            services.AddReverseProxy().LoadFromConfig(ConfigRoot.GetSection("ReverseProxy"));
-            services.AddMoviesLibrary();
+            services.AddScoped<MovieService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IOptionsMonitor<Configs> configs)
         {
-            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
             IconFontsHelper.GenerateIconFont();
 
             app.UseExceptionHandler(configs.CurrentValue.ErrorHandler);
@@ -81,6 +79,7 @@ namespace BeaverVideos
             app.UseSession();
             app.UseWtmSwagger();
             app.UseWtm();
+            app.UseHttpActivities();
 
             app.UseEndpoints(endpoints =>
             {
@@ -89,8 +88,9 @@ namespace BeaverVideos
                    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Movie}/{action=Index}/{id?}");
-            });
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+        //pattern: "{controller=Movie}/{action=Index}/{id?}");
+        });
 
             app.UseWtmContext();
         }

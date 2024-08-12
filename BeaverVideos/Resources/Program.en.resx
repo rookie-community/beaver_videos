@@ -274,7 +274,7 @@
     <value>Tenant management</value>
   </data>
   <data name="MenuKey.GroupManagement" xml:space="preserve">
-    <value>Group Management</value>
+    <value>Dept Management</value>
   </data>
   <data name="MenuKey.Login" xml:space="preserve">
     <value>Login</value>
@@ -583,7 +583,7 @@
     <value>Record(s)</value>
   </data>
   <data name="Sys.RecordsPerPage" xml:space="preserve">
-    <value>Per Page</value>
+    <value />
   </data>
   <data name="Sys.Refresh" xml:space="preserve">
     <value>Refresh</value>
@@ -805,22 +805,22 @@
     <value>Gender</value>
   </data>
   <data name="_Admin.Group" xml:space="preserve">
-    <value>Group</value>
+    <value>Dept</value>
   </data>
   <data name="_Admin.GroupApi" xml:space="preserve">
-    <value>Group management Api</value>
+    <value>Dept management Api</value>
   </data>
   <data name="_Admin.GroupCode" xml:space="preserve">
-    <value>Group code</value>
+    <value>Dept code</value>
   </data>
   <data name="_Admin.GroupDp" xml:space="preserve">
-    <value>Group Dp</value>
+    <value>Dept Dp</value>
   </data>
   <data name="_Admin.GroupManager" xml:space="preserve">
-    <value>Group Manager</value>
+    <value>Dept Manager</value>
   </data>
   <data name="_Admin.GroupName" xml:space="preserve">
-    <value>Group name</value>
+    <value>Dept name</value>
   </data>
   <data name="_Admin.HasMainHost" xml:space="preserve">
     <value>This operation cannot be performed. Please go to the main site for corresponding operation</value>
@@ -1014,13 +1014,34 @@
   <data name="_Admin.ZipCode" xml:space="preserve">
     <value>Zip</value>
   </data>
-  <data name="MenuMangement" xml:space="preserve">
-    <value>Menu Mangement</value>
+  <data name="MenuKey.Workflow" xml:space="preserve">
+    <value>WorkFlow</value>
   </data>
-  <data name="Validate.{0}range{1}" xml:space="preserve">
-    <value>{0} is at least {1}!</value>
+  <data name="Sys.NoWorkflow" xml:space="preserve">
+    <value>No related work flow is found</value>
   </data>
-  <data name="Validate.{0}range{2}" xml:space="preserve">
-    <value>{0} is {1} at most!</value>
+    <data name="_Workflow.Canceled" xml:space="preserve">
+    <value>Canceled</value>
   </data>
-</root>
+  <data name="_Workflow.Finished" xml:space="preserve">
+    <value>Finished</value>
+  </data>
+  <data name="_Workflow.NotStarted" xml:space="preserve">
+    <value>Not Started</value>
+  </data>
+  <data name="_Workflow.Processing" xml:space="preserve">
+    <value>In Process</value>
+  </data>
+     <data name="Sys.Aggree" xml:space="preserve">
+    <value>Agree</value>
+  </data>
+    <data name="Sys.Approve" xml:space="preserve">
+    <value>Approve</value>
+  </data>
+    <data name="Sys.Refuse" xml:space="preserve">
+    <value>Refuse</value>
+  </data>
+    <data name="_Admin.WorkflowApi" xml:space="preserve">
+    <value>Workflow Api</value>
+  </data>
+ </root>

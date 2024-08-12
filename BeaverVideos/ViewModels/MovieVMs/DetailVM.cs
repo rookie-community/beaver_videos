@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using MoviesLibrary.Model;
+﻿using BeaverVideos.Dto;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 
 namespace BeaverVideos.ViewModels.MovieVMs

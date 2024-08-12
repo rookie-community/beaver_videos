@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MoviesLibrary.Model
+namespace BeaverVideos.Dto
 {
     /// <summary>
     /// 影视
     /// </summary>
-    public class Movie: BaseModel
+    public class Movie : BaseModel
     {
         /// <summary>
         /// ID
@@ -19,29 +19,29 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 类型名称
         /// </summary>
-        public string? CatName { get; set; }
+        public string CatName { get; set; }
         /// <summary>
         /// 封面URL
         /// </summary>
-        public Uri? Cover { get; set; }
+        public Uri Cover { get; set; }
         /// <summary>
         /// 封面信息
         /// </summary>
-        public Dictionary<string, string>? CoverInfo { get; set; }
+        public Dictionary<string, string> CoverInfo { get; set; }
 
         public int Year { get; set; }
         /// <summary>
         /// 影片描述
         /// </summary>
-        public string? Description { get; set; }
+        public string Description { get; set; }
         /// <summary>
         /// 地区
         /// </summary>
-        public List<string>? Area { get; set; }
+        public List<string> Area { get; set; }
         /// <summary>
         /// 标签
         /// </summary>
-        public List<string>? Tag { get; set; }
+        public List<string> Tag { get; set; }
         /// <summary>
         /// 评分
         /// </summary>
@@ -49,11 +49,11 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 主演
         /// </summary>
-        public List<string>? ActList { get; set; }
+        public List<string> ActList { get; set; }
         /// <summary>
         /// 导演
         /// </summary>
-        public List<string>? DirList { get; set; }
+        public List<string> DirList { get; set; }
         /// <summary>
         /// 是否需要会员
         /// </summary>
@@ -61,10 +61,10 @@ namespace MoviesLibrary.Model
         /// <summary>
         /// 影视状态
         /// </summary>
-        public string? VideoStatus { get; set; }
+        public string VideoStatus { get; set; }
         /// <summary>
         /// 播放列表
         /// </summary>
-        public Dictionary<string, object>? PlayLinks { get; set; }
+        public Dictionary<string, object> PlayLinks { get; set; }
     }
 }

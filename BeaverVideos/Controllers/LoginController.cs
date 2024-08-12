@@ -31,7 +31,6 @@ namespace BeaverVideos.Controllers
 
         [Public]
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginVM vm)
         {
             if (Wtm.ConfigInfo.IsQuickDebug == false)
@@ -83,7 +82,7 @@ namespace BeaverVideos.Controllers
         {
             if (ConfigInfo.HasMainHost)
             {
-
+                
                 return Content(Localizer["_Admin.HasMainHost"]);
             }
             var vm = Wtm.CreateVM<RegVM>();
@@ -92,7 +91,6 @@ namespace BeaverVideos.Controllers
 
         [Public]
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public IActionResult Reg(RegVM vm)
         {
             if (!ModelState.IsValid)
