@@ -61,13 +61,14 @@ namespace BeaverVideos
                 options.ReloadUserFunc = ReloadUser;
             });
             services.AddScoped<MovieService>();
+            var reverseProxyConfig = ConfigRoot.GetSection("ReverseProxy");
+            services.AddReverseProxy().LoadFromConfig(reverseProxyConfig);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IOptionsMonitor<Configs> configs)
         {
             IconFontsHelper.GenerateIconFont();
-
             app.UseExceptionHandler(configs.CurrentValue.ErrorHandler);
             app.UseStaticFiles();
             app.UseWtmStaticFiles();
@@ -83,14 +84,15 @@ namespace BeaverVideos
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapReverseProxy();//使用代理
                 endpoints.MapControllerRoute(
                    name: "areaRoute",
                    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
-        //pattern: "{controller=Movie}/{action=Index}/{id?}");
-        });
+                    pattern: "{controller=Movie}/{action=Index}/{id?}");
+                //pattern: "{controller=Home}/{action=Index}/{id?}");
+            });
 
             app.UseWtmContext();
         }

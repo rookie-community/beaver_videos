@@ -13,7 +13,7 @@
     <div class="layui-row">
         <div class="layui-col-md8">
             <div class="layui-panel" style="height:420px;">
-                <iframe style="width:100%;height:inherit;" allowtransparency="true" frameborder="0" scrolling="no" allowfullscreen="true" src="@ViewBag.PlayUrl" autoplay="true"></iframe>
+                <iframe id="myIframe" style="width:100%;height:inherit;" allowtransparency="true" frameborder="0" scrolling="no" allowfullscreen="allowfullscreen" src="@ViewBag.PlayUrl" onload="iframeLoaded()" />
             </div>
             <div>
                 <div class="layui-collapse" lay-filter="test">
@@ -133,3 +133,27 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    //待完善
+    function iframeLoaded() {
+        alert("IFRAME已加载！");
+        console.log('Iframe已加载');
+        var iframe = document.getElementById('myIframe');
+        // 检查浏览器是否支持contentDocument属性
+        if (iframe.contentDocument) {
+            // 现代浏览器
+            var elementA = iframe.contentDocument.getElementById('adv_wrap_hh');
+        } else if (iframe.contentWindow) {
+            // 较老版本的IE浏览器
+            var elementA = iframe.contentWindow.document.getElementById('adv_wrap_hh');
+        }
+
+        // 现在elementA就是iframe内ID为"A"的元素
+        // 你可以对其进行操作，比如：
+        if (elementA) {
+            // 例如，更改其内容
+            elementA.innerHTML = '新内容';
+        }
+    }
+</script>

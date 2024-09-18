@@ -12,7 +12,7 @@ namespace BeaverVideos.Common.Enums
     public enum TopType
     {
         /// <summary>
-        /// 默认
+        /// 总榜
         /// </summary>
         Default = 1,
         /// <summary>

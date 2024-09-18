@@ -15,6 +15,7 @@
     <PackageReference Include="Elsa.Designer.Components.Web" Version="2.14.1" />
     <PackageReference Include="WalkingTec.Mvvm.TagHelpers.LayUI" Version="8.1.10" />
     <PackageReference Include="WalkingTec.Mvvm.Mvc" Version="8.1.10" />
+    <PackageReference Include="Yarp.ReverseProxy" Version="2.2.0-preview.1.24266.1" />
 </ItemGroup>
 </Project>
 

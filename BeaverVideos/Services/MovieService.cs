@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Security.Authentication;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Diagnostics;
@@ -9,32 +8,39 @@ using System.Collections.Generic;
 using System.Linq;
 using BeaverVideos.Common.Enums;
 using BeaverVideos.Dto;
+using System.Threading.Tasks;
 
 namespace BeaverVideos.Services
 {
     public class MovieService
     {
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
+
+        private readonly JsonSerializerOptions _jsonSerializerOptions;
 
         /// <summary>
         /// 影视服务类
         /// </summary>
-        public MovieService()
+        public MovieService(IHttpClientFactory httpClientFactory)
         {
-            _httpClient = new HttpClient(new HttpClientHandler
+            _jsonSerializerOptions = new JsonSerializerOptions
             {
-                ServerCertificateCustomValidationCallback = (message, cert, chain, error) => true,
-                SslProtocols = SslProtocols.Tls12,
-            });
+                PropertyNameCaseInsensitive = true
+
+            };
+            _httpClientFactory = httpClientFactory;
         }
+
+        #region 旧方法
 
         /// <summary>
         /// 获取排行榜数据
         /// </summary>
         /// <param name="topType">类型</param>
         /// <returns></returns>
-        public IEnumerable<TopInfoModel> GetTops(TopType topType)
+        public IEnumerable<TopInfoModel> GetTops2(TopType topType)
         {
+            Test();
             string JsonStr = GetHttpString(new Uri($"https://api.web.360kan.com/v1/rank?cat={(int)topType}&callback=data"));
             var obj = JsonNode.Parse(JsonStr)!["data"] as JsonArray;
             foreach (var item in obj!)
@@ -80,7 +86,7 @@ namespace BeaverVideos.Services
             List<TopInfoModel> tops = new();
             types.ForEach((item) =>
             {
-                tops.AddRange(GetTops(item));
+                tops.AddRange(GetTops2(item));
             });
             return tops.OrderBy(x => x.Cat);
         }
@@ -350,7 +356,9 @@ namespace BeaverVideos.Services
         {
             try
             {
-                return _httpClient.GetStringAsync(uri.ToString()).Result.Trim()[5..^2];
+                using var client = _httpClientFactory.CreateClient();
+                var temp = client.GetStringAsync(uri).Result.Trim()[5..^2];
+                return temp;
             }
             catch (Exception)
             {
@@ -397,6 +405,240 @@ namespace BeaverVideos.Services
         {
             var attribs = (DescriptionAttribute[])obj.GetType().GetField(obj.ToString())!.GetCustomAttributes(typeof(DescriptionAttribute), false);
             return attribs.Length > 0 ? attribs[0].Description : obj.ToString();
+        }
+
+        #endregion
+
+
+        private void Test()
+        {
+            GetRecommend(CatType.Anime, "热血").Wait();
+        }
+
+        /// <summary>
+        /// 搜索提示
+        /// </summary>
+        /// <param name="content">文本内容</param>
+        /// <returns></returns>
+        public async Task<ResultDto<List<SuggestionDto>>> SearchQuerySuggestion(string content)
+        {
+            try
+            {
+                using var client = _httpClientFactory.CreateClient();
+                var url = $"https://api.so.360kan.com/suggest.php?kw={content}";
+                var jsonResult = await client.GetStringAsync(url);
+                var result = JsonSerializer.Deserialize<ResultDto>(jsonResult, _jsonSerializerOptions);
+                if (!result.IsSuccess)
+                {
+                    return new ResultDto<List<SuggestionDto>>
+                    {
+                        Code = 500,
+                        Message = result.Message
+                    };
+                }
+
+                var obj = JsonNode.Parse(jsonResult)!;
+                var jsonData = obj["data"]["suglist"].ToJsonString();
+                var data = JsonSerializer.Deserialize<List<SuggestionDto>>(jsonData, _jsonSerializerOptions);
+                return new ResultDto<List<SuggestionDto>>
+                {
+                    Data = data,
+                    Code = 200
+                };
+            }
+            catch (Exception ex)
+            {
+                var result = new ResultDto<List<SuggestionDto>>
+                {
+                    Message = ex.Message,
+                    Code = 500
+                };
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// 搜索
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public async Task<ResultDto<List<QueryResultDto>>> Query(string name)
+        {
+            try
+            {
+                using var client = _httpClientFactory.CreateClient();
+                var url = $"https://api.so.360kan.com/index?kw={name}&pageno=1";
+                var jsonResult = await client.GetStringAsync(url);
+                var result = JsonSerializer.Deserialize<ResultDto>(jsonResult, _jsonSerializerOptions);
+                if (!result.IsSuccess)
+                {
+                    return new ResultDto<List<QueryResultDto>>
+                    {
+                        Code = 500,
+                        Message = result.Message
+                    };
+                }
+
+                var obj = JsonNode.Parse(jsonResult)!;
+                var jsonData = obj["data"]["longData"]["rows"].ToJsonString();
+
+                var data = JsonSerializer.Deserialize<List<QueryResultDto>>(jsonData, _jsonSerializerOptions);
+                return new ResultDto<List<QueryResultDto>>
+                {
+                    Data = data,
+                    Code = 200
+                };
+            }
+            catch (Exception ex)
+            {
+                var result = new ResultDto<List<QueryResultDto>>
+                {
+                    Message = ex.Message,
+                    Code = 500
+                };
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// 影视推荐
+        /// </summary>
+        /// <param name="cat">类型</param>
+        /// <param name="size">数量</param>
+        /// <returns></returns>
+        public async Task<ResultDto<List<RecommendDto>>> GetRecommend(CatType cat, int size = 8)
+        {
+            try
+            {
+                using var client = _httpClientFactory.CreateClient();
+                var jsonResult = await client.GetStringAsync($"https://api.web.360kan.com/v1/rank?cat={(int)cat}&size={size}");
+                var result = JsonSerializer.Deserialize<ResultDto<List<RecommendDto>>>(jsonResult, _jsonSerializerOptions);
+                if (!result.IsSuccess)
+                {
+                    return new ResultDto<List<RecommendDto>>
+                    {
+                        Code = 500,
+                        Message = result.Message
+                    };
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                var result = new ResultDto<List<RecommendDto>>
+                {
+                    Code = 500,
+                    Message = ex.Message,
+                };
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// 精彩推荐
+        /// </summary>
+        /// <param name="cat">类型</param>
+        /// <param name="tag">标签，例如：冒险</param>
+        /// <param name="size">数量</param>
+        /// <returns></returns>
+        public async Task<ResultDto<List<ExcitingRecommendationsDto>>> GetRecommend(CatType cat, string tag, int size = 18)
+        {
+            try
+            {
+                using var client = _httpClientFactory.CreateClient();
+                var jsonResult = await client.GetStringAsync($"https://api.web.360kan.com/v1/filter/list?catid={(int)cat}&size={size}&cat={tag}");
+                var result = JsonSerializer.Deserialize<ResultDto>(jsonResult, _jsonSerializerOptions);
+                if (!result.IsSuccess)
+                {
+                    return new ResultDto<List<ExcitingRecommendationsDto>>
+                    {
+                        Code = 500,
+                        Message = result.Message
+                    };
+                }
+                var obj = JsonNode.Parse(jsonResult);
+                var jsonData = obj["data"]["movies"].ToJsonString();
+
+                var data = JsonSerializer.Deserialize<List<ExcitingRecommendationsDto>>(jsonData, _jsonSerializerOptions);
+                return new ResultDto<List<ExcitingRecommendationsDto>>
+                {
+                    Code = 200,
+                    Data = data
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultDto<List<ExcitingRecommendationsDto>>
+                {
+                    Code = 500,
+                    Message = ex.Message,
+                };
+            }
+        }
+
+        /// <summary>
+        /// 排行榜
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <returns></returns>
+        public async Task<ResultDto<List<RecommendDto>>> GetTops(TopType type)
+        {
+            try
+            {
+                using var client = _httpClientFactory.CreateClient();
+                var jsonResult = await client.GetStringAsync($"https://api.web.360kan.com/v1/rank?cat={(int)type}");
+                var result = JsonSerializer.Deserialize<ResultDto<List<RecommendDto>>>(jsonResult, _jsonSerializerOptions);
+                if (!result.IsSuccess)
+                {
+                    return new ResultDto<List<RecommendDto>>
+                    {
+                        Code = 500,
+                        Message = result.Message
+                    };
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                var result = new ResultDto<List<RecommendDto>>
+                {
+                    Code = 500,
+                    Message = ex.Message,
+                };
+                return result;
+            }
+        }
+
+        public async Task<ResultDto> GetDetail()
+        {
+            try
+            {
+                using var client = _httpClientFactory.CreateClient();
+                var jsonResult = await client.GetStringAsync($"");
+
+                var result = JsonSerializer.Deserialize<ResultDto>(jsonResult);
+                if (!result.IsSuccess)
+                {
+                    return new ResultDto
+                    {
+                        Code = 500,
+                        Message = result.Message
+                    };
+                }
+
+                return new ResultDto
+                {
+                    Code = 200,
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultDto
+                {
+                    Code = 500,
+                    Message = ex.Message,
+                };
+            }
         }
     }
 }
