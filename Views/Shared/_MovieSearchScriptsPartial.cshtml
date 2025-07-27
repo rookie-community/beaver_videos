@@ -1,0 +1,80 @@
+﻿<script type="text/javascript">
+    layui.use(function(){
+      let dropdown = layui.dropdown;
+      let $ = layui.$;
+      let form = layui.form;
+
+      // 输入框点缀事件 - 搜索示例
+      form.on('input-affix(search)', function(data){
+          let elem = data.elem; // 输入框
+          let value = elem.value; // 输入框的值
+          if(!value){
+            layer.msg('请输入搜索内容');
+            return elem.focus()
+          };
+          // 搜索跳转
+          location.href = '/Home/Search?name='+ value;
+      });
+
+      $('#ID-dropdown-demo').keydown(function(e){
+          if(e.keyCode == 13){
+              // 触发 form.on('input-affix(search)' 事件
+              let searchInput = $('#ID-dropdown-demo'); // 输入框dom
+              let value = searchInput.val();
+              if(value){
+                  // 搜索跳转
+                  location.href = '/Home/Search?name='+ value;
+              }
+          }
+      })
+
+      let inst = dropdown.render({
+        elem: '#ID-dropdown-demo',
+        data: [],
+        click: function(obj){
+          this.elem.val(obj.title);
+          this.elem.attr('data-id', obj.id)
+        }
+      });
+
+      $(inst.config.elem).on('input propertychange',async function() {
+        let elem = $(this);
+        let value = elem.val().trim();
+        elem.removeAttr('data-id');
+
+        let dataNew = await loadData(value);
+        dropdown.reloadData(inst.config.id, {
+          data: dataNew
+        })
+      });
+
+      // $(inst.config.elem).on('blur', function() {
+      //   var elem = $(this);
+      //   var dataId = elem.attr('data-id');
+      //   if (!dataId) {
+      //       elem.val('');
+      //   }
+      // });
+
+      function loadData(value) {
+          // 返回一个Promise对象
+          return new Promise((resolve) => {
+              $.get(`/Home/GetMovieName?name=${value}`, function(result){
+                  if (Array.isArray(result)) {
+                      let data = result.map(x => ({
+                          id: x.info,
+                          title: x.word
+                      }));
+                      resolve(data); // 将处理后的数据通过resolve返回
+                  } else {
+                      console.log(result);
+                      resolve([]); // 非数组时返回空数组
+                  }}).fail(function() {
+                      // 处理请求失败的情况
+                      console.error("请求失败");
+                      resolve([]); // 失败时也返回空数组
+                  });
+          });
+      }
+    });
+</script>

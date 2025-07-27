@@ -1,0 +1,42 @@
+﻿@using BeaverVideos.Dtos
+@using BeaverVideos.Dtos.Movies
+@model IEnumerable<MovieQueryResponses>
+@{
+    ViewData["title"] = $"“{ViewBag.Name}”的搜索结果 - 小狸影视";
+}
+<div class="layui-container">
+    <partial name="_MovieSearchPartial" model="@ViewBag.Name" />
+
+    @if (Model != null && Model.Any())
+    {
+        foreach (var item in Model)
+        {
+            <a asp-area="" asp-controller="Home" asp-action="Detail" asp-route-entId="@item.EnId" asp-route-catType="@item.CatId">
+                <div class="layui-row layui-panel" style="margin:10px 0px;">
+                    <div class="layui-col-md2">
+                        <img src="@item.Cover" style="width:180px;height:240px;">
+                    </div>
+
+                    <div class="layui-col-md10">
+                        <h2 style="margin:15px 0px">@Html.Raw(item.Title)</h2>
+                        <h3 style="margin:10px 0px;">@item.CatName / @item.Year</h3>
+                        <div class="layui-row">
+                            <p>@item.Description</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        }
+    }
+    else
+    {
+        <blockquote class="layui-elem-quote">
+            <h2>查无数据</h2>
+        </blockquote>
+    }
+</div>
+
+
+@section Scripts {
+    <partial name="_MovieSearchScriptsPartial" />
+}

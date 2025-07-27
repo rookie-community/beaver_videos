@@ -1,0 +1,139 @@
+﻿@using BeaverVideos.Dtos
+@using BeaverVideos.Dtos.Enums
+@using BeaverVideos.Dtos.Movies
+@using BeaverVideos.Extensions
+@model MovieDetailViewModel
+@{
+    ViewData["title"] = $"{Model.Title} 第{Model.CurrentIndex}集";
+    var total = Model.PlayLinksDetail.Count;
+    var limit = 50;
+    var tabs = total / limit + Convert.ToInt32(total % limit != 0);
+}
+<div class="layui-container">
+    <partial name="_MovieSearchPartial" model="@Model.Title" />
+    <div class="layui-row">
+        <div class="layui-col-md8">
+            <div class="layui-panel" style="height:420px;">
+                <iframe allow="fullscreen" allowtransparency="true" id="player" frameborder="0" src="@Model.CurrentPlayUrl" style="width:100%;height:inherit;"></iframe>
+            </div>
+            <div class="layui-collapse" lay-filter="test">
+                <div class="layui-colla-item">
+                    <h2 class="layui-colla-title">
+                        《@Model.Title》简介
+                        @Html.Raw("&nbsp;&nbsp;&nbsp;&nbsp;")
+                        @Html.Raw((Model.Vip ? "<span class='layui-badge'>VIP</span>" : "<span class='layui-badge layui-bg-blue'>免费</span>"))
+
+                        @* 导演 *@
+                        @if (Model.Director.Count != 0)
+                        {
+                            <span class="layui-badge layui-bg-black">
+                                导演：
+                                @string.Join("、", Model.Director);
+                            </span>
+                        }
+
+                        @foreach (var item in Model.Moviecategory)
+                        {
+                            <span class="layui-badge-rim">@item</span>
+                        }
+                    </h2>
+                    <div class="layui-colla-content">
+                        <p>@Model.Description</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md4" style="padding-left:5px;">
+            <blockquote class="layui-elem-quote" style="margin:0px 0px 10px 15px;"><b>@Model.Title</b></blockquote>
+            <div class="layui-form">
+                <form asp-controller="Home" asp-action="Detail" method="get">
+                    <div class="layui-row">
+                        <label class="layui-form-label layui-col-md4" style="width:120px;">当前线路:</label>
+                        <input style="display:none;" name="entId" value="@Model.EntId" />
+                        <input style="display:none;" name="catType" value="@Model.CatType">
+                        <input style="display:none;" name="index" value="@ViewBag.ThisIndex">
+                        <div class="layui-input-inline layui-col-md6">
+                            <select name="linkType" asp-for="CurrentPlayLink">
+                                @foreach (var item in Model.PlayLinkSites)
+                                {
+                                    <option value="@item">@item.GetDescription()</option>
+                                }
+                            </select>
+                        </div>
+                        <button class="layui-btn layui-btn-primary layui-border-blue layui-col-md2" type="submit">切换</button>
+                    </div>
+                </form>
+            </div>
+            <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+                <ul class="layui-tab-title">
+                    @for (var i = 0; i < tabs; i++)
+                    {
+                        if (Model.CatType == CatType.Film || Model.PlayLinksDetail.Count == 1)
+                        {
+                            <li class="layui-this">播放列表</li>
+                        }
+                        else
+                        {
+                            <li @(i* limit + 1 <= Model.CurrentIndex && Model.CurrentIndex <= (i + 1) * limit ? "class=layui-this" : null)>@($"{i * limit + 1} - {Math.Min(total, (i + 1) * limit)}")</li>
+                        }
+                    }
+                </ul>
+                <div class="layui-tab-content" style="overflow-y:auto;">
+                    @{
+                        int videoIndex = 0;//用于循环时输出剧集的索引
+                        foreach (var item in Model.PlayLinksDetail)
+                        {
+                            videoIndex++;
+                            if (videoIndex % limit == 1)
+                            {
+                                if (videoIndex <= Model.CurrentIndex && Model.CurrentIndex <= (videoIndex + limit -1))
+                                {
+                                    @Html.Raw($"<div class='layui-tab-item layui-show' style='max-height:420px;min-height:100px;'>")
+                                }
+                                else
+                                {
+                                    @Html.Raw($"<div class='layui-tab-item' style='max-height:420px;min-height:100px;'>")
+                                }
+                            }
+                            <a asp-controller="Home" asp-action="Detail"
+                               asp-route-entId="@Model.EntId"
+                               asp-route-catType="@Model.CatType"
+                               asp-route-linkType="@Model.CurrentPlayLink"
+                               asp-route-index="@videoIndex" class="layui-btn layui-btn-sm @(Model.CurrentIndex==videoIndex?"layui-btn-normal":"layui-btn-primary")" style="width:55px;margin:3px;">
+                                @videoIndex
+                                @Html.Raw(item.IsVip == "1" ? $"<span class='layui-badge' style='padding:1px;'>vip</span>" : null)
+                            </a>
+                            if (videoIndex % limit == 0 || videoIndex == Model.PlayLinksDetail.Count)
+                            {
+                                @Html.Raw("</div>")
+                            }
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row">
+        <blockquote class="layui-elem-quote" style="margin-top:20px;">精彩推荐</blockquote>
+        <div class="layui-row">
+            @foreach (var item in Model.Recommends)
+            {
+                <div class="layui-col-md2 layui-col-sm3">
+                    <div class="layui-panel" style="width:170px;height:275px;margin:5px;">
+                        <a asp-controller="Home" asp-action="Detail"
+                           asp-route-entId="@item.Id"
+                           asp-route-catType="@Model.CatType" title="@item.Comment" target="_blank">
+                            <img src="@item.CdnCover" style="width:170px;height:235px;" />
+                            <label class="layui-form-label" style="width:150px;text-align:center;padding:2px 15px;">@item.Title</label>
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <div id="SOHUCS" sid="@Model.EntId"></div>
+</div>
+@section Scripts {
+    <partial name="_MovieSearchScriptsPartial" />
+    <partial name="_ChangYanScriptPartial" />
+}

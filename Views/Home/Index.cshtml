@@ -1,0 +1,81 @@
+﻿@using System.Text.Json
+@using BeaverVideos.Dtos
+@using BeaverVideos.Dtos.Enums
+@using BeaverVideos.Dtos.Movies
+@model IndexViewModel
+@{
+    ViewData["title"] = "首页";
+}
+
+<style>
+    .carousel-img {
+        width:100%;
+        height: 380px;
+        object-fit: cover;
+        object-position: center;
+    }
+
+</style>
+
+<div class="layui-container">
+    <partial name="_MovieSearchPartial" model="string.Empty" />
+    <div class="layui-carousel" id="ID-carousel-demo-image">
+        <div carousel-item>
+            @foreach (var item in Model.Carousels)
+            {
+                <a asp-area="" asp-controller="Home" asp-action="Detail" asp-route-entId="@item.EntId" asp-route-catType="@item.Cat" target="_blank" title="@item.Title">
+                    <img src="@item.PicLists.Select(x => x.Url).FirstOrDefault()" class="carousel-img">
+                </a>
+            }
+        </div>
+    </div>
+
+    <blockquote class="layui-elem-quote" style="margin-top:20px;">排行榜</blockquote>
+    <div class="layui-row">
+        <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+            <ul class="layui-tab-title">
+                <li class="layui-this">首页</li>
+                <li>电影</li>
+                <li>电视剧</li>
+                <li>综艺</li>
+                <li>动漫</li>
+            </ul>
+            <div class="layui-tab-content" style="height: 100px;">
+                @foreach (var tops in Model.Movies)
+                {
+                    <div class="layui-tab-item @(tops.Key == MovieType.Default ? "layui-show" : null)">
+                        <div class="layui-row">
+                            @foreach (var item in tops.Value)
+                            {
+                                <div class="layui-col-md2 layui-col-sm4">
+                                    <div class="layui-panel" style="width:170px;height:275px;margin:5px;">
+                                        <a asp-area="" asp-controller="Home" asp-action="Detail" asp-route-entId="@item.EntId" asp-route-catType="@item.Cat" target="_blank" title="@item.Description">
+                                            <img src="@item.Cover" style="width:170px;height:235px;" />
+                                            <label class="layui-form-label" style="width:150px;text-align:center;padding:2px 15px;">@item.Title</label>
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_MovieSearchScriptsPartial"/>
+    <script type="text/javascript">
+        layui.use(function(){
+          var carousel = layui.carousel;
+          // 渲染 - 图片轮播
+          carousel.render({
+            elem: '#ID-carousel-demo-image',
+            width: 'auto',
+            height: '380px',
+            interval: 3000
+          });
+        });
+    </script>
+}

@@ -1,0 +1,327 @@
+﻿@* @model EquipmentQueryModel
+@inject IFreeSql freeSql
+@{
+    ViewData["Title"] = "设备信息";
+    var equipmentTypes = freeSql.Queryable<EquipmentType>().ToList(x => new SelectListItem
+    {
+        Value = x.Id.ToString(),
+        Text = x.Name
+    });
+    var isAdmin = User.IsInRole(nameof(RoleType.Admin));
+}
+
+<div class="layui-card">
+    <div class="layui-card-body">
+        <form class="layui-form layui-form-pane" id="form-val-filter" lay-filter="form-val-filter">
+            <div class="layui-inline">
+                <label class="layui-form-label">设备编号</label>
+                <div class="layui-input-inline">
+                    <input type="text" asp-for="Code" placeholder="" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">设备名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" asp-for="Name" placeholder="" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">设备类型</label>
+                <div class="layui-input-inline">
+                    <select asp-for="EquipmentTypeId" asp-items="equipmentTypes">
+                        <option value="" selected>全部</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">区域</label>
+                <div class="layui-input-inline">
+                    <input type="text" asp-for="DestinationArea" placeholder="" class="layui-input">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="layui-panel">
+    <table class="layui-hide" id="equipmentTable" lay-filter="equipmentTable"></table>
+</div>
+
+<div id="ID-layer-addOrEdit" style="display: none; padding: 15px;">
+    <partial name="AddOrEdit" model="equipmentTypes" />
+</div>
+
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="search">
+            <i class="layui-icon layui-icon-search"></i>
+            查询
+        </button>
+        <button class="layui-btn layui-btn-sm layui-btn-primary" lay-event="refresh">
+            <i class="layui-icon layui-icon-refresh"></i>
+            重置
+        </button>
+        <button class="layui-btn layui-btn-sm layui-btn-normal @(isAdmin ? "" : "layui-hide")" lay-event="add">
+            <i class="layui-icon layui-icon-add-1"></i>
+            新增
+        </button>
+        <button class="layui-btn layui-btn-sm layui-btn-warm @(isAdmin ? "" : "layui-hide")" lay-event="syncData">
+            <i class="layui-icon layui-icon-download-circle"></i>
+            同步数据
+        </button>
+        <button class="layui-btn layui-btn-sm layui-btn-danger @(isAdmin ? "" : "layui-hide")" lay-event="batchDelete">
+            <i class="layui-icon layui-icon-delete"></i>
+            批量删除
+        </button>
+    </div>
+</script>
+
+<script type="text/html" id="toolDisable">
+    <input type="checkbox" name="disable" value="{{= d.id }}" lay-filter="disable-switch-filter" lay-skin="switch" {{= d.disable == false ? "checked" : "" }} title="启用|禁用">
+</script>
+<partial name="_EquipmentTypeIdFormatPartial" model="equipmentTypes" />
+<partial name="_DateTimeFormatPartial" />
+<script type="text/html" id="toolDemo">
+    <div class="layui-clear-space">
+        <a class="layui-btn layui-btn-xs layui-btn-warm @(isAdmin ? "" : "layui-hide")" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+        <a class="layui-btn layui-btn-xs layui-btn-danger @(isAdmin ? "" : "layui-hide")" lay-event="delete"><i class="layui-icon layui-icon-delete"></i>删除</a>
+        <a class="layui-btn layui-btn-xs layui-btn-primary" lay-event="detail"><i class="layui-icon layui-icon-about"></i>详情</a>
+    </div>
+</script>
+@section Scripts {
+    <script type="text/javascript">
+        layui.use(['table', 'form'], function () {
+            var table = layui.table;
+            var form = layui.form;
+            var $ = layui.$;
+
+            // 创建渲染实例
+            table.render({
+                elem: '#equipmentTable',
+                url: 'Load', // 此处为静态模拟数据，实际使用时需换成真实接口
+                toolbar: '#toolbarDemo',
+                defaultToolbar: ['filter', 'exports', 'print'],
+                height: 'full-200', // 最大高度减去其他容器已占有的高度差
+                cellMinWidth: 80,
+                page: true,
+                cols: [[
+                    { type: 'checkbox', fixed: 'left' },
+                    { field: 'id', fixed: 'left', title: 'ID', hide: true },
+                    { field: 'code', fixed: 'left', width: 240, title: '设备编号' },
+                    { field: 'name', width: 180, title: '设备名称' },
+                    { field: 'ip', width: 160, title: 'IP地址' },
+                    { field: 'equipmentTypeId', width: 200, title: '设备类型', templet: '#toolEquipmentTypeId' },
+                    { field: 'destinationArea', width: 30, title: '区域' },
+                    { field: 'disable', width: 90, title: '状态', templet: '#toolDisable' },
+                    { field: 'createdBy', title: '创建人', hide: true },
+                    { field: 'created', width: 160, title: '创建时间', templet:'#toolCreated' },
+                    { field: 'updatedBy', title: '更新人', hide: true },
+                    { field: 'updated', width: 160, title: '更新时间', templet: '#toolUpdated' },
+                    { fixed: 'right', title: '操作', width: @(isAdmin ? 200 : 90), templet: '#toolDemo' }
+                ]],
+                before: function (options) {
+                    options.where.DestinationArea = $('#DestinationArea')[0].value;
+                },
+                error: function (res, msg) {
+                    console.log(res, msg)
+                }
+            });
+
+            // 工具栏事件
+            table.on('toolbar(equipmentTable)', function (obj) {
+                var id = obj.config.id;
+                var checkStatus = table.checkStatus(id);
+                var othis = lay(this);
+                switch (obj.event) {
+                    case 'search':
+                        search();
+                        break;
+                    case 'refresh':
+                        refresh();
+                        break;
+                    case 'syncData':
+                        syncData();
+                        break;
+                    case 'add':
+                        add();
+                        break;
+                    case 'batchDelete':
+                        batchDelete(checkStatus.data);
+                        break;
+                };
+            });
+
+            // 触发单元格工具事件
+            table.on('tool(equipmentTable)', function (obj) {
+                let data = obj.data; // 获得当前行数据
+                if (obj.event === 'edit') {
+                    edit(data);
+                } else if (obj.event === 'delete') {
+                    batchDelete([data]);
+                } else if (obj.event === 'detail') {
+                    detail(data);
+                }
+            })
+
+            // checkbox 事件
+            form.on('switch(disable-switch-filter)', function (obj) {
+                let id = this.value;
+                let elem = obj.elem;
+                let disable = obj.elem.checked == false;
+                let data = {
+                    id: id,
+                    disable: disable
+                }
+                $.post('UpdateStatus', data).done(function (result) {
+                    if (result.code == 0) {
+                        table.reloadData('equipmentTable');
+                        layer.msg(result.msg, { icon: 1 })
+                    } else {
+                        $(elem).prop('checked', !elem.checked);
+                        layer.msg(result.msg, { icon: 2 })
+                    }
+                }).fail(function (xhr, status, error) {
+                    $(elem).prop('checked', !elem.checked);
+                    layer.msg(`操作失败，状态码${xhr.status}，${error}`, { icon: 2 });
+                })
+            });
+
+            function search() {
+                let data = form.val('form-val-filter');
+                table.reloadData('equipmentTable', {
+                    where: data,
+                    scrollPos: true,
+                });
+            }
+
+            function refresh() {
+                $("#form-val-filter")[0].reset();
+                table.reloadData('equipmentTable', {
+                    where: {},
+                });
+            }
+
+            function syncData() {
+                layer.confirm('数据同步操作会从服务器获取最新配置信息，清空并覆盖本地数据，此操作不可逆，确认执行？', { icon: 3 }, function (index) {
+                    layer.close(index);
+
+                    var loadIndex = layer.msg('数据同步中...', {
+                        icon: 16,
+                        shade: 0.3
+                    });
+
+                    $.get('SyncData').done(function (result) {
+                        if (result.code === 0) {
+                            layer.msg(result.msg, { icon: 1,time:1000 }, function () {
+                                //刷新页面
+                                location.reload();
+                            });
+                        } else {
+                            layer.msg(result.msg, { icon: 2 });
+                        }
+                        layer.close(loadIndex);
+                    }).fail(function (xhr, status, error) {
+                        layer.close(loadIndex);
+                        layer.msg(`操作失败，状态码${xhr.status}，${error}`, { icon: 2 });
+                    })
+                });
+            }
+
+            function add() {
+                layer.open({
+                    title: '新增',
+                    type: 1,
+                    area: ['600px', '80%'],
+                    content: $('#ID-layer-addOrEdit'),
+                    btn: ['保存', '取消'],
+                    yes: function (index, layero, that) {
+                        var isValid = form.validate('#form-addOrEdit-filter')
+                        if (!isValid) {
+                            return false;
+                        }
+                        let data = form.val('form-addOrEdit-filter');
+                        data.disable = data.disable === 'on' ? false : true;
+                        $.post('Add', data).done(function (result) {
+                            if (result.code === 0) {
+                                table.reloadData('equipmentTable');
+                                layer.msg(result.msg, { icon: 1 });
+                                layer.close(index);
+                            } else {
+                                layer.msg(result.msg, { icon: 2 });
+                            }
+                        }).fail(function (xhr, status, error) {
+                            layer.msg(`操作失败，状态码${xhr.status}，${error}`, { icon: 2 });
+                        })
+                        return false;
+                    },
+                    end: function () {
+                        //关闭后的回调
+                        $("#form-addOrEdit-filter")[0].reset();
+                    }
+                });
+            }
+
+            function edit(data) {
+                form.val('form-addOrEdit-filter', data);
+                $('#switchDisable')[0].checked = data.disable == false;
+                layer.open({
+                    title: '编辑 - id:' + data.id,
+                    type: 1,
+                    area: ['600px', '80%'],
+                    content: $('#ID-layer-addOrEdit'),
+                    btn: ['保存', '取消'],
+                    yes: function (index, layero, that) {
+                        var isValid = form.validate('#form-addOrEdit-filter')
+                        if (!isValid) {
+                            return false;
+                        }
+                        let data = form.val('form-addOrEdit-filter');
+                        data.disable = data.disable === 'on' ? false : true;
+                        $.post('Update', data).done(function (result) {
+                            if (result.code === 0) {
+                                table.reloadData('equipmentTable');
+                                layer.msg(result.msg, { icon: 1 });
+                                layer.close(index); // 关闭弹层
+                            } else {
+                                layer.msg(result.msg, { icon: 2 });
+                            }
+                        }).fail(function (xhr, status, error) {
+                            layer.msg(`操作失败，状态码${xhr.status}，${error}`, { icon: 2 });
+                        })
+                        return false;
+                    },
+                    end: function () {
+                        //关闭后的回调
+                        $("#form-addOrEdit-filter")[0].reset();
+                    }
+                });
+            }
+
+            function batchDelete(data) {
+                layer.confirm('确定删除？', { icon: 3 }, function () {
+                    let ids = data.map(x => x.id);
+                    $.post('Delete', { ids: ids }).done(function (result) {
+                        if (result.code === 0) {
+                            table.reloadData('equipmentTable');
+                            layer.msg(result.msg, { icon: 1 });
+                        } else {
+                            layer.msg(result.msg, { icon: 2 });
+                        }
+                    }).fail(function (xhr, status, error) {
+                        layer.msg(`操作失败，状态码${xhr.status}，${error}`, { icon: 2 });
+                    })
+                });
+            }
+
+            function detail(data) {
+                layer.open({
+                    type: 2,
+                    title: `${data.name} - 设备属性`,
+                    shadeClose: true,
+                    maxmin: true,
+                    area: ['80%', '80%'],
+                    content: `../EquipmentProp/Index?id=${data.id}`
+                });
+            }
+        });
+    </script>
+} *@

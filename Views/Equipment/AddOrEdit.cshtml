@@ -1,0 +1,72 @@
+﻿@model List<SelectListItem>
+
+<form class="layui-form layui-form-pane" action="" id="form-addOrEdit-filter" lay-filter="form-addOrEdit-filter">
+    <div class="layui-form-item layui-hide">
+        <label class="layui-form-label">Id</label>
+        <div class="layui-input-block">
+            <input type="text" name="id" autocomplete="off" class="layui-input layui-disabled">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">编号</label>
+        <div class="layui-input-block">
+            <input type="text" name="code" autocomplete="off" placeholder="请输入" lay-verify="required" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="name" autocomplete="off" placeholder="请输入" lay-verify="required" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">设备类型</label>
+        <div class="layui-input-block">
+            <select name="equipmentTypeId" asp-items="Model">
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">IP地址</label>
+        <div class="layui-input-block">
+            <input type="text" name="ip" autocomplete="off" placeholder="请输入" lay-verify="required" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">连接名</label>
+        <div class="layui-input-block">
+            <input type="text" name="connectName" autocomplete="off" placeholder="请输入" lay-verify="required" min="0" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item" pane>
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <input type="checkbox" name="disable" lay-skin="switch" id="switchDisable" lay-filter="switchDisable" title="启用|禁用">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">区域</label>
+        <div class="layui-input-block">
+            <input type="text" name="destinationArea" autocomplete="off" placeholder="请输入" lay-verify="required" min="0" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item layui-hide">
+        <label class="layui-form-label">项目编号</label>
+        <div class="layui-input-block">
+            <input type="text" name="projectCode" autocomplete="off" placeholder="请输入" min="0" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item layui-hide">
+        <label class="layui-form-label">仓库编号</label>
+        <div class="layui-input-block">
+            <input type="text" name="factoryCode" autocomplete="off" placeholder="请输入" min="0" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-block">
+            <textarea name="description" placeholder="请输入内容" class="layui-textarea"></textarea>
+        </div>
+    </div>
+</form>

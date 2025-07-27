@@ -1,0 +1,172 @@
+﻿@inject IWebHostEnvironment webHostEnvironment
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - DataAcquisition</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/HHECS.DAQWebClient.styles.css" asp-append-version="true" />
+    <environment include="Development">
+        <link href="~/lib/layui/css/layui.css" rel="stylesheet" asp-append-version="true" />
+        <link href="~/lib/font-awesome/css/all.css" rel="stylesheet" asp-append-version="true" />
+    </environment>
+    <environment exclude="Development">
+        <link href="~/lib/layui/css/layui.min.css" rel="stylesheet" asp-append-version="true" />
+        <link href="~/lib/font-awesome/css/all.min.css" rel="stylesheet" asp-append-version="true" />
+    </environment>
+    <link href="~/lib/layui-theme-dark/layui-theme-dark-selector.css" rel="stylesheet" asp-append-version="true" />
+</head>
+<body>
+    <div class="layui-layout layui-layout-admin">
+        <div class="layui-header">
+            <div class="layui-logo layui-hide-xs layui-bg-black">数据采集&nbsp;<span id="isProductionEnvironment" class="layui-badge layui-bg-blue @(webHostEnvironment.IsDevelopment() ? string.Empty : "layui-hide")">Beta</span></div>
+            <!-- 头部区域（可配合layui 已有的水平导航） -->
+            <ul class="layui-nav layui-layout-right">
+                <li class="layui-nav-item">
+                    <div class="layui-form">
+                        <input type="checkbox" name="dark" id="dark-switch-filter" lay-filter="dark-switch-filter" lay-skin="switch">
+                        <div lay-checkbox>
+                            <i class="layui-icon layui-icon-moon"></i> |
+                            <i class="layui-icon layui-icon-light"></i>
+                        </div>
+                    </div>
+                </li>
+                <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
+                    <a href="javascript:;">
+                        <i class="layui-icon layui-icon-username"></i>
+                        @User.Identity?.Name
+                    </a>
+                    <dl class="layui-nav-child">
+                        <dd lay-header-event="setPwd"><a href="javascript:;">修改密码</a></dd>
+                        <dd lay-header-event="signOut"><a asp-controller="Account" asp-action="Logout">注销</a></dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+        <div class="layui-side layui-bg-black">
+            <div class="layui-side-scroll">
+                <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+                <partial name="_NavMenuPartial" />
+            </div>
+        </div>
+        <div class="layui-body">
+            <!-- 内容主体区域 -->
+            <div style="padding: 10px;">
+                @RenderBody()
+            </div>
+        </div>
+        <div class="layui-footer">
+            <!-- 底部固定区域 -->
+            Copyright &copy; 2025 <a asp-area="" asp-controller="Home" asp-action="Index">小狸影视</a> MIT Licensed
+        </div>
+    </div>
+    <div id="ID-layer-pwd" style="display: none; padding: 15px;">
+        <form class="layui-form layui-form-pane" action="" id="form-pwd-filter" lay-filter="form-pwd-filter">
+            <div class="layui-form-item">
+                <label class="layui-form-label">原密码</label>
+                <div class="layui-input-block">
+                    <input type="password" name="currentPassword" autocomplete="off" placeholder="请输入原密码" lay-verify="required" class="layui-input" lay-affix="eye">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">新密码</label>
+                <div class="layui-input-block">
+                    <input type="password" name="newPassword" autocomplete="off" placeholder="请输入新密码" lay-verify="required" class="layui-input" lay-affix="eye">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">确认密码</label>
+                <div class="layui-input-block">
+                    <input type="password" name="confirmNewPassword" autocomplete="off" placeholder="请再次输入新密码" lay-verify="required" class="layui-input" lay-affix="eye">
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <environment include="Development">
+        <script src="~/lib/layui/layui.js" asp-append-version="true"></script>
+        <script src="~/lib/microsoft-signalr/signalr.js" asp-append-version="true"></script>
+        <script src="~/lib/font-awesome/js/all.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="~/lib/layui/layui.min.js" asp-append-version="true"></script>
+        <script src="~/lib/microsoft-signalr/signalr.min.js" asp-append-version="true"></script>
+        <script src="~/lib/font-awesome/js/all.min.js" asp-append-version="true"></script>
+    </environment>
+    <partial name="_DarkScriptPartial" />
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script type="text/javascript" asp-append-version="true">
+        //JS
+        layui.use(['element', 'layer', 'util', 'form'], function () {
+            let element = layui.element;
+            let layer = layui.layer;
+            let util = layui.util;
+            let form = layui.form;
+            let $ = layui.$;
+
+            const APPERANCE_KEY = 'layui-theme-mode-prefer-dark'
+            let savedPreferDark = localStorage.getItem(APPERANCE_KEY)
+            if (savedPreferDark === 'true' || (!savedPreferDark && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                $('#dark-switch-filter').prop('checked', true);
+            } else {
+                $('#dark-switch-filter').prop('checked', false);
+            }
+
+            //头部事件
+            util.event('lay-header-event', {
+                setPwd: function () {
+                    layer.open({
+                        title: '修改密码',
+                        type: 1,
+                        area: ['400px', '300px'],
+                        content: $('#ID-layer-pwd'),
+                        btn: ['保存', '取消'],
+                        yes: function (index, layero, that) {
+                            var isValid = form.validate('#form-pwd-filter')
+                            if (!isValid) {
+                                return false;
+                            }
+                            let data = form.val('form-pwd-filter');
+                            if (data.newPassword != data.confirmNewPassword) {
+                                layer.msg('两次输入的密码不一致', { icon: 2 });
+                                return;
+                            }
+
+                            $.post('../Account/UpdatePassword', data).done(function (result) {
+                                if (result.code === 0) {
+                                    layer.msg(result.msg, { icon: 1 });
+                                    layer.close(index);
+                                } else {
+                                    layer.msg(result.msg, { icon: 2 });
+                                }
+                            }).fail(function (xhr, status, error) {
+                                layer.msg(`操作失败，状态码${xhr.status}，${error}`, { icon: 2 });
+                            });
+                            return false;
+                        },
+                        end: function () {
+                            //关闭后的回调
+                            $("#form-pwd-filter")[0].reset();
+                        }
+                    });
+                }
+            });
+
+            // checkbox 事件
+            form.on('switch(dark-switch-filter)', function (obj) {
+                let elem = obj.elem;
+                //elem.checked
+                var cls = document.documentElement.classList;
+                cls.toggle('dark');
+                localStorage.setItem(APPERANCE_KEY, String(cls.contains('dark')))
+            });
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+    <partial name="_BaiduStatisticsScriptsPartial" />
+</body>
+</html>

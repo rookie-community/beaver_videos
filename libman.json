@@ -1,0 +1,52 @@
+{
+  "version": "3.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "layui@2.11.5",
+      "destination": "wwwroot/lib/layui/"
+    },
+    {
+      "library": "jquery@3.7.1",
+      "destination": "wwwroot/lib/jquery/"
+    },
+    {
+      "library": "jquery-validation-unobtrusive@4.0.0",
+      "destination": "wwwroot/lib/jquery-validation-unobtrusive/"
+    },
+    {
+      "provider": "unpkg",
+      "library": "xm-select@0.0.3",
+      "destination": "wwwroot/lib/xm-select/",
+      "files": [
+        "dist/index.html",
+        "dist/xm-select.js",
+        "dist/static/2.js",
+        "dist/static/3.js",
+        "dist/static/docs.js",
+        "dist/static/element-icons.535877f.woff",
+        "dist/static/element-icons.732389d.ttf",
+        "dist/static/wx.b556b2e.jpg",
+        "LICENSE",
+        "README.md"
+      ]
+    },
+    {
+      "library": "font-awesome@7.0.0",
+      "destination": "wwwroot/lib/font-awesome/"
+    },
+    {
+      "provider": "unpkg",
+      "library": "layui-theme-dark@2.10.0",
+      "destination": "wwwroot/lib/layui-theme-dark/",
+      "files": [
+        "dist/layui-theme-dark-selector.css",
+        "dist/layui-theme-dark-selector.css.map",
+        "dist/layui-theme-dark.css",
+        "dist/layui-theme-dark.css.map",
+        "README.md",
+        "LICENSE"
+      ]
+    }
+  ]
+}

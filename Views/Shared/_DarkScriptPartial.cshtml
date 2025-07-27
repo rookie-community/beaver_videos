@@ -1,0 +1,9 @@
+﻿<script type="text/javascript">
+    const APPERANCE_KEY = 'layui-theme-mode-prefer-dark'
+    let savedPreferDark = localStorage.getItem(APPERANCE_KEY)
+    if (savedPreferDark === 'true' || (!savedPreferDark && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark')
+    } else {
+        document.documentElement.classList.remove('dark')
+    }
+</script>
