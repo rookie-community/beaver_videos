@@ -197,7 +197,12 @@ namespace BeaverVideos.Services.Implementations
                 }
 
                 using var client = _httpClientFactory.CreateClient();
-                var url = $"https://api.web.360kan.com/v1/detail?cat={(int)cat}&id={endId}&site={site}";
+                var url = $"https://api.web.360kan.com/v1/detail?cat={(int)cat}&id={endId}";
+                if (site != default && cat != CatType.Variety)
+                {
+                    url += $"&site={site}";
+                }
+
                 if (start > 0 && end > 0)
                 {
                     url += $"&start={start}&end={end}";
@@ -242,33 +247,30 @@ namespace BeaverVideos.Services.Implementations
                         end = total;
                     }
 
+                IL001:
                     var result = await GetMovieDetail(cat, endId, site, start, end, cancellationToken);
-                    if (!result.IsSuccess)
+                    if (result.IsSuccess)
                     {
-                        //这个接口存在问题，有数据则返回数据
-                        if (data.Count != 0)
-                        {
-                            //这里再尝试一下,可能会获取到数据
-                            do
-                            {
-                                end--;
-                                result = await GetMovieDetail(cat, endId, site, start, end, cancellationToken);
-                                if (!result.IsSuccess)
-                                {
-                                    continue;
-                                }
-                                var temp1 = result.Value.Allepidetail[$"{site}"];
-                                data.AddRange(temp1);
-                                break;
-                            } while (start < end);
-                            return Result.Ok(data);
-                        }
-                        //无数据返回错误信息
+                        var temp = result.Value.Allepidetail[$"{site}"];
+                        data.AddRange(temp);
+                        continue;
+                    }
+
+                    // 无数据返回错误信息
+                    if (data.Count == 0)
+                    {
                         return Result.Fail(result.Errors);
                     }
-                    var temp2 = result.Value.Allepidetail[$"{site}"];
-                    data.AddRange(temp2);
-                    continue;
+
+                    // 这里再尝试一下,可能会获取到数据
+                    if (start < end)
+                    {
+                        end--;
+                        goto IL001;
+                    }
+
+                    // 返回数据
+                    return Result.Ok(data);
                 }
                 return Result.Ok(data);
             }
@@ -316,6 +318,8 @@ namespace BeaverVideos.Services.Implementations
                     var jsonNode = JsonNode.Parse(resultContent)!;
                     var json = jsonNode?["data"]?["lists"]?.ToJsonString() ?? string.Empty;
                     var data = JsonSerializer.Deserialize<List<MovieCarousel>>(json, _jsonSerializerOptions);
+                    //过滤类型为空的数据
+                    data = data?.Where(x => !string.IsNullOrWhiteSpace(x.Cat)).ToList();
 
                     //缓存数据
                     var options = new DistributedCacheEntryOptions()

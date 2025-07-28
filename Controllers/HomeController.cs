@@ -123,6 +123,7 @@ namespace BeaverVideos.Controllers
 
                 var playUrl = string.Empty;
                 var playLinksDetails = new List<AllepidetailItem>();
+                //电影
                 if (catType == CatType.Film)
                 {
                     var temp = movieDetail.PlayLinksDetail[$"{currentPlayLink}"];
@@ -136,6 +137,20 @@ namespace BeaverVideos.Controllers
                     };
                     playLinksDetails.Add(playLinksDetailItem);
                     playUrl = playLinksDetailItem.Url;
+                }
+                //综艺
+                if (catType == CatType.Variety)
+                {
+                    var temp = movieDetail.DefaultEpisode;
+                    var playLinksDetailItems = temp.Select(x => new AllepidetailItem
+                    {
+                        Id = x.Id,
+                        ApiVideoId = x.ApiVideoId,
+                        Url = x.Url,
+                        IsVip = x.IsVip,
+                    }).ToList();
+                    playLinksDetails.AddRange(playLinksDetailItems);
+                    playUrl = playLinksDetailItems[index].Url;
                 }
                 else
                 {

@@ -52,7 +52,16 @@ namespace BeaverVideos.Dtos.Movies
         public Dictionary<string, string> Allupinfo { get; set; } = new Dictionary<string, string>();
         public Dictionary<string, string> Playlinks { get; set; } = new Dictionary<string, string>();
         public Dictionary<string, List<AllepidetailItem>> Allepidetail { get; set; } = new Dictionary<string, List<AllepidetailItem>>();
+
+        /// <summary>
+        /// 电影数据
+        /// </summary>
         public Dictionary<string, PlayLinksDetailObj> PlayLinksDetail { get; set; } = new Dictionary<string, PlayLinksDetailObj>();
+
+        /// <summary>
+        /// 综艺数据
+        /// </summary>
+        public List<DefaultEpisodeItem> DefaultEpisode { get; set; } = new List<DefaultEpisodeItem>();
 
         [JsonPropertyName("playlink_sites")]
         public List<string> PlaylinkSites { get; set; } = new List<string>();
@@ -100,4 +109,48 @@ namespace BeaverVideos.Dtos.Movies
         [JsonPropertyName("api_video_id")]
         public string ApiVideoId { get; set; } = null!;
     }
+
+    /// <summary>
+    /// 综艺
+    /// </summary>
+    public class DefaultEpisodeItem
+    {
+        public string Act { get; set; } = null!;
+
+        [JsonPropertyName("api_id")]
+        public string ApiId { get; set; } = null!;
+
+        [JsonPropertyName("api_video_id")]
+        public string ApiVideoId { get; set; } = null!;
+
+        [JsonPropertyName("cdn_v_cover")]
+        public string CdnVCover { get; set; } = null!;
+        public string Createline { get; set; } = null!;
+        public string Duration { get; set; } = null!;
+        public string Id { get; set; } = null!;
+
+        [JsonPropertyName("is_vip")]
+        public string IsVip { get; set; } = null!;
+
+        [JsonPropertyName("mini_url")]
+        public string MiniUrl { get; set; } = null!;
+        public string Name { get; set; } = null!;
+        public string Period { get; set; } = null!;
+
+        [JsonPropertyName("period_alias")]
+        public string PeriodAlias { get; set; } = null!;
+
+        [JsonPropertyName("playlink_num")]
+        public string PlaylinkNum { get; set; } = null!;
+        public string ProgramUrl { get; set; } = null!;
+        public string Pubdate { get; set; } = null!;
+        public string Sort { get; set; } = null!;
+        public string Swf { get; set; } = null!;
+        public string Updateline { get; set; } = null!;
+        public string Url { get; set; } = null!;
+
+        [JsonPropertyName("v_cover")]
+        public string Vcover { get; set; } = null!;
+    }
+
 }
