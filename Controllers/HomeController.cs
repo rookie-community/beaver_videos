@@ -11,12 +11,23 @@ namespace BeaverVideos.Controllers
     [AutoValidateAntiforgeryToken]
     public class HomeController : Controller
     {
-        private const string AnalysisBaseUrl = "https://jx.xmflv.com/?url=";
+        private readonly Dictionary<string, string> analysisDictionary = new Dictionary<string, string>();
         private readonly IMovieService _movieService;
+        private readonly IWebHostEnvironment _environment;
 
-        public HomeController(IMovieService movieService)
+        public HomeController(IMovieService movieService, IWebHostEnvironment environment)
         {
             _movieService = movieService;
+            _environment = environment;
+            analysisDictionary = new Dictionary<string, string>
+            {
+                { "虾米解析" , "https://jx.xmflv.com/?url=" },
+                { "极速云解析" , "https://jx.2s0.cn/player/?url=" },
+                { "七哥解析" , "https://jx.nnxv.cn/tv.php?url=" },
+                { "jy解析" , "https://media.staticfile.link/?iv=3232302e3230322e3131342e3137&key=2264f8ca9cfad6b17ff57bcf3fe4aee7&url=" },
+                //{ "jy解析" , "https://jx.playerjy.com/?url=" },
+                { "咸鱼解析" , "https://jx.xymp4.cc/?url=" },
+            };
         }
 
         public async Task<IActionResult> Index(CancellationToken cancellationToken = default)
@@ -24,10 +35,12 @@ namespace BeaverVideos.Controllers
             var movieTypes = new List<MovieType>()
             {
                 MovieType.Default,
-                MovieType.Film,
                 MovieType.Teleplay,
+                MovieType.Film,
                 MovieType.Variety,
-                MovieType.Anime
+                MovieType.Children,
+                MovieType.Anime,
+                MovieType.General,
             };
             var carouselResult = await _movieService.GetCarousel(cancellationToken: cancellationToken);
 
@@ -149,7 +162,7 @@ namespace BeaverVideos.Controllers
                     PlayLinkSites = playLinkSites,
                     CatType = catType,
                     CurrentIndex = index,
-                    CurrentPlayUrl = $"{AnalysisBaseUrl}{playUrl}",
+                    CurrentPlayUrl = GetAnalysisUrl(playUrl!),
                     Vip = movieDetail.Vip,
                     Description = movieDetail.Description,
                     Recommends = recommend,
@@ -165,7 +178,18 @@ namespace BeaverVideos.Controllers
 
         public IActionResult Analysis(string url)
         {
-            return View(model: $"{AnalysisBaseUrl}{url}");
+            var analysisUrl = GetAnalysisUrl(url);
+            return View(model: $"{analysisUrl}{url}");
+        }
+
+        private string GetAnalysisUrl(string playUrl)
+        {
+            //if (_environment.IsDevelopment())
+            //{
+            //    return string.Empty;
+            //}
+            var analysisUrl = analysisDictionary.OrderBy(x => Guid.NewGuid()).Select(x => x.Value).FirstOrDefault();
+            return $"{analysisUrl}{playUrl}";
         }
     }
 }

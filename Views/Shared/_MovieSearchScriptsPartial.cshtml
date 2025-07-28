@@ -1,6 +1,5 @@
 ﻿<script type="text/javascript">
     layui.use(function(){
-      let dropdown = layui.dropdown;
       let $ = layui.$;
       let form = layui.form;
 
@@ -16,10 +15,13 @@
           location.href = '/Home/Search?name='+ value;
       });
 
-      $('#ID-dropdown-demo').keydown(function(e){
+      //输入框dom
+      let searchInput = $("#ID-search");
+      let listDom = $("#ID-search-list");
+
+      //回车事件
+      searchInput.keydown(function(e){
           if(e.keyCode == 13){
-              // 触发 form.on('input-affix(search)' 事件
-              let searchInput = $('#ID-dropdown-demo'); // 输入框dom
               let value = searchInput.val();
               if(value){
                   // 搜索跳转
@@ -28,32 +30,21 @@
           }
       })
 
-      let inst = dropdown.render({
-        elem: '#ID-dropdown-demo',
-        data: [],
-        click: function(obj){
-          this.elem.val(obj.title);
-          this.elem.attr('data-id', obj.id)
-        }
-      });
-
-      $(inst.config.elem).on('input propertychange',async function() {
-        let elem = $(this);
-        let value = elem.val().trim();
-        elem.removeAttr('data-id');
-
-        let dataNew = await loadData(value);
-        dropdown.reloadData(inst.config.id, {
-          data: dataNew
-        })
-      });
-
-      // $(inst.config.elem).on('blur', function() {
-      //   var elem = $(this);
-      //   var dataId = elem.attr('data-id');
-      //   if (!dataId) {
-      //       elem.val('');
-      //   }
+      //输入框值变更
+    searchInput.on("input", async function() {
+        listDom.empty(); // 先清空
+        let value = searchInput.val();
+        console.log(value);
+        let dataArray = await loadData(value);
+        $.each(dataArray, function(index, item) {
+            listDom.append(
+                $('<option>').attr('value', item.name).text(item.type)
+            );
+        });
+    });
+      
+      // searchInput.on("blur", function() {
+      //     listDom.empty(); // 清空
       // });
 
       function loadData(value) {
@@ -61,9 +52,15 @@
           return new Promise((resolve) => {
               $.get(`/Home/GetMovieName?name=${value}`, function(result){
                   if (Array.isArray(result)) {
+                      const typeMap = {
+                          "dm": "动漫",
+                          "ds": "电视剧",
+                          "dy": "电影",
+                          "zy": "综艺",
+                      };
                       let data = result.map(x => ({
-                          id: x.info,
-                          title: x.word
+                          type: typeMap[x.type] || null,
+                          name: x.word
                       }));
                       resolve(data); // 将处理后的数据通过resolve返回
                   } else {

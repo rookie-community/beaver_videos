@@ -248,13 +248,26 @@ namespace BeaverVideos.Services.Implementations
                         //这个接口存在问题，有数据则返回数据
                         if (data.Count != 0)
                         {
+                            //这里再尝试一下,可能会获取到数据
+                            do
+                            {
+                                end--;
+                                result = await GetMovieDetail(cat, endId, site, start, end, cancellationToken);
+                                if (!result.IsSuccess)
+                                {
+                                    continue;
+                                }
+                                var temp1 = result.Value.Allepidetail[$"{site}"];
+                                data.AddRange(temp1);
+                                break;
+                            } while (start < end);
                             return Result.Ok(data);
                         }
                         //无数据返回错误信息
                         return Result.Fail(result.Errors);
                     }
-                    var temp = result.Value.Allepidetail[$"{site}"];
-                    data.AddRange(temp);
+                    var temp2 = result.Value.Allepidetail[$"{site}"];
+                    data.AddRange(temp2);
                     continue;
                 }
                 return Result.Ok(data);
@@ -265,11 +278,28 @@ namespace BeaverVideos.Services.Implementations
             }
         }
 
-        public async Task<Result<List<MovieCarousel>>> GetCarousel(int blockid = 522, CancellationToken cancellationToken = default)
+        public async Task<Result<List<MovieCarousel>>> GetCarousel(int blockid = default, CancellationToken cancellationToken = default)
         {
             try
             {
-                var cacheKey = $"{nameof(GetCarousel)}_{blockid}".GetHashCode().ToString();
+                var list = new List<int>
+                {
+                    522,//首页
+                    503,//电视剧
+                    227,//综艺
+                    99,//电影
+                    3,//儿童
+                    79,//动漫
+                    551,//经典
+                };
+
+                var blockidTemp = blockid;
+                if (blockid == default)
+                {
+                    blockidTemp = list.OrderBy(x => Guid.NewGuid()).First();
+                }
+
+                var cacheKey = $"{nameof(GetCarousel)}_{blockidTemp}".GetHashCode().ToString();
                 var cacheBytes = _cache.Get(cacheKey);
                 if (cacheBytes != null)
                 {
@@ -278,7 +308,7 @@ namespace BeaverVideos.Services.Implementations
                 }
 
                 using var client = _httpClientFactory.CreateClient();
-                var url = $"https://api.web.360kan.com/v1/block?blockid={blockid}";
+                var url = $"https://api.web.360kan.com/v1/block?blockid={blockidTemp}";
                 using var result = await client.GetAsync(url, cancellationToken);
                 var resultContent = await result.Content.ReadAsStringAsync(cancellationToken);
                 if (result.IsSuccessStatusCode)

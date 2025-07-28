@@ -9,7 +9,7 @@
 
 <style>
     .carousel-img {
-        width:100%;
+        width: 100%;
         height: 380px;
         object-fit: cover;
         object-position: center;
@@ -35,10 +35,12 @@
         <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
             <ul class="layui-tab-title">
                 <li class="layui-this">首页</li>
-                <li>电影</li>
                 <li>电视剧</li>
+                <li>电影</li>
                 <li>综艺</li>
+                <li>儿童</li>
                 <li>动漫</li>
+                <li>经典</li>
             </ul>
             <div class="layui-tab-content" style="height: 100px;">
                 @foreach (var tops in Model.Movies)
@@ -50,7 +52,7 @@
                                 <div class="layui-col-md2 layui-col-sm4">
                                     <div class="layui-panel" style="width:170px;height:275px;margin:5px;">
                                         <a asp-area="" asp-controller="Home" asp-action="Detail" asp-route-entId="@item.EntId" asp-route-catType="@item.Cat" target="_blank" title="@item.Description">
-                                            <img src="@item.Cover" style="width:170px;height:235px;" />
+                                            <img src="@item.Cover" style="width:170px;height:235px;object-fit: cover;" />
                                             <label class="layui-form-label" style="width:150px;text-align:center;padding:2px 15px;">@item.Title</label>
                                         </a>
                                     </div>
@@ -65,7 +67,7 @@
 </div>
 
 @section Scripts {
-    <partial name="_MovieSearchScriptsPartial"/>
+    <partial name="_MovieSearchScriptsPartial" />
     <script type="text/javascript">
         layui.use(function(){
           var carousel = layui.carousel;

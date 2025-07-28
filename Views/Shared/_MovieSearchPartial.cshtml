@@ -5,7 +5,10 @@
     </div>
     <div class="layui-form layui-col-md10">
         <div class="layui-input-wrap">
-            <input type="text" lay-affix="search" lay-filter="search" lay-options="{split: true}" value="@Model" placeholder="请输入影视名称" id="ID-dropdown-demo" class="layui-input">
+            <input type="text" list="ID-search-list" lay-affix="search" lay-filter="search" lay-options="{split: true}" value="@Model" placeholder="请输入影视名称" id="ID-search" class="layui-input">
+            <datalist id="ID-search-list">
+
+            </datalist>
         </div>
     </div>
 </div>

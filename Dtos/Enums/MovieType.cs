@@ -8,7 +8,7 @@ namespace BeaverVideos.Dtos.Enums
     public enum MovieType
     {
         /// <summary>
-        /// 总榜
+        /// 总榜/首页
         /// </summary>
         [Description("总榜")]
         Default = 1,
@@ -44,7 +44,7 @@ namespace BeaverVideos.Dtos.Enums
         Children = 6,
 
         /// <summary>
-        /// 所有类型
+        /// 所有类型/经典
         /// </summary>
         [Description("所有类型")]
         General = 7

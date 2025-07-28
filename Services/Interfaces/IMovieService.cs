@@ -47,6 +47,6 @@ namespace BeaverVideos.Services.Interfaces
         /// <param name="blockid">数据块Id</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<Result<List<MovieCarousel>>> GetCarousel(int blockid = 522, CancellationToken cancellationToken = default);
+        Task<Result<List<MovieCarousel>>> GetCarousel(int blockid = default, CancellationToken cancellationToken = default);
     }
 }

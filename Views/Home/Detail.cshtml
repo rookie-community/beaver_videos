@@ -64,21 +64,23 @@
                     </div>
                 </form>
             </div>
-            <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
-                <ul class="layui-tab-title">
+            <div class="layui-tabs layui-hide-v" id="demoTabs-hash">
+                <ul class="layui-tabs-header">
                     @for (var i = 0; i < tabs; i++)
                     {
                         if (Model.CatType == CatType.Film || Model.PlayLinksDetail.Count == 1)
                         {
-                            <li class="layui-this">播放列表</li>
+                            <li class="layui-this" lay-id="@($"A{i}")"><a href="@($"#A{i}")">播放列表</a></li>
                         }
                         else
                         {
-                            <li @(i* limit + 1 <= Model.CurrentIndex && Model.CurrentIndex <= (i + 1) * limit ? "class=layui-this" : null)>@($"{i * limit + 1} - {Math.Min(total, (i + 1) * limit)}")</li>
+                            var tabClass = i* limit + 1 <= Model.CurrentIndex && Model.CurrentIndex <= (i + 1) * limit ? "class=layui-this" : null;
+                            var playNum = $"{i * limit + 1} - {Math.Min(total, (i + 1) * limit)}";
+                            <li lay-id="@($"A{i}")" class="@tabClass"><a href="@($"#A{i}")">@playNum</a></li>
                         }
                     }
                 </ul>
-                <div class="layui-tab-content" style="overflow-y:auto;">
+                <div class="layui-tabs-body" style="overflow-y:auto;">
                     @{
                         int videoIndex = 0;//用于循环时输出剧集的索引
                         foreach (var item in Model.PlayLinksDetail)
@@ -86,25 +88,21 @@
                             videoIndex++;
                             if (videoIndex % limit == 1)
                             {
-                                if (videoIndex <= Model.CurrentIndex && Model.CurrentIndex <= (videoIndex + limit -1))
-                                {
-                                    @Html.Raw($"<div class='layui-tab-item layui-show' style='max-height:420px;min-height:100px;'>")
-                                }
-                                else
-                                {
-                                    @Html.Raw($"<div class='layui-tab-item' style='max-height:420px;min-height:100px;'>")
-                                }
+                                var showClass = videoIndex <= Model.CurrentIndex && Model.CurrentIndex <= (videoIndex + limit -1) ? "layui-show" : null;
+                                @Html.Raw($"<div class='layui-tabs-item {showClass}' style='max-height:420px;min-height:100px;'>")
+                                @Html.Raw("<div class='layui-btn-container'>")
                             }
                             <a asp-controller="Home" asp-action="Detail"
                                asp-route-entId="@Model.EntId"
                                asp-route-catType="@Model.CatType"
                                asp-route-linkType="@Model.CurrentPlayLink"
-                               asp-route-index="@videoIndex" class="layui-btn layui-btn-sm @(Model.CurrentIndex==videoIndex?"layui-btn-normal":"layui-btn-primary")" style="width:55px;margin:3px;">
+                               asp-route-index="@videoIndex" class="layui-btn layui-btn-sm @(Model.CurrentIndex==videoIndex?"layui-btn-normal":"layui-btn-primary")" style="min-width:50px;">
                                 @videoIndex
                                 @Html.Raw(item.IsVip == "1" ? $"<span class='layui-badge' style='padding:1px;'>vip</span>" : null)
                             </a>
                             if (videoIndex % limit == 0 || videoIndex == Model.PlayLinksDetail.Count)
                             {
+                                @Html.Raw("</div>")
                                 @Html.Raw("</div>")
                             }
                         }
@@ -136,4 +134,12 @@
 @section Scripts {
     <partial name="_MovieSearchScriptsPartial" />
     <partial name="_ChangYanScriptPartial" />
+    <script type="text/javascript">
+        layui.use(function(){
+          let tabs = layui.tabs;
+          // HASH 初始定位
+          let hash = layui.hash();
+          tabs.change('demoTabs-hash', hash.href);
+        });
+    </script>
 }
