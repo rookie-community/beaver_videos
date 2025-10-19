@@ -108,7 +108,7 @@
                     <input type="checkbox" asp-for="RememberMe" lay-skin="primary" title="记住密码">
                 </div>
                 <div class="layui-form-item layui-hide">
-                    <input type="text" asp-for="ReturnUrl" lay-skin="primary" title="回调页面">
+                    <input type="text" asp-for="ReturnUrl" value="@ViewData["ReturnUrl"]" lay-skin="primary" title="回调页面">
                 </div>
                 <div class="layui-form-item">
                     <div asp-validation-summary="All" style="color: #ff5722"></div>

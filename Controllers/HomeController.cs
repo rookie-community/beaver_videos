@@ -3,13 +3,15 @@ using BeaverVideos.Dtos.Movies;
 using BeaverVideos.Services.Interfaces;
 using FluentResults;
 using FluentResults.Extensions.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
+using Volo.Abp.AspNetCore.Mvc;
 
 namespace BeaverVideos.Controllers
 {
     [AutoValidateAntiforgeryToken]
-    public class HomeController : Controller
+    public class HomeController : AbpController
     {
         private readonly Dictionary<string, string> analysisDictionary = new Dictionary<string, string>();
         private readonly IMovieService _movieService;
@@ -86,6 +88,7 @@ namespace BeaverVideos.Controllers
         /// <param name="linkType">线路</param>
         /// <param name="index">当前选集</param>
         /// <returns></returns>
+        [Authorize]
         public async Task<IActionResult> Detail(string entId, CatType catType, PlayLinkSites linkType, int index = 1, CancellationToken cancellationToken = default)
         {
             try

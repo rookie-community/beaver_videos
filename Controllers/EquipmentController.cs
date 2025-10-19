@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Volo.Abp.AspNetCore.Mvc;
 
 namespace BeaverVideos.Controllers
 {
     [Authorize]
-    public class EquipmentController : Controller
+    public class EquipmentController : AbpController
     {
         //private readonly ILogger<EquipmentController> _logger;
 

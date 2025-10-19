@@ -68,15 +68,15 @@
                 <ul class="layui-tabs-header">
                     @for (var i = 0; i < tabs; i++)
                     {
+                        var tabClass = i * limit + 1 <= Model.CurrentIndex && Model.CurrentIndex <= (i + 1) * limit ? "layui-this" : null;
                         if (Model.CatType == CatType.Film || Model.PlayLinksDetail.Count == 1)
                         {
-                            <li class="layui-this" lay-id="@($"A{i}")"><a href="@($"#A{i}")">播放列表</a></li>
+                            <li class="@tabClass" lay-id="@($"A{i}")"><a href="@($"#A{i}")">播放列表</a></li>
                         }
                         else
                         {
-                            var tabClass = i* limit + 1 <= Model.CurrentIndex && Model.CurrentIndex <= (i + 1) * limit ? "class=layui-this" : null;
                             var playNum = $"{i * limit + 1} - {Math.Min(total, (i + 1) * limit)}";
-                            <li lay-id="@($"A{i}")" class="@tabClass"><a href="@($"#A{i}")">@playNum</a></li>
+                            <li class="@tabClass" lay-id="@($"A{i}")"><a href="@($"#A{i}")">@playNum</a></li>
                         }
                     }
                 </ul>
@@ -88,7 +88,7 @@
                             videoIndex++;
                             if (videoIndex % limit == 1)
                             {
-                                var showClass = videoIndex <= Model.CurrentIndex && Model.CurrentIndex <= (videoIndex + limit -1) ? "layui-show" : null;
+                                var showClass = videoIndex <= Model.CurrentIndex && Model.CurrentIndex <= (videoIndex + limit - 1) ? "layui-show" : null;
                                 @Html.Raw($"<div class='layui-tabs-item {showClass}' style='max-height:420px;min-height:100px;'>")
                                 @Html.Raw("<div class='layui-btn-container'>")
                             }
@@ -109,6 +109,7 @@
                     }
                 </div>
             </div>
+            <div id="cyReward" role="cylabs" data-use="reward"></div>
         </div>
     </div>
     <div class="layui-row">

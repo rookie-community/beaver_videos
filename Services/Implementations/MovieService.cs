@@ -5,10 +5,11 @@ using FluentResults;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Volo.Abp.DependencyInjection;
 
 namespace BeaverVideos.Services.Implementations
 {
-    public class MovieService : IMovieService
+    public class MovieService : IMovieService, ITransientDependency
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IDistributedCache _cache;
@@ -238,7 +239,7 @@ namespace BeaverVideos.Services.Implementations
             {
                 var data = new List<AllepidetailItem>();
                 const int limit = 50;
-                for (int i = 1; i < total; i+=limit)
+                for (int i = 1; i < total; i += limit)
                 {
                     var start = i;
                     var end = i + limit - 1;

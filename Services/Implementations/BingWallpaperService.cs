@@ -3,10 +3,11 @@ using BeaverVideos.Services.Interfaces;
 using FluentResults;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Volo.Abp.DependencyInjection;
 
 namespace BeaverVideos.Services.Implementations
 {
-    public class BingWallpaperService : IBingWallpaperService
+    public class BingWallpaperService : IBingWallpaperService, ITransientDependency
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly JsonSerializerOptions _jsonSerializerOptions;

@@ -7,7 +7,6 @@
         public string Password { get; set; } = null!;
 
         public string? ReturnUrl { get; set; }
-
         public bool RememberMe { get; set; }
     }
 }

@@ -3,22 +3,24 @@ using BeaverVideos.Dtos;
 using BeaverVideos.Dtos.Account;
 using BeaverVideos.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Volo.Abp.AspNetCore.Mvc;
+using Volo.Abp.Identity;
+using Volo.Abp.Identity.AspNetCore;
 
 namespace BeaverVideos.Areas.Identity.Controllers
 {
     [Area("Identity")]
     [AutoValidateAntiforgeryToken]
-    public class AccountController : Controller
+    public class AccountController : AbpController
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly AbpSignInManager _signInManager;
+        private readonly IdentityUserManager _userManager;
         private readonly IBingWallpaperService _bingWallpaperService;
         private readonly ILogger<AccountController> _logger;
 
-        public AccountController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IBingWallpaperService bingWallpaperService, ILogger<AccountController> logger)
+        public AccountController(AbpSignInManager signInManager, IdentityUserManager userManager, IBingWallpaperService bingWallpaperService, ILogger<AccountController> logger)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -27,8 +29,22 @@ namespace BeaverVideos.Areas.Identity.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Login(CancellationToken cancellationToken)
+        public async Task<IActionResult> Login(string? returnUrl = null, CancellationToken cancellationToken = default)
         {
+            //创建默认用户
+            var adminUser = await _userManager.FindByNameAsync("admin");
+            if (adminUser == null)
+            {
+                adminUser = new IdentityUser(
+                    Guid.NewGuid(),
+                    "admin",
+                    "admin@example.com"
+                );
+                await _userManager.CreateAsync(adminUser, "1q2w3E*");
+                // 你可以在这里为用户分配角色
+            }
+
+            ViewData["ReturnUrl"] = returnUrl;
             var bgIndex = Random.Shared.Next(8);
             var imgResult = await _bingWallpaperService.GetWallpaper(bgIndex, cancellationToken);
             if (imgResult.IsSuccess)
@@ -44,22 +60,31 @@ namespace BeaverVideos.Areas.Identity.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> LoginAsync(LoginModel model)
+        public async Task<IActionResult> LoginAsync(LoginModel model, string? returnUrl = null)
         {
             try
             {
-                var returnUrl = HttpContext.Request.Query.Where(x => x.Key == "ReturnUrl").Select(x => x.Value).FirstOrDefault();
+                var localReturnUrl = model.ReturnUrl ?? returnUrl;
+                ViewData["ReturnUrl"] = localReturnUrl;
+                //model.ReturnUrl = HttpContext.Request.Query.Where(x => x.Key == "ReturnUrl").Select(x => x.Value).FirstOrDefault();
                 var result = await _signInManager.PasswordSignInAsync(
                     model.UserName,
                     model.Password,
                     model.RememberMe,
                     lockoutOnFailure: false);
-                if (result.Succeeded)
+                if (!result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
-                    return Ok("登录成功");
+                    ModelState.AddModelError(nameof(model.Password), "登录失败：请检查账号或密码后重试！");
+                    return View(model);
                 }
-                return Ok($"登录失败");
+
+                // 防止开放重定向攻击
+                if (!Url.IsLocalUrl(localReturnUrl))
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                return Redirect(localReturnUrl);
 
                 //    var user = _freeSql.Queryable<User>().Where(x => x.Account == model.UserName).First();
                 //    if (user == null)
