@@ -1,0 +1,111 @@
+﻿@using Beaver
+@using Beaver.Dtos
+@using Beaver.Models
+@{
+    var currentPath = Context.Request.Path;
+    var menus = new List<MenuDataItem>
+{
+        new MenuDataItem
+        {
+            Name = "控制台",
+            Path = "/",
+            Icon = "layui-icon-app",
+        },
+        new MenuDataItem
+        {
+            Name = "基础配置",
+            Icon = "layui-icon-template-1",
+            Children = new List<MenuDataItem>
+            {
+                new MenuDataItem
+                {
+                    Name = "通讯配置",
+                    Path = "/Communication/Index",
+                    Icon = "layui-icon-link",
+                },
+                new MenuDataItem
+                {
+                    Name = "设备信息",
+                    Path = "/Equipment/Index",
+                    Icon = "layui-icon-component",
+                }
+            }
+        },
+        new MenuDataItem
+        {
+            Name = "待推送数据",
+            Path = "/CacheData/Index",
+            Icon = "layui-icon-list"
+        },
+        new MenuDataItem
+        {
+            Name = "设置",
+            Path = "/Setting/Index",
+            Icon = "layui-icon-set"
+        },
+    };
+}
+
+<ul class="layui-nav layui-nav-tree" lay-filter="navMenu" lay-accordion>
+    @foreach (var item in menus)
+    {
+        if (item.Children.Count == 0)
+        {
+            <li class="layui-nav-item @(currentPath == item.Path ? "layui-this" : "")">
+                <a href="@item.Path">
+                    @if (!string.IsNullOrWhiteSpace(item.Icon))
+                    {
+                        <i class="layui-icon @item.Icon"></i>
+                    }
+                    @item.Name
+                </a>
+            </li>
+            continue;
+        }
+        <li class="layui-nav-item @(item.Children.Where(x => x.Path==currentPath).Any() ? "layui-nav-itemed" : "")">
+            <a class="" href="javascript:;">
+                @if (!string.IsNullOrWhiteSpace(item.Icon))
+                {
+                    <i class="layui-icon @item.Icon"></i>
+                }
+                @item.Name
+            </a>
+            <dl class="layui-nav-child">
+                @foreach (var child in item.Children)
+                {
+                    <dd class="@(currentPath == child.Path ? "layui-this" : "")">
+                        <a href="@child.Path">
+                            @if (!string.IsNullOrWhiteSpace(child.Icon))
+                            {
+                                <i class="layui-icon @child.Icon"></i>
+                            }
+                            @child.Name
+                        </a>
+                    </dd>
+                }
+            </dl>
+        </li>
+    }
+
+    @*<li class="layui-nav-item layui-nav-itemed">
+            <a class="" href="javascript:;"> <i class="layui-icon layui-icon-face-smile"></i> menu group 1</a>
+            <dl class="layui-nav-child">
+                <dd><a href="javascript:;"> <i class="layui-icon layui-icon-face-smile"></i> menu 1</a></dd>
+                <dd><a href="javascript:;">menu 2</a></dd>
+                <dd><a href="javascript:;">menu 3</a></dd>
+                <dd><a href="javascript:;">the links</a></dd>
+            </dl>
+        </li>
+        <li class="layui-nav-item">
+            <a href="javascript:;">menu group 2</a>
+            <dl class="layui-nav-child">
+                <dd><a href="javascript:;" class="layui-this">list 1</a></dd>
+                <dd><a href="javascript:;">list 2</a></dd>
+                <dd><a href="javascript:;">超链接</a></dd>
+            </dl>
+        </li>
+        <li class="layui-nav-item @(path=="/" ?"layui-this":"")"><a asp-controller="Home" asp-action="Index">主页</a></li>
+        <li class="layui-nav-item @(path=="/Home/Privacy" ?"layui-this":"")"><a asp-controller="Home" asp-action="Privacy">通讯配置</a></li>
+        <li class="layui-nav-item"><a href="javascript:;">设备信息</a></li>
+        <li class="layui-nav-item"><a href="javascript:;">待推送数据</a></li>*@
+</ul>

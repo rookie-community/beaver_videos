@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<RootNamespace>Beaver</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.Emailing" Version="9.3.6" />
+		<PackageReference Include="Volo.Abp.Ddd.Domain" Version="9.3.6" />
+		<PackageReference Include="Volo.Abp.Identity.Domain" Version="9.3.6" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Beaver.Domain.Shared\Beaver.Domain.Shared.csproj" />
+	</ItemGroup>
+
+</Project>
