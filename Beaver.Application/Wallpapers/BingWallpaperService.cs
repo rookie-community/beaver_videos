@@ -1,5 +1,4 @@
-﻿using Beaver.Dtos.BingWallpaper;
-using FluentResults;
+﻿using FluentResults;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Volo.Abp.DependencyInjection;
@@ -20,7 +19,7 @@ namespace Beaver.Wallpapers
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<Result<List<BingImage>>> GetWallpaper(BingWallpaperRequest model, CancellationToken cancellationToken = default)
+        public async Task<Result<List<BingImageDto>>> GetWallpaper(BingWallpaperRequestDto model, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -33,7 +32,7 @@ namespace Beaver.Wallpapers
                     var stream = await result.Content.ReadAsStreamAsync(cancellationToken);
                     var jsonNode = await JsonNode.ParseAsync(stream, cancellationToken: cancellationToken);
                     var json = jsonNode?["images"] ?? string.Empty;
-                    var data = JsonSerializer.Deserialize<List<BingImage>>(json, _jsonSerializerOptions);
+                    var data = JsonSerializer.Deserialize<List<BingImageDto>>(json, _jsonSerializerOptions);
                     return Result.Ok(data!);
                 }
 
@@ -50,11 +49,11 @@ namespace Beaver.Wallpapers
             }
         }
 
-        public async Task<Result<BingImage>> GetWallpaper(int day, CancellationToken cancellationToken)
+        public async Task<Result<BingImageDto>> GetWallpaper(int day, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await GetWallpaper(new BingWallpaperRequest
+                var result = await GetWallpaper(new BingWallpaperRequestDto
                 {
                     Idx = day,
                     Count = 1,

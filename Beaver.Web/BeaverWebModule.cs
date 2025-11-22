@@ -1,6 +1,10 @@
 ﻿using Beaver.Localization;
 using Beaver.MultiTenancy;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Polly;
+using Scalar.AspNetCore;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc.Localization;
@@ -11,7 +15,6 @@ using Volo.Abp.Identity.AspNetCore;
 using Volo.Abp.Modularity;
 using Volo.Abp.Quartz;
 using Volo.Abp.Security.Claims;
-using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
 
 namespace Beaver
@@ -23,8 +26,7 @@ namespace Beaver
         typeof(AbpAutofacModule),
         typeof(AbpAspNetCoreMvcModule),
         typeof(AbpIdentityAspNetCoreModule),
-        typeof(AbpQuartzModule),
-        typeof(AbpSwashbuckleModule)
+        typeof(AbpQuartzModule)
     )]
     public class BeaverWebModule : AbpModule
     {
@@ -55,10 +57,9 @@ namespace Beaver
             ConfigureUrls(configuration);
             ConfigureAutoMapper();
             ConfigureAutoApiControllers();
-            ConfigureSwaggerServices(context.Services);
+            ConfigureScalarServices(context.Services);
 
             context.Services.AddHttpClient();
-            context.Services.AddDistributedMemoryCache();
             context.Services.AddAbpIdentity(options =>
             {
                 options.Password.RequireDigit = false;
@@ -66,16 +67,16 @@ namespace Beaver
             });
 
             // 配置 ASP.NET Core 的 Cookie 认证
-            context.Services.ConfigureApplicationCookie(options =>
-            {
-                // 设置登录页面路径
-                options.LoginPath = new PathString("/Identity/Account/Login");
-                // 设置登出页面路径
-                options.LogoutPath = "/Account/Logout";
-                // 设置访问被拒绝的页面路径
-                options.AccessDeniedPath = new PathString("/Identity/Account/AccessDenied");
-                options.ExpireTimeSpan = TimeSpan.FromDays(14); // 其他可选配置
-            });
+            //context.Services.ConfigureApplicationCookie(options =>
+            //{
+            //    // 设置登录页面路径
+            //    options.LoginPath = new PathString("/Identity/Account/Login");
+            //    // 设置登出页面路径
+            //    options.LogoutPath = "/Account/Logout";
+            //    // 设置访问被拒绝的页面路径
+            //    options.AccessDeniedPath = new PathString("/Identity/Account/AccessDenied");
+            //    options.ExpireTimeSpan = TimeSpan.FromDays(14); // 其他可选配置
+            //});
 
             // 配置 EF Core
             Configure<AbpDbContextOptions>(options =>
@@ -84,9 +85,17 @@ namespace Beaver
             });
         }
 
+        private void ConfigureScalarServices(IServiceCollection services)
+        {
+            services.AddOpenApi(options =>
+            {
+                options.AddScalarTransformers();
+            });
+        }
+
         private void ConfigureAuthentication(ServiceConfigurationContext context)
         {
-            //context.Services.ForwardIdentityAuthenticationForBearer(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            context.Services.ForwardIdentityAuthenticationForBearer(JwtBearerDefaults.AuthenticationScheme);
             context.Services.Configure<AbpClaimsPrincipalFactoryOptions>(options =>
             {
                 options.IsDynamicClaimsEnabled = true;
@@ -120,18 +129,6 @@ namespace Beaver
             });
         }
 
-        private void ConfigureSwaggerServices(IServiceCollection services)
-        {
-            services.AddAbpSwaggerGen(
-                options =>
-                {
-                    options.SwaggerDoc("v1", new OpenApiInfo { Title = "BeaverVideos API", Version = "v1" });
-                    options.DocInclusionPredicate((docName, description) => true);
-                    options.CustomSchemaIds(type => type.FullName);
-                }
-            );
-        }
-
         public override void OnApplicationInitialization(ApplicationInitializationContext context)
         {
             var app = context.GetApplicationBuilder();
@@ -161,14 +158,18 @@ namespace Beaver
             app.UseDynamicClaims();
             app.UseAuthorization();
 
-            app.UseSwagger();
-            app.UseAbpSwaggerUI(options =>
-            {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", "BookStore API");
-            });
-
             app.UseConfiguredEndpoints(endpoints =>
             {
+                endpoints.MapOpenApi();
+                // scalar/v1
+                endpoints.MapScalarApiReference(options =>
+                {
+                    options.Title = "DataAcquisition API";
+                    //options.Theme = ScalarTheme.Default;
+                    //options.ShowSidebar = true;
+                    options.DefaultHttpClient = new(ScalarTarget.CSharp, ScalarClient.HttpClient);
+                });
+
                 // 配置路由
                 endpoints.MapControllerRoute(
                     name: "defaultArea",

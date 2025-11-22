@@ -5,6 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<RootNamespace>Beaver</RootNamespace>
+		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Volo.Abp.Autofac" Version="9.3.6" />

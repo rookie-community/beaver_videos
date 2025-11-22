@@ -18,7 +18,7 @@ class Program
 #if DEBUG
                 .MinimumLevel.Override("BeaverVideos", LogEventLevel.Debug)
 #else
-                .MinimumLevel.Override("Acme.BookStore", LogEventLevel.Information)
+                .MinimumLevel.Override("BeaverVideos", LogEventLevel.Information)
 #endif
                 .Enrich.FromLogContext()
             .WriteTo.Async(c => c.File("Logs/logs.txt"))

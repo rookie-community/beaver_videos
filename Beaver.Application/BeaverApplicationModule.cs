@@ -2,6 +2,7 @@
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Identity;
 using Volo.Abp.Modularity;
+using Volo.Abp.PermissionManagement;
 
 namespace Beaver
 {
@@ -9,8 +10,8 @@ namespace Beaver
         typeof(BeaverDomainModule),
         typeof(BeaverApplicationContractsModule),
         typeof(AbpDddApplicationModule),
-        typeof(AbpAutoMapperModule)
-        //typeof(AbpIdentityApplicationModule)
+        typeof(AbpAutoMapperModule),
+        typeof(AbpIdentityApplicationModule)
     )]
     public class BeaverApplicationModule : AbpModule
     {

@@ -1,6 +1,8 @@
-﻿namespace Beaver.Dtos
+﻿using Volo.Abp.Application.Dtos;
+
+namespace Beaver.Dtos
 {
-    public class MenuDataItem
+    public class MenuItemDto : EntityDto
     {
         public string Path { get; set; } = null!;
 
@@ -8,6 +10,6 @@
 
         public string Icon { get; set; } = null!;
 
-        public List<MenuDataItem> Children { get; set; } = new List<MenuDataItem>();
+        public List<MenuItemDto> Children { get; set; } = new List<MenuItemDto>();
     }
 }

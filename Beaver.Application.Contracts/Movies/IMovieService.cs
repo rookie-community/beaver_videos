@@ -1,6 +1,4 @@
-﻿using Beaver.Dtos.Enums;
-using Beaver.Dtos.Movies;
-using FluentResults;
+﻿using FluentResults;
 
 namespace Beaver.Movies
 {

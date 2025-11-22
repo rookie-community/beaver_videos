@@ -3,7 +3,7 @@
   "defaultProvider": "cdnjs",
   "libraries": [
     {
-      "library": "layui@2.11.5",
+      "library": "layui@2.12.0",
       "destination": "wwwroot/lib/layui/"
     },
     {
@@ -32,7 +32,7 @@
       ]
     },
     {
-      "library": "font-awesome@7.0.0",
+      "library": "font-awesome@7.0.1",
       "destination": "wwwroot/lib/font-awesome/"
     },
     {
@@ -46,6 +46,16 @@
         "dist/layui-theme-dark.css.map",
         "README.md",
         "LICENSE"
+      ]
+    },
+    {
+      "provider": "unpkg",
+      "library": "mitt@3.0.1",
+      "destination": "wwwroot/lib/mitt/",
+      "files": [
+        "LICENSE",
+        "README.md",
+        "dist/mitt.umd.js"
       ]
     }
   ]

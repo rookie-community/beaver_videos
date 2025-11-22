@@ -1,15 +1,16 @@
-﻿@inject IWebHostEnvironment webHostEnvironment
+﻿@using Beaver.Account
+@inject IWebHostEnvironment webHostEnvironment
+@model SettingPasswordDto
 
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - DataAcquisition</title>
+    <title>@ViewData["Title"] - 小狸影视</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/HHECS.DAQWebClient.styles.css" asp-append-version="true" />
     <environment include="Development">
         <link href="~/lib/layui/css/layui.css" rel="stylesheet" asp-append-version="true" />
         <link href="~/lib/font-awesome/css/all.css" rel="stylesheet" asp-append-version="true" />
@@ -18,12 +19,12 @@
         <link href="~/lib/layui/css/layui.min.css" rel="stylesheet" asp-append-version="true" />
         <link href="~/lib/font-awesome/css/all.min.css" rel="stylesheet" asp-append-version="true" />
     </environment>
-    <link href="~/lib/layui-theme-dark/layui-theme-dark-selector.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/lib/layui-theme-dark/dist/layui-theme-dark-selector.css" rel="stylesheet" asp-append-version="true" />
 </head>
 <body>
     <div class="layui-layout layui-layout-admin">
         <div class="layui-header">
-            <div class="layui-logo layui-hide-xs layui-bg-black">数据采集&nbsp;<span id="isProductionEnvironment" class="layui-badge layui-bg-blue @(webHostEnvironment.IsDevelopment() ? string.Empty : "layui-hide")">Beta</span></div>
+            <div class="layui-logo layui-hide-xs layui-bg-black">小狸影视&nbsp;<span id="isProductionEnvironment" class="layui-badge layui-bg-blue @(webHostEnvironment.IsDevelopment() ? string.Empty : "layui-hide")">Beta</span></div>
             <!-- 头部区域（可配合layui 已有的水平导航） -->
             <ul class="layui-nav layui-layout-right">
                 <li class="layui-nav-item">
@@ -37,13 +38,19 @@
                 </li>
                 <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
                     <a href="javascript:;">
+                        @* <img src="//unpkg.com/outeres@0.0.10/img/layui/icon-v2.png" class="layui-nav-img"> *@
                         <i class="layui-icon layui-icon-username"></i>
                         @User.Identity?.Name
                     </a>
                     <dl class="layui-nav-child">
                         <dd lay-header-event="setPwd"><a href="javascript:;">修改密码</a></dd>
-                        <dd lay-header-event="signOut"><a asp-controller="Account" asp-action="Logout">注销</a></dd>
+                        <dd lay-header-event="signOut"><a asp-area="" asp-controller="Account" asp-action="Logout">注销</a></dd>
                     </dl>
+                </li>
+                <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
+                    <a href="javascript:;">
+                        <i class="layui-icon layui-icon-more-vertical"></i>
+                    </a>
                 </li>
             </ul>
         </div>
@@ -69,32 +76,31 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">原密码</label>
                 <div class="layui-input-block">
-                    <input type="password" name="currentPassword" autocomplete="off" placeholder="请输入原密码" lay-verify="required" class="layui-input" lay-affix="eye">
+                    <input type="password" asp-for="OldPassword" autocomplete="off" placeholder="请输入原密码" lay-verify="required" class="layui-input" lay-affix="eye">
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">新密码</label>
                 <div class="layui-input-block">
-                    <input type="password" name="newPassword" autocomplete="off" placeholder="请输入新密码" lay-verify="required" class="layui-input" lay-affix="eye">
+                    <input type="password" asp-for="NewPassword" autocomplete="off" placeholder="请输入新密码" lay-verify="required" class="layui-input" lay-affix="eye">
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">确认密码</label>
                 <div class="layui-input-block">
-                    <input type="password" name="confirmNewPassword" autocomplete="off" placeholder="请再次输入新密码" lay-verify="required" class="layui-input" lay-affix="eye">
+                    <input type="password" asp-for="ConfirmPassword" autocomplete="off" placeholder="请再次输入新密码" lay-verify="required" class="layui-input" lay-affix="eye">
                 </div>
             </div>
+            @Html.AntiForgeryToken()
         </form>
     </div>
 
     <environment include="Development">
         <script src="~/lib/layui/layui.js" asp-append-version="true"></script>
-        <script src="~/lib/microsoft-signalr/signalr.js" asp-append-version="true"></script>
         <script src="~/lib/font-awesome/js/all.js"></script>
     </environment>
     <environment exclude="Development">
         <script src="~/lib/layui/layui.min.js" asp-append-version="true"></script>
-        <script src="~/lib/microsoft-signalr/signalr.min.js" asp-append-version="true"></script>
         <script src="~/lib/font-awesome/js/all.min.js" asp-append-version="true"></script>
     </environment>
     <partial name="_DarkScriptPartial" />
@@ -122,7 +128,7 @@
                     layer.open({
                         title: '修改密码',
                         type: 1,
-                        area: ['400px', '300px'],
+                        area: ['400px', 'auto'],
                         content: $('#ID-layer-pwd'),
                         btn: ['保存', '取消'],
                         yes: function (index, layero, that) {
@@ -131,12 +137,12 @@
                                 return false;
                             }
                             let data = form.val('form-pwd-filter');
-                            if (data.newPassword != data.confirmNewPassword) {
+                            if (data.NewPassword != data.ConfirmPassword) {
                                 layer.msg('两次输入的密码不一致', { icon: 2 });
                                 return;
                             }
 
-                            $.post('../Account/UpdatePassword', data).done(function (result) {
+                            $.post('/Account/ChangePassword', data).done(function (result) {
                                 if (result.code === 0) {
                                     layer.msg(result.msg, { icon: 1 });
                                     layer.close(index);
@@ -153,6 +159,18 @@
                             $("#form-pwd-filter")[0].reset();
                         }
                     });
+                },
+                menuRight: function(){  // 右侧菜单事件
+                      layer.open({
+                        type: 1,
+                        title: '更多',
+                        content: '<div style="padding: 15px;">处理右侧面板的操作</div>',
+                        area: ['260px', '100%'],
+                        offset: 'rt', // 右上角
+                        anim: 'slideLeft', // 从右侧抽屉滑出
+                        shadeClose: true,
+                        scrollbar: false
+                      });
                 }
             });
 

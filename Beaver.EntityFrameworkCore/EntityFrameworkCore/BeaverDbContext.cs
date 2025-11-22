@@ -6,6 +6,7 @@ using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.EntityFrameworkCore;
+using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 
 namespace Beaver.EntityFrameworkCore
 {
@@ -34,17 +35,17 @@ namespace Beaver.EntityFrameworkCore
         #endregion
 
         public DbSet<Book> Books => Set<Book>();
+
         public BeaverDbContext(DbContextOptions<BeaverDbContext> options) : base(options)
         {
-            //Database.EnsureCreated();
-            //Database.Migrate();
-        }
 
+        }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
             // 配置 Identity 模块
+            builder.ConfigurePermissionManagement();
             builder.ConfigureIdentity();
 
             builder.Entity<Book>(b =>

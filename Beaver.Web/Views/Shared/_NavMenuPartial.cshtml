@@ -3,45 +3,33 @@
 @using Beaver.Models
 @{
     var currentPath = Context.Request.Path;
-    var menus = new List<MenuDataItem>
+    var menus = new List<MenuItemDto>
 {
-        new MenuDataItem
+        new MenuItemDto
         {
             Name = "控制台",
-            Path = "/",
+            Path = "/Workbench/Dashboard/Index",
             Icon = "layui-icon-app",
         },
-        new MenuDataItem
+        new MenuItemDto
         {
-            Name = "基础配置",
-            Icon = "layui-icon-template-1",
-            Children = new List<MenuDataItem>
+            Name = "系统设置",
+            Icon = "layui-icon-set",
+            Children = new List<MenuItemDto>
             {
-                new MenuDataItem
+                new MenuItemDto
                 {
-                    Name = "通讯配置",
-                    Path = "/Communication/Index",
+                    Name = "用户管理",
+                    Path = "/System/User/Index",
                     Icon = "layui-icon-link",
                 },
-                new MenuDataItem
+                new MenuItemDto
                 {
-                    Name = "设备信息",
-                    Path = "/Equipment/Index",
+                    Name = "角色管理",
+                    Path = "/System/Role/Index",
                     Icon = "layui-icon-component",
                 }
             }
-        },
-        new MenuDataItem
-        {
-            Name = "待推送数据",
-            Path = "/CacheData/Index",
-            Icon = "layui-icon-list"
-        },
-        new MenuDataItem
-        {
-            Name = "设置",
-            Path = "/Setting/Index",
-            Icon = "layui-icon-set"
         },
     };
 }

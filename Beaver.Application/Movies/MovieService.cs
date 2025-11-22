@@ -1,6 +1,4 @@
-﻿using Beaver.Dtos.Enums;
-using Beaver.Dtos.Movies;
-using FluentResults;
+﻿using FluentResults;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -12,6 +10,7 @@ namespace Beaver.Movies
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IDistributedCache _cache;
+
         private readonly JsonSerializerOptions _jsonSerializerOptions;
 
         /// <summary>

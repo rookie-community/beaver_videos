@@ -1,12 +1,10 @@
 ﻿using Beaver.Movies;
-using Beaver.Dtos.Enums;
-using Beaver.Dtos.Movies;
 using FluentResults;
 using FluentResults.Extensions.AspNetCore;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
 using Volo.Abp.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Beaver.Controllers
 {
@@ -88,7 +86,7 @@ namespace Beaver.Controllers
         /// <param name="linkType">线路</param>
         /// <param name="index">当前选集</param>
         /// <returns></returns>
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> Detail(string entId, CatType catType, PlayLinkSites linkType, int index = 1, CancellationToken cancellationToken = default)
         {
             try
