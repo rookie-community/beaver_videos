@@ -1,18 +1,22 @@
-﻿using Beaver.Users;
+﻿using Beaver.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc;
+using Volo.Abp.Identity;
 
 namespace Beaver.Areas.System.Controllers
 {
+    /// <summary>
+    /// 用户
+    /// </summary>
     [Area("System")]
     [Authorize]
     public class UserController : AbpController
     {
-        private readonly IUserService _userService;
+        private readonly IIdentityUserAppService _userService;
         private readonly ILogger<UserController> _logger;
 
-        public UserController(IUserService userService, ILogger<UserController> logger)
+        public UserController(IIdentityUserAppService userService, ILogger<UserController> logger)
         {
             _userService = userService;
             _logger = logger;
@@ -23,11 +27,11 @@ namespace Beaver.Areas.System.Controllers
             return View();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Index(GetUserListDto model)
+        [HttpGet]
+        public async Task<IActionResult> Search(GetIdentityUsersInput model)
         {
             var result = await _userService.GetListAsync(model);
-            return Ok(result);
+            return Ok(result.ToLayuiResult());
         }
 
         public IActionResult Create()
@@ -36,7 +40,7 @@ namespace Beaver.Areas.System.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateUserDto model)
+        public async Task<IActionResult> Create(IdentityUserCreateDto model)
         {
             var result = await _userService.CreateAsync(model);
             return Ok(result);
@@ -49,7 +53,7 @@ namespace Beaver.Areas.System.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(Guid id, UpdateUserDto model)
+        public async Task<IActionResult> Edit(Guid id, IdentityUserUpdateDto model)
         {
             var result = await _userService.UpdateAsync(id, model);
             return Ok(result);

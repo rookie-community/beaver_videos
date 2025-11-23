@@ -23,4 +23,15 @@
 		<ProjectReference Include="..\Beaver.EntityFrameworkCore\Beaver.EntityFrameworkCore.csproj" />
 	</ItemGroup>
 
+
+
+	<ItemGroup>
+	  <None Update="appsettings.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="appsettings.secrets.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 </Project>

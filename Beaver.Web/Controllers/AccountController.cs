@@ -32,31 +32,25 @@ namespace Beaver.Controllers
         [HttpGet]
         public async Task<IActionResult> Login(string? returnUrl = null, CancellationToken cancellationToken = default)
         {
-            //创建默认用户
-            var adminUser = await _userManager.FindByNameAsync("admin");
-            if (adminUser == null)
-            {
-                adminUser = new IdentityUser(
-                    Guid.NewGuid(),
-                    "admin",
-                    "admin@example.com"
-                );
-                await _userManager.CreateAsync(adminUser, "1q2w3E*");
-                // 你可以在这里为用户分配角色
-            }
-
-            //ViewData["ReturnUrl"] = returnUrl;
             var bgIndex = Random.Shared.Next(8);
             var imgResult = await _bingWallpaperService.GetWallpaper(bgIndex, cancellationToken);
             if (imgResult.IsSuccess)
             {
                 ViewBag.LoginImage = imgResult.ValueOrDefault;
             }
-            return View(new LoginDto
+
+            var model = new LoginDto
             {
-                UserName =_environment.IsDevelopment() ? "admin" : string.Empty,
                 ReturnUrl = returnUrl,
-            });
+            };
+
+            if (_environment.IsDevelopment())
+            {
+                model.UserName =  IdentityDataSeedContributor.AdminUserNameDefaultValue;
+                model.Password = IdentityDataSeedContributor.AdminPasswordDefaultValue;
+            }
+
+            return View(model);
         }
 
         /// <summary>
@@ -154,7 +148,7 @@ namespace Beaver.Controllers
             catch (Exception ex)
             {
                 var msg = $"修改密码失败：{ex.Message}";
-                return Ok(new ResultDto
+                return Ok(new LayuiResultDto
                 {
                     Code = 0,
                     //Msg = msg
