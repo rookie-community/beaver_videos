@@ -2,8 +2,6 @@
 using Beaver.MultiTenancy;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
-using Polly;
 using Scalar.AspNetCore;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.Mvc;
@@ -164,7 +162,7 @@ namespace Beaver
                 // scalar/v1
                 endpoints.MapScalarApiReference(options =>
                 {
-                    options.Title = "DataAcquisition API";
+                    options.Title = "BeaverVideos API";
                     //options.Theme = ScalarTheme.Default;
                     //options.ShowSidebar = true;
                     options.DefaultHttpClient = new(ScalarTarget.CSharp, ScalarClient.HttpClient);
