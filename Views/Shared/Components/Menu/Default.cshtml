@@ -1,0 +1,44 @@
+﻿@using Beaver.Menus
+@model List<MenuItemDto>
+
+<ul class="layui-nav layui-nav-tree" lay-filter="navMenu" lay-accordion>
+    @foreach (var item in Model)
+    {
+        if (item.Children.Count == 0)
+        {
+            <li class="layui-nav-item @(ViewBag.CurrentPath == item.Path ? "layui-this" : "")">
+                <a href="@item.Path">
+                    @if (!string.IsNullOrWhiteSpace(item.Icon))
+                    {
+                        <i class="layui-icon @item.Icon"></i>
+                    }
+                    @item.Name
+                </a>
+            </li>
+            continue;
+        }
+        <li class="layui-nav-item @(item.Children.Where(x => x.Path == ViewBag.CurrentPath).Any() ? "layui-nav-itemed" : "")">
+            <a class="" href="javascript:;">
+                @if (!string.IsNullOrWhiteSpace(item.Icon))
+                {
+                    <i class="layui-icon @item.Icon"></i>
+                }
+                @item.Name
+            </a>
+            <dl class="layui-nav-child">
+                @foreach (var child in item.Children)
+                {
+                    <dd class="@(ViewBag.CurrentPath == child.Path ? "layui-this" : "")">
+                        <a href="@child.Path">
+                            @if (!string.IsNullOrWhiteSpace(child.Icon))
+                            {
+                                <i class="layui-icon @child.Icon"></i>
+                            }
+                            @child.Name
+                        </a>
+                    </dd>
+                }
+            </dl>
+        </li>
+    }
+</ul>

@@ -266,6 +266,15 @@ ServiceFabricBackup/
 *.ldf
 *.ndf
 
+# SQLite 本地数据库（测试 / 开发环境使用，正式环境是 MySQL，不需要入库）
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.sqlite-shm
+*.sqlite-wal
+
 # Business Intelligence projects
 *.rdl.data
 *.bim.layout

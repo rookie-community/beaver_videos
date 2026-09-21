@@ -1,0 +1,22 @@
+@{
+    ViewData["title"] = "没有访问权限";
+}
+<div class="layui-container" style="padding: 70px 0;">
+    <div class="layui-card" style="max-width: 640px; margin: 0 auto;">
+        <div class="layui-card-body" style="padding: 40px 30px; text-align: center;">
+            <i class="layui-icon layui-icon-face-cry" style="font-size: 64px; color: #FF5722;"></i>
+            <h2 style="margin: 20px 0 12px;">403&nbsp;没有访问权限</h2>
+            <p style="color: #666; line-height: 26px;">
+                后台管理只对管理员开放，当前账号
+                <b>@User.Identity?.Name</b>
+                是普通用户。
+                <br />
+                如需后台权限，请联系管理员为你的账号开通。
+            </p>
+            <div style="margin-top: 28px;">
+                <a class="layui-btn layui-btn-normal" asp-area="" asp-controller="Home" asp-action="Index">返回首页</a>
+                <a class="layui-btn layui-btn-primary" asp-area="" asp-controller="Account" asp-action="Logout">退出登录</a>
+            </div>
+        </div>
+    </div>
+</div>

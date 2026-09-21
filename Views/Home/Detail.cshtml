@@ -1,0 +1,327 @@
+﻿@using Beaver
+@using Beaver.Extensions
+@using Beaver.Models
+@using Beaver.Services.Movies
+@using Beaver.Services.Movies.Dtos
+@model MovieDetailViewModel
+@{
+    ViewData["title"] = $"{Model.Title} 第{Model.CurrentIndex}集";
+    var total = Model.PlayLinksDetail.Count;
+    var limit = 50;
+    var tabs = total / limit + Convert.ToInt32(total % limit != 0);
+}
+<div class="layui-container">
+    <partial name="_MovieSearchPartial" model="@Model.Title" />
+    <div class="layui-row">
+        <div class="layui-col-md8">
+            <!-- 保留优化后的播放器样式 -->
+            <div class="video-player">
+                <iframe allow="fullscreen" allowtransparency="true" id="player" frameborder="0" src="@Model.CurrentPlayUrl"></iframe>
+            </div>
+
+            <div class="layui-collapse" lay-filter="test">
+                <div class="layui-colla-item">
+                    <h2 class="layui-colla-title">
+                        《@Model.Title》简介
+                        @Html.Raw("&nbsp;&nbsp;&nbsp;&nbsp;")
+                        @Html.Raw((Model.Vip ? "<span class='layui-badge'>VIP</span>" : "<span class='layui-badge layui-bg-blue'>免费</span>"))
+
+                        @* 导演 *@
+                        @if (Model.Director.Count != 0)
+                        {
+                            <span class="layui-badge layui-bg-black">
+                                导演：
+                                @string.Join("、", Model.Director);
+                            </span>
+                        }
+
+                        @foreach (var item in Model.Moviecategory)
+                        {
+                            <span class="layui-badge-rim">@item</span>
+                        }
+                    </h2>
+                    <div class="layui-colla-content">
+                        <p>@Model.Description</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md4" style="padding-left:5px;">
+            <blockquote class="layui-elem-quote" style="margin:0px 0px 10px 15px;"><b>@Model.Title</b></blockquote>
+            <div class="layui-form">
+                <form asp-controller="Home" asp-action="Detail" method="get" id="form-switch-link">
+                    <div class="layui-row">
+                        <label class="layui-form-label layui-col-md4" style="width:120px;">当前线路:</label>
+                        <input style="display:none;" name="entId" value="@Model.EntId" />
+                        <input style="display:none;" name="catType" value="@Model.CatType">
+                        @* 换线路时保留当前集数，否则会回到第 1 集 *@
+                        <input style="display:none;" name="index" value="@Model.CurrentIndex">
+                        <div class="layui-input-inline layui-col-md8">
+                            <select name="linkType" asp-for="CurrentPlayLink" lay-filter="linkType-filter">
+                                @foreach (var item in Model.PlayLinkSites)
+                                {
+                                    <option value="@item">@item.GetDescription()</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="layui-tabs layui-hide-v" id="demoTabs-hash">
+                <ul class="layui-tabs-header">
+                    @for (var i = 0; i < tabs; i++)
+                    {
+                        var tabClass = i * limit + 1 <= Model.CurrentIndex && Model.CurrentIndex <= (i + 1) * limit ? "layui-this" : null;
+                        if (Model.CatType == CatType.Film || Model.PlayLinksDetail.Count == 1)
+                        {
+                            <li class="@tabClass" lay-id="@($"A{i}")"><a href="@($"#A{i}")">播放列表</a></li>
+                        }
+                        else
+                        {
+                            var playNum = $"{i * limit + 1} - {Math.Min(total, (i + 1) * limit)}";
+                            <li class="@tabClass" lay-id="@($"A{i}")"><a href="@($"#A{i}")">@playNum</a></li>
+                        }
+                    }
+                </ul>
+                <div class="layui-tabs-body" style="overflow-y:auto;">
+                    @{
+                        int videoIndex = 0;//用于循环时输出剧集的索引
+                        foreach (var item in Model.PlayLinksDetail)
+                        {
+                            videoIndex++;
+                            if (videoIndex % limit == 1)
+                            {
+                                var showClass = videoIndex <= Model.CurrentIndex && Model.CurrentIndex <= (videoIndex + limit - 1) ? "layui-show" : null;
+                                @Html.Raw($"<div class='layui-tabs-item {showClass}' style='max-height:420px;min-height:100px;'>")
+                                @Html.Raw("<div class='layui-btn-container'>")
+                            }
+                            <a asp-controller="Home" asp-action="Detail"
+                               asp-route-entId="@Model.EntId"
+                               asp-route-catType="@Model.CatType"
+                               asp-route-linkType="@Model.CurrentPlayLink"
+                               asp-route-index="@videoIndex" class="layui-btn layui-btn-sm @(Model.CurrentIndex==videoIndex?"layui-btn-normal":"layui-btn-primary")" style="min-width:50px;">
+                                @videoIndex
+                                @Html.Raw(item.IsVip == "1" ? $"<span class='layui-badge' style='padding:1px;'>vip</span>" : null)
+                            </a>
+                            if (videoIndex % limit == 0 || videoIndex == Model.PlayLinksDetail.Count)
+                            {
+                                @Html.Raw("</div>")
+                                @Html.Raw("</div>")
+                            }
+                        }
+                    }
+                </div>
+            </div>
+            <div id="cyReward" role="cylabs" data-use="reward"></div>
+        </div>
+    </div>
+
+    <!-- 保留优化后的精彩推荐部分 -->
+    <div class="recommendations-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="layui-icon layui-icon-star"></i>
+                精彩推荐
+            </h2>
+        </div>
+
+        <div class="recommendations-grid">
+            @foreach (var item in Model.Recommends)
+            {
+                <div class="recommend-card">
+                    <a asp-controller="Home" asp-action="Detail"
+                       asp-route-entId="@item.Id"
+                       asp-route-catType="@Model.CatType" class="recommend-link">
+                        <div class="recommend-poster">
+                            <img src="@item.CdnCover" alt="@item.Title" loading="lazy">
+                            <div class="recommend-overlay">
+                                <i class="layui-icon layui-icon-play"></i>
+                            </div>
+                        </div>
+                        <div class="recommend-info">
+                            <h4 class="recommend-title">@item.Title</h4>
+                            <p class="recommend-comment">@item.Comment</p>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div id="SOHUCS" sid="@Model.EntId"></div>
+</div>
+
+<style>
+    /* 优化后的播放器样式 */
+    .video-player {
+        background: #000;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        aspect-ratio: 16/9;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+        .video-player iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+    /* 优化后的精彩推荐样式 */
+    .recommendations-section {
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .section-header {
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        font-size: 24px;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .section-title .layui-icon {
+            font-size: 28px;
+            color: #FF5722;
+        }
+
+    .recommendations-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 20px;
+    }
+
+    .recommend-card {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+        .recommend-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+    .recommend-link {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .recommend-poster {
+        position: relative;
+        width: 100%;
+        padding-top: 135%;
+        overflow: hidden;
+    }
+
+        .recommend-poster img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+    .recommend-card:hover .recommend-poster img {
+        transform: scale(1.05);
+    }
+
+    .recommend-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .recommend-card:hover .recommend-overlay {
+        opacity: 1;
+    }
+
+    .recommend-overlay .layui-icon {
+        color: white;
+        font-size: 40px;
+    }
+
+    .recommend-info {
+        padding: 12px;
+    }
+
+    .recommend-title {
+        font-size: 14px;
+        font-weight: bold;
+        margin: 0 0 5px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .recommend-comment {
+        font-size: 12px;
+        color: #666;
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* 响应式优化 */
+    @@media (max-width: 768px) {
+        .recommendations-grid
+
+    {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+    }
+
+    }
+
+    @@media (max-width: 480px) {
+        .recommendations-grid
+
+    {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+    }
+
+    }
+</style>
+
+@section Scripts {
+    <partial name="_MovieSearchScriptsPartial" />
+    <partial name="_ChangYanScriptPartial" />
+    <script type="text/javascript">
+        layui.use(function(){
+          let form = layui.form;
+          let tabs = layui.tabs;
+
+          // 线路下拉框切换后立即刷新，不必再点“切换”按钮
+          form.on('select(linkType-filter)', function () {
+            document.getElementById('form-switch-link').submit();
+          });
+
+          // HASH 初始定位
+          let hash = layui.hash();
+          tabs.change('demoTabs-hash', hash.href);
+        });
+    </script>
+}

@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<!-- 命名空间统一保持 Beaver.*，与重构前的多层结构一致，避免大范围改名 -->
+		<RootNamespace>Beaver</RootNamespace>
+		<UserSecretsId>479ec4b6-d674-4ad3-92bd-856e765074f0</UserSecretsId>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+		<DockerfileContext>.</DockerfileContext>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- ABP 核心：模块化 / 依赖注入 / MVC 集成 / 应用服务契约基类 -->
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.24.1-preview.1" />
+		<PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="9.3.6" />
+		<PackageReference Include="Volo.Abp.Autofac" Version="9.3.6" />
+		<PackageReference Include="Volo.Abp.Ddd.Application" Version="9.3.6" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- 数据访问：只依赖微软官方 EF Core 包，不再引用任何 Volo.Abp.EntityFrameworkCore* -->
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.17" />
+		<!-- MySQL 提供程序（第三方开源，面向 EF Core 9），与 Sqlite 并存，由 DatabaseType 配置切换 -->
+		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.10">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- FluentResults.Extensions.AspNetCore 0.2.0 是针对 FluentResults 3.15.0 编译的，
+		     与 4.0.0 之间 ResultBase.Errors 的返回类型不兼容（4.0 起改为 IReadOnlyList），
+		     会对 ToActionResult() 抛 MissingMethodException，因此这里固定在 3.15.0 -->
+		<PackageReference Include="FluentResults" Version="3.15.0" />
+		<PackageReference Include="FluentResults.Extensions.AspNetCore" Version="0.2.0" />
+		<PackageReference Include="Scalar.AspNetCore.Microsoft" Version="2.10.3" />
+	</ItemGroup>
+
+</Project>
