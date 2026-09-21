@@ -48,6 +48,23 @@
         </div>
         <div class="layui-col-md4" style="padding-left:5px;">
             <blockquote class="layui-elem-quote" style="margin:0px 0px 10px 15px;"><b>@Model.Title</b></blockquote>
+            <!-- 收藏按钮：POST /Favorite/Toggle，已收藏时再点即为取消 -->
+            <div class="favorite-bar">
+                <button type="button" id="ID-favorite-btn"
+                        class="layui-btn layui-btn-sm @(Model.IsFavorited ? "layui-btn-primary" : "layui-btn-danger")"
+                        data-favorited="@(Model.IsFavorited ? "true" : "false")">
+                    <i class="layui-icon @(Model.IsFavorited ? "layui-icon-star-fill" : "layui-icon-rate")"></i><span class="favorite-text">@(Model.IsFavorited ? "已收藏" : "收藏")</span>
+                </button>
+            </div>
+            <div class="layui-hide">
+                <form id="form-favorite">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="entId" value="@Model.EntId" />
+                    <input type="hidden" name="catType" value="@((int)Model.CatType)" />
+                    <input type="hidden" name="title" value="@Model.Title" />
+                    <input type="hidden" name="cover" value="@Model.Cover" />
+                </form>
+            </div>
             <div class="layui-form">
                 <form asp-controller="Home" asp-action="Detail" method="get" id="form-switch-link">
                     <div class="layui-row">
@@ -168,6 +185,15 @@
             height: 100%;
             border: none;
         }
+
+        /* 收藏按钮 */
+        .favorite-bar {
+            margin: 0 0 10px 15px;
+        }
+
+            .favorite-bar .favorite-text {
+                margin-left: 4px;
+            }
 
     /* 优化后的精彩推荐样式 */
     .recommendations-section {
@@ -322,6 +348,35 @@
           // HASH 初始定位
           let hash = layui.hash();
           tabs.change('demoTabs-hash', hash.href);
+
+          // 收藏 / 取消收藏
+          let $ = layui.$;
+          $('#ID-favorite-btn').on('click', function () {
+            let btn = $(this);
+            if (btn.prop('disabled')) {
+              return;
+            }
+
+            btn.prop('disabled', true);
+            $.post('/Favorite/Toggle', $('#form-favorite').serialize(), function (result) {
+              btn.prop('disabled', false);
+              if (result.code !== 0) {
+                layui.layer.msg(result.msg, { icon: 2 });
+                return;
+              }
+
+              // 以服务端返回的状态为准刷新按钮
+              let favorited = !!(result.data && result.data.isFavorited);
+              btn.attr('data-favorited', favorited);
+              btn.toggleClass('layui-btn-danger', !favorited).toggleClass('layui-btn-primary', favorited);
+              btn.find('i').attr('class', favorited ? 'layui-icon layui-icon-star-fill' : 'layui-icon layui-icon-rate');
+              btn.find('.favorite-text').text(favorited ? '已收藏' : '收藏');
+              layui.layer.msg(result.msg, { icon: 1 });
+            }).fail(function (xhr) {
+              btn.prop('disabled', false);
+              layui.layer.msg('操作失败，状态码' + xhr.status, { icon: 2 });
+            });
+          });
         });
     </script>
 }

@@ -3,12 +3,16 @@
     <div class="layui-col-md2">
         <h1><a asp-controller="Home" asp-action="Index">小狸影视</a></h1>
     </div>
-    <div class="layui-form layui-col-md10">
+    <div class="layui-form layui-col-md7">
         <div class="layui-input-wrap">
             <input type="text" list="ID-search-list" lay-affix="search" lay-filter="search" lay-options="{split: true}" value="@Model" placeholder="请输入影视名称" id="ID-search" class="layui-input">
             <datalist id="ID-search-list">
 
             </datalist>
         </div>
+    </div>
+    <!-- 右上角用户区：未登录显示登录按钮，已登录显示用户信息与下拉菜单 -->
+    <div class="layui-col-md3">
+        <partial name="_UserNavPartial" />
     </div>
 </div>

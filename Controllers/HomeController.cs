@@ -1,8 +1,12 @@
-﻿using Beaver.Services.Movies;
+﻿using Beaver.Services.Favorites;
+using Beaver.Services.History;
+using Beaver.Services.History.Dtos;
+using Beaver.Services.Movies;
 using Beaver.Services.Movies.Dtos;
 using FluentResults;
 using FluentResults.Extensions.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 using Volo.Abp.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
@@ -14,11 +18,15 @@ namespace Beaver.Controllers
     {
         private readonly Dictionary<string, string> analysisDictionary = new Dictionary<string, string>();
         private readonly IMovieService _movieService;
+        private readonly IFavoriteAppService _favoriteAppService;
+        private readonly IHistoryAppService _historyAppService;
         private readonly IWebHostEnvironment _environment;
 
-        public HomeController(IMovieService movieService, IWebHostEnvironment environment)
+        public HomeController(IMovieService movieService, IFavoriteAppService favoriteAppService, IHistoryAppService historyAppService, IWebHostEnvironment environment)
         {
             _movieService = movieService;
+            _favoriteAppService = favoriteAppService;
+            _historyAppService = historyAppService;
             _environment = environment;
             analysisDictionary = new Dictionary<string, string>
             {
@@ -170,10 +178,16 @@ namespace Beaver.Controllers
                     playUrl = playLinksDetails?.Where(x => x.PlaylinkNum==$"{index}").Select(x => x.Url).FirstOrDefault();
                 }
 
+                // 收藏按钮的初始状态（详情页已要求登录，正常情况下都能取到当前用户）
+                var isFavorited = Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var currentUserId)
+                    && await _favoriteAppService.IsFavoritedAsync(currentUserId, movieDetail.EntId, catType, cancellationToken);
+
                 var vm = new MovieDetailViewModel
                 {
                     Title = movieDetail.Title,
                     EntId = movieDetail.EntId,
+                    Cover = movieDetail.Cdncover,
+                    IsFavorited = isFavorited,
                     Moviecategory = movieDetail.Moviecategory,
                     CurrentPlayLink = currentPlayLink,
                     PlayLinkSites = playLinkSites,
@@ -185,6 +199,20 @@ namespace Beaver.Controllers
                     Recommends = recommend,
                     PlayLinksDetail = playLinksDetails ?? new List<AllepidetailItem>()
                 };
+
+                // 记录播放历史（详情页已要求登录，currentUserId 取自上方收藏状态判断）
+                if (currentUserId != Guid.Empty)
+                {
+                    await _historyAppService.RecordAsync(currentUserId, new RecordPlayHistoryDto
+                    {
+                        EntId = movieDetail.EntId,
+                        CatType = catType,
+                        Title = movieDetail.Title,
+                        Cover = movieDetail.Cdncover,
+                        EpisodeIndex = index
+                    }, cancellationToken);
+                }
+
                 return View(vm);
             }
             catch (Exception ex)

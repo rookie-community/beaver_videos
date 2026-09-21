@@ -1,0 +1,77 @@
+@using Beaver.Services.History.Dtos
+@model List<PlayHistoryDto>
+@{
+    ViewData["title"] = "播放记录";
+}
+
+<div class="layui-container ws-user-center">
+    <partial name="_MovieSearchPartial" model="string.Empty" />
+
+    <div class="section-header">
+        <h2 class="section-title">
+            <i class="layui-icon layui-icon-time"></i>播放记录
+            <span class="ws-count">(@Model.Count)</span>
+        </h2>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="ws-empty">
+            <i class="layui-icon layui-icon-face-surprised"></i>
+            <p>还没有播放记录，去看点什么吧～</p>
+            <a class="layui-btn layui-btn-danger" asp-area="" asp-controller="Home" asp-action="Index">返回首页</a>
+        </div>
+    }
+    else
+    {
+        <div class="movie-grid">
+            @foreach (var item in Model)
+            {
+                <div class="movie-card">
+                    <a asp-area="" asp-controller="Home" asp-action="Detail"
+                       asp-route-entId="@item.EntId" asp-route-catType="@((int)item.CatType)"
+                       asp-route-index="@item.EpisodeIndex"
+                       class="movie-link">
+                        <div class="movie-poster">
+                            <img src="@item.Cover" alt="@item.Title" loading="lazy">
+                            <div class="movie-overlay">
+                                <span class="play-icon"><i class="layui-icon layui-icon-play"></i></span>
+                            </div>
+                            @if (item.EpisodeIndex > 1)
+                            {
+                                <span class="ws-episode-badge">第 @item.EpisodeIndex 集</span>
+                            }
+                        </div>
+                        <div class="movie-info">
+                            <h3 class="movie-title">@item.Title</h3>
+                            <p class="movie-desc">@item.CreationTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm") 观看</p>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .ws-user-center { padding-bottom: 30px; }
+    .ws-user-center .section-header { margin: 20px 0 10px; }
+    .ws-count { font-size: 16px; color: #999; }
+    .ws-empty { text-align: center; padding: 60px 0; color: #999; }
+    .ws-empty .layui-icon { font-size: 48px; color: #FF5722; }
+    .ws-empty p { margin: 16px 0; }
+    .ws-episode-badge {
+        position: absolute;
+        left: 8px;
+        bottom: 8px;
+        background: rgba(0,0,0,.6);
+        color: #fff;
+        font-size: 12px;
+        padding: 2px 8px;
+        border-radius: 10px;
+    }
+</style>
+
+@section Scripts {
+    <partial name="_MovieSearchScriptsPartial" />
+}

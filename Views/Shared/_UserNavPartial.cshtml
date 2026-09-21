@@ -1,0 +1,183 @@
+@{
+    // 前台右上角用户区：未登录显示登录按钮；已登录显示用户名 + 下拉（播放记录 / 我的收藏 / 退出登录）
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+    var userName = User.Identity?.Name ?? string.Empty;
+    var currentUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
+}
+
+<div class="ws-user-nav">
+    @if (isAuthenticated)
+    {
+        <div class="ws-user-menu">
+            <a href="javascript:;" class="ws-user-trigger">
+                <i class="layui-icon layui-icon-username"></i>
+                <span class="ws-user-name" title="@userName">@userName</span>
+                <i class="layui-icon layui-icon-down ws-user-caret"></i>
+            </a>
+            <dl class="ws-user-child">
+                <dd>
+                    <a asp-area="" asp-controller="User" asp-action="History">
+                        <i class="layui-icon layui-icon-time"></i>播放记录
+                    </a>
+                </dd>
+                <dd>
+                    <a asp-area="" asp-controller="User" asp-action="Favorites">
+                        <i class="layui-icon layui-icon-star-fill"></i>我的收藏
+                    </a>
+                </dd>
+                <dd class="ws-user-child-split">
+                    <a asp-area="" asp-controller="Account" asp-action="Logout">
+                        <i class="layui-icon layui-icon-logout"></i>退出登录
+                    </a>
+                </dd>
+            </dl>
+        </div>
+    }
+    else
+    {
+        <a class="layui-btn layui-btn-sm layui-btn-danger ws-user-login"
+           asp-area="" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@currentUrl">
+            <i class="layui-icon layui-icon-username"></i> 登录
+        </a>
+    }
+</div>
+
+<style>
+    .ws-user-nav {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        height: 40px;
+    }
+
+    /* 已登录：头像用户名的胶囊按钮 */
+    .ws-user-menu {
+        position: relative;
+    }
+
+    .ws-user-trigger {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        height: 36px;
+        padding: 0 14px;
+        border-radius: 18px;
+        background: #fff;
+        color: #333;
+        font-size: 14px;
+        text-decoration: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+        transition: all .25s ease;
+    }
+
+        .ws-user-trigger:hover {
+            color: #FF5722;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, .14);
+        }
+
+    .ws-user-name {
+        max-width: 110px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .ws-user-caret {
+        font-size: 12px;
+        transition: transform .25s ease;
+    }
+
+    .ws-user-menu:hover .ws-user-caret,
+    .ws-user-menu-open .ws-user-caret {
+        transform: rotate(180deg);
+    }
+
+    /* 下拉面板：悬停展开，移动端点击展开 */
+    .ws-user-child {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        z-index: 1999;
+        display: none;
+        min-width: 140px;
+        margin-top: 8px;
+        padding: 6px 0;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, .15);
+    }
+
+        /* 覆盖胶囊与面板之间的 8px 间隙，避免鼠标移动过程中收起 */
+        .ws-user-child::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 0;
+            right: 0;
+            height: 8px;
+        }
+
+    .ws-user-menu:hover .ws-user-child,
+    .ws-user-menu-open .ws-user-child {
+        display: block;
+    }
+
+    .ws-user-child dd a {
+        display: block;
+        padding: 0 16px;
+        line-height: 36px;
+        color: #333;
+        font-size: 14px;
+        text-decoration: none;
+        transition: background .2s ease;
+    }
+
+        .ws-user-child dd a:hover {
+            background: #f6f6f6;
+            color: #FF5722;
+        }
+
+        .ws-user-child dd a .layui-icon {
+            margin-right: 8px;
+            font-size: 14px;
+        }
+
+    .ws-user-child-split {
+        margin-top: 6px;
+        padding-top: 6px;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .ws-user-login {
+        line-height: 30px;
+    }
+
+    @@media (max-width: 768px) {
+        .ws-user-nav {
+            justify-content: flex-start;
+            height: auto;
+            margin-top: 10px;
+        }
+    }
+</style>
+
+<script type="text/javascript">
+    // 下拉面板：移动端（无 hover）点击展开 / 收起
+    (function () {
+        var menu = document.querySelector('.ws-user-nav .ws-user-menu');
+        if (!menu) {
+            return;
+        }
+
+        menu.querySelector('.ws-user-trigger').addEventListener('click', function (e) {
+            e.preventDefault();
+            menu.classList.toggle('ws-user-menu-open');
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!menu.contains(e.target)) {
+                menu.classList.remove('ws-user-menu-open');
+            }
+        });
+    })();
+</script>

@@ -3,6 +3,7 @@ using Beaver.Entities;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Scalar.AspNetCore;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.Mvc;
@@ -130,6 +131,85 @@ namespace Beaver
         {
             var dbContext = context.ServiceProvider.GetRequiredService<AppDbContext>();
             await dbContext.Database.EnsureCreatedAsync();
+
+            // 本项目用 EnsureCreated + HasData 建库，没有 EF 迁移。
+            // 已存在的数据库不会被 EnsureCreated 补建新表，这里手动补齐本次新增的
+            // 收藏表（AppFavorites）与播放记录表（AppPlayHistories），避免运行时报「表不存在」。
+            var configuration = context.ServiceProvider.GetRequiredService<IConfiguration>();
+            var databaseTypeText = configuration["DatabaseType"];
+            var isMySql = !string.IsNullOrWhiteSpace(databaseTypeText)
+                          && Enum.TryParse<DatabaseProvider>(databaseTypeText, ignoreCase: true, out var provider)
+                          && provider == DatabaseProvider.MySql;
+            await EnsureUserTablesAsync(dbContext, isMySql);
+        }
+
+        /// <summary>
+        /// 已存在的库上补齐新增的用户相关表：先探测表是否存在，缺失才建表与索引。
+        /// DDL 与 Data/Configurations 下的映射保持一致（列名 / 类型 / 唯一约束）。
+        /// </summary>
+        private static async Task EnsureUserTablesAsync(AppDbContext dbContext, bool isMySql)
+        {
+            const string favoritesTable = "AppFavorites";
+            const string historyTable = "AppPlayHistories";
+
+            if (isMySql)
+            {
+                await EnsureTableAsync(dbContext, favoritesTable,
+                    "CREATE TABLE AppFavorites (" +
+                    "Id char(36) NOT NULL, UserId char(36) NOT NULL, EntId varchar(64) NOT NULL, " +
+                    "CatType int NOT NULL, Title varchar(256) NOT NULL, Cover varchar(512) NULL, " +
+                    "CreationTime datetime(6) NOT NULL, PRIMARY KEY (Id))",
+                    "CREATE UNIQUE INDEX UX_AppFavorites_UserEntCat ON AppFavorites (UserId, EntId, CatType);" +
+                    "CREATE INDEX IX_AppFavorites_UserCreation ON AppFavorites (UserId, CreationTime)");
+
+                await EnsureTableAsync(dbContext, historyTable,
+                    "CREATE TABLE AppPlayHistories (" +
+                    "Id char(36) NOT NULL, UserId char(36) NOT NULL, EntId varchar(64) NOT NULL, " +
+                    "CatType int NOT NULL, Title varchar(256) NOT NULL, Cover varchar(512) NULL, " +
+                    "EpisodeIndex int NOT NULL, CreationTime datetime(6) NOT NULL, PRIMARY KEY (Id))",
+                    "CREATE UNIQUE INDEX UX_AppPlayHistories_UserEntCat ON AppPlayHistories (UserId, EntId, CatType);" +
+                    "CREATE INDEX IX_AppPlayHistories_UserCreation ON AppPlayHistories (UserId, CreationTime)");
+            }
+            else
+            {
+                await EnsureTableAsync(dbContext, favoritesTable,
+                    "CREATE TABLE AppFavorites (" +
+                    "Id text NOT NULL, UserId text NOT NULL, EntId varchar(64) NOT NULL, " +
+                    "CatType integer NOT NULL, Title varchar(256) NOT NULL, Cover varchar(512) NULL, " +
+                    "CreationTime text NOT NULL, CONSTRAINT PK_AppFavorites PRIMARY KEY (Id))",
+                    "CREATE UNIQUE INDEX UX_AppFavorites_UserEntCat ON AppFavorites (UserId, EntId, CatType);" +
+                    "CREATE INDEX IX_AppFavorites_UserCreation ON AppFavorites (UserId, CreationTime)");
+
+                await EnsureTableAsync(dbContext, historyTable,
+                    "CREATE TABLE AppPlayHistories (" +
+                    "Id text NOT NULL, UserId text NOT NULL, EntId varchar(64) NOT NULL, " +
+                    "CatType integer NOT NULL, Title varchar(256) NOT NULL, Cover varchar(512) NULL, " +
+                    "EpisodeIndex integer NOT NULL, CreationTime text NOT NULL, CONSTRAINT PK_AppPlayHistories PRIMARY KEY (Id))",
+                    "CREATE UNIQUE INDEX UX_AppPlayHistories_UserEntCat ON AppPlayHistories (UserId, EntId, CatType);" +
+                    "CREATE INDEX IX_AppPlayHistories_UserCreation ON AppPlayHistories (UserId, CreationTime)");
+            }
+        }
+
+        private static async Task EnsureTableAsync(AppDbContext dbContext, string tableName, string createTable, string createIndexes)
+        {
+            try
+            {
+                // 探测表是否存在：能查到就跳过，避免重复建表（表名取自常量，无注入风险）
+#pragma warning disable EF1002
+                await dbContext.Database.ExecuteSqlRawAsync($"SELECT 1 FROM `{tableName}` LIMIT 1");
+#pragma warning restore EF1002
+                return;
+            }
+            catch (Exception)
+            {
+                // 表不存在，建表并建索引
+            }
+
+            await dbContext.Database.ExecuteSqlRawAsync(createTable);
+            if (!string.IsNullOrWhiteSpace(createIndexes))
+            {
+                await dbContext.Database.ExecuteSqlRawAsync(createIndexes);
+            }
         }
     }
 }

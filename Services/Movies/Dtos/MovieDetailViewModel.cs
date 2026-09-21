@@ -20,6 +20,16 @@
 
         public CatType CatType { get; set; }
 
+        /// <summary>
+        /// 封面地址（收藏时作为快照一并保存）
+        /// </summary>
+        public string? Cover { get; set; }
+
+        /// <summary>
+        /// 当前登录用户是否已收藏该影视，作为详情页收藏按钮的初始状态
+        /// </summary>
+        public bool IsFavorited { get; set; }
+
         public bool Vip { get; set; }
 
         /// <summary>

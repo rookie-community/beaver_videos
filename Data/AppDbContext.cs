@@ -18,6 +18,10 @@ namespace Beaver.Data
 
         public DbSet<User> Users => Set<User>();
 
+        public DbSet<Favorite> Favorites => Set<Favorite>();
+
+        public DbSet<PlayHistory> PlayHistories => Set<PlayHistory>();
+
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             // 原生 DbContext 没有审计拦截器，创建时间在这里统一补：

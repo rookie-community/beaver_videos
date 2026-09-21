@@ -29,6 +29,9 @@ BeaverVideos/
 ├── AppModule.cs               # ABP 模块：DI 注册、中间件管道、启动时首次建库
 ├── appsettings.json           # 正式环境配置（DatabaseType=MySql）
 ├── appsettings.Development.json # 测试环境覆盖项（DatabaseType=Sqlite）
+├── Dockerfile                 # 容器镜像构建（多阶段：sdk:9.0 构建 → aspnet:9.0 运行）
+├── libman.json                # 前端库清单（Layui、jQuery、xm-select、Font Awesome 等，供 LibMan 还原）
+├── Properties/                # launchSettings.json（环境变量与端口）等
 ├── Data/                      # 数据访问层
 │   ├── AppDbContext.cs        #   原生 DbContext（含创建时间自动填充）
 │   ├── DatabaseProvider.cs    #   数据库提供程序枚举（Sqlite / MySql）
@@ -51,8 +54,10 @@ BeaverVideos/
 ├── Menus/                     # 左侧菜单 ViewComponent 与 MenuItemDto
 ├── Models/                    # 通用模型（LayuiResultDto、ErrorViewModel）
 ├── Extensions/                # 枚举与 DTO 扩展
+├── Migrations/                # 空目录：本项目未启用 EF Core 迁移（建库走 EnsureCreated）
 ├── Views/                     # Razor 视图（Home / Account / Equipment / Shared）
-└── wwwroot/                   # 静态资源（Layui、Font Awesome、jQuery、xm-select 等）
+├── wwwroot/                   # 静态资源（Layui、Font Awesome、jQuery、xm-select 等）
+└── LICENSE                    # MIT 开源协议
 ```
 
 ## 数据库
@@ -76,11 +81,11 @@ appsettings.json  →  appsettings.{环境}.json  →  环境变量  →  命令
 `{环境}` 取自 `ASPNETCORE_ENVIRONMENT`（或 `DOTNET_ENVIRONMENT`），**未设置即为 `Production`**。
 
 ```jsonc
-// appsettings.json —— 正式环境
+// appsettings.json —— 正式环境（当前仓库默认值，部署时替换）
 {
   "DatabaseType": "MySql",
   "ConnectionStrings": {
-    "Default": "server=127.0.0.1;port=3306;database=BeaverVideos;user=root;password=CHANGE_ME;"
+    "Default": "server=172.17.0.13;port=28937;database=BeaverVideos;user=user;password=Aa123456;"
   }
 }
 ```
@@ -109,9 +114,9 @@ appsettings.json  →  appsettings.{环境}.json  →  环境变量  →  命令
 - **种子数据**：声明在实体配置类里（如 `UserConfiguration` 的 `HasData`），随建库一并插入，只写这一次。
   种子里的口令哈希用**固定盐**生成（见 `Data/AppSeedData.cs`），值确定，既能作为模型种子，
   也能被 `PasswordHasher` 正常校验——默认账号 `admin` / `123456` 可照常登录。
-- **结构变更用手工 SQL**：本项目**不依赖自动迁移机制**——启动时不再 `MigrateAsync`，
-  仓库中也没有 `Migrations/` 目录与 `__EFMigrationsHistory` 表。需要加表 / 加列 / 改类型时，
-  手工编写 SQL 并在目标库上执行，例如：
+- **结构变更用手工 SQL**：本项目**不依赖自动迁移机制**——启动时不做 `MigrateAsync`，
+  仓库中的 `Migrations/` 是**空目录（未启用迁移）**，目标库里也没有 `__EFMigrationsHistory` 表。
+  需要加表 / 加列 / 改类型时，手工编写 SQL 并在目标库上执行，例如：
 
   ```sql
   -- 给账号表增加一列（SQLite 与 MySQL 的 DDL 写法不同，两个库需分别执行）
@@ -192,6 +197,18 @@ cd out && dotnet BeaverVideos.dll
 首次启动时执行 `EnsureCreatedAsync()`，按当前模型在 MySQL 上建表，并写入 `HasData` 声明的默认管理员账号；
 库已存在时不做任何改动，后续表结构变更请手工执行 SQL（见上文「建库与结构变更」）。
 
+### 容器（Docker）
+
+```bash
+docker build -t beavervideos .
+docker run -d -p 8080:8080 --name beavervideos beavervideos
+```
+
+镜像基于 `mcr.microsoft.com/dotnet/aspnet:9.0`，容器内监听 `HTTP 8080` / `HTTPS 8081`
+（与 `Properties/launchSettings.json` 的 `Container (Dockerfile)` profile 一致）。
+容器内不设置 `ASPNETCORE_ENVIRONMENT`，因此读取 `appsettings.json`，即默认使用 MySQL；
+连的是哪个库由该文件的 `ConnectionStrings:Default` 决定，容器内请把地址改成容器可达的主机。
+
 ## 与重构前的对应关系
 
 | 重构前 | 重构后 |
@@ -217,10 +234,11 @@ cd out && dotnet BeaverVideos.dll
    编译的，若使用 4.0.0（重构前的实际解析结果）会让 `ToActionResult()` 抛
    `MissingMethodException`，影视详情页在上游接口报错时会返回 500。
 4. 影视数据来自第三方接口（`api.web.360kan.com` 等），其可用性不受本项目控制。
-5. **表结构变更靠手工 SQL**：项目不使用 EF Core 迁移，库里没有 `__EFMigrationsHistory` 表，
-   因此不要对已有库执行 `dotnet ef database update`（会尝试从零建表而报「表已存在」），
-   也不要指望启动时自动升级结构。
-6. **`appsettings.json` 里的 MySQL 连接串是占位值**（`password=CHANGE_ME`），部署前必须替换；
+5. **表结构变更靠手工 SQL**：项目不使用 EF Core 迁移（`Migrations/` 目录为空），库里没有
+   `__EFMigrationsHistory` 表，因此不要对已有库执行 `dotnet ef database update`
+   （会尝试从零建表而报「表已存在」），也不要指望启动时自动升级结构。
+6. **`appsettings.json` 里的 MySQL 连接串是仓库内的默认值**（当前指向内网
+   `172.17.0.13:28937`），部署前必须替换为正式库地址与账号口令；
    应用启动时用 `ServerVersion.AutoDetect` 连库探测一次 MySQL 版本，数据库不可达会直接启动失败，
    请确保网络与账号可用。
 

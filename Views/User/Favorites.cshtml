@@ -1,0 +1,110 @@
+@using Beaver.Services.Favorites.Dtos
+@model List<FavoriteDto>
+@{
+    ViewData["title"] = "我的收藏";
+}
+
+<div class="layui-container ws-user-center">
+    <partial name="_MovieSearchPartial" model="string.Empty" />
+
+    <div class="section-header">
+        <h2 class="section-title">
+            <i class="layui-icon layui-icon-star-fill"></i>我的收藏
+            <span class="ws-count">(@Model.Count)</span>
+        </h2>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="ws-empty">
+            <i class="layui-icon layui-icon-rate"></i>
+            <p>还没有收藏任何影视，去首页逛逛吧～</p>
+            <a class="layui-btn layui-btn-danger" asp-area="" asp-controller="Home" asp-action="Index">返回首页</a>
+        </div>
+    }
+    else
+    {
+        @Html.AntiForgeryToken()
+        <div class="movie-grid">
+            @foreach (var item in Model)
+            {
+                <div class="movie-card" data-ent-id="@item.EntId" data-cat-type="@((int)item.CatType)">
+                    <a asp-area="" asp-controller="Home" asp-action="Detail"
+                       asp-route-entId="@item.EntId" asp-route-catType="@((int)item.CatType)"
+                       class="movie-link">
+                        <div class="movie-poster">
+                            <img src="@item.Cover" alt="@item.Title" loading="lazy">
+                            <div class="movie-overlay">
+                                <span class="play-icon"><i class="layui-icon layui-icon-play"></i></span>
+                            </div>
+                        </div>
+                        <div class="movie-info">
+                            <h3 class="movie-title">@item.Title</h3>
+                            <p class="movie-desc">@item.CreationTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm") 收藏</p>
+                        </div>
+                    </a>
+                    <button type="button" class="layui-btn layui-btn-xs ws-remove-btn" data-role="remove-favorite">
+                        <i class="layui-icon layui-icon-delete"></i>取消收藏
+                    </button>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .ws-user-center { padding-bottom: 30px; }
+    .ws-user-center .section-header { margin: 20px 0 10px; }
+    .ws-count { font-size: 16px; color: #999; }
+    .ws-empty {
+        text-align: center;
+        padding: 60px 0;
+        color: #999;
+    }
+    .ws-empty .layui-icon { font-size: 48px; color: #FF5722; }
+    .ws-empty p { margin: 16px 0; }
+    .movie-card { position: relative; }
+    .ws-remove-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(0,0,0,.55);
+        color: #fff;
+        border: none;
+        z-index: 2;
+    }
+</style>
+
+@section Scripts {
+    <partial name="_MovieSearchScriptsPartial" />
+    <script type="text/javascript">
+        layui.use(function () {
+            var $ = layui.$;
+            $(document).on('click', '[data-role="remove-favorite"]', function () {
+                var btn = $(this);
+                var card = btn.closest('.movie-card');
+                var entId = card.data('ent-id');
+                var catType = card.data('cat-type');
+                if (!entId) { return; }
+
+                btn.prop('disabled', true);
+                $.ajax({
+                    url: '/Favorite/Toggle',
+                    type: 'POST',
+                    data: { entId: entId, catType: catType, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() }
+                }).done(function (result) {
+                    if (result && result.code === 0) {
+                        layui.layer.msg('已取消收藏', { icon: 1 });
+                        card.fadeOut(200, function () { $(this).remove(); });
+                    } else {
+                        btn.prop('disabled', false);
+                        layui.layer.msg((result && result.msg) || '操作失败', { icon: 2 });
+                    }
+                }).fail(function () {
+                    btn.prop('disabled', false);
+                    layui.layer.msg('网络错误，请重试', { icon: 2 });
+                });
+            });
+        });
+    </script>
+}
